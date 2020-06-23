@@ -1,0 +1,9 @@
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+####################################################
+# DEBIAN ALIASES
+####################################################
+alias allsblk="lsblk -o name,fstype,size,mountpoint,partuuid"
+alias alportsinuse='sudo netstat -tulpn'
+alias alwwwhtml='cd /var/www/html'
+

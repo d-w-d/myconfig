@@ -1,0 +1,42 @@
+##############################################
+# Logic to determine OS type
+##############################################
+
+OS=""
+if [[ $(uname -s) == Darwin ]]; then OS="MACOS"; fi
+
+if [[ $(uname -s) == Linux ]]; then
+    if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
+        OS="RHEL"
+    fi
+    if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
+        OS="DEBIAN"
+    fi
+fi
+
+##############################################
+# Source config files common to all OSes
+##############################################
+source ./COMMON/common_entry
+
+##############################################
+# Source config files based on OS type
+##############################################
+
+case "$OS" in
+MACOS)
+    echo "Macos is the case"
+    source ./MACOS/source_macos
+    ;;
+DEBIAN)
+    echo "Debian is the case"
+    source ./DEBIAN/source_debian
+    ;;
+RHEL)
+    echo "Red Hat is the case"
+    source ./RHEL/source_rhel
+    ;;
+*)
+    echo "Source failed to identify this OS. Only 'Common' shell settings applied."
+    ;;
+esac
