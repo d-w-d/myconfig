@@ -15,9 +15,14 @@ if [[ $(uname -s) == Linux ]]; then
 fi
 
 ##############################################
+### Get dir this script is in:
+##############################################
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+##############################################
 # Source config files common to all OSes
 ##############################################
-source ./COMMON/common_entry
+source $DIR/COMMON/source_common
 
 ##############################################
 # Source config files based on OS type
@@ -25,16 +30,16 @@ source ./COMMON/common_entry
 
 case "$OS" in
 MACOS)
-    echo "Macos is the case"
-    source ./MACOS/source_macos
+    echo "Shell set up for MACOS"
+    source $DIR/../MACOS/source_macos
     ;;
 DEBIAN)
-    echo "Debian is the case"
-    source ./DEBIAN/source_debian
+    echo "Shell set up for Debian"
+    source $DIR/../DEBIAN/source_debian
     ;;
 RHEL)
-    echo "Red Hat is the case"
-    source ./RHEL/source_rhel
+    echo "Shell set up for RHEL"
+    source $DIR/../RHEL/source_rhel
     ;;
 *)
     echo "Source failed to identify this OS. Only 'Common' shell settings applied."
