@@ -1,9 +1,7 @@
-#!/bin/bash
-
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+#!/usr/bin/env false
 
 ##############################################################
-# MAC-Specifi Aliases 
+# MAC-Specific Aliases
 ##############################################################
 
 alias alcoreapps='open /System/Library/CoreServices/Applications'

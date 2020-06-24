@@ -1,3 +1,12 @@
+#!/usr/bin/env false
+
+##############################################################
+### Inherit $MYCONFIG_ROOT_DIR from parent script
+##############################################################
+MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
+
+echo $MYCONFIG_ROOT_DIR"<<< 0"
+
 ##############################################
 # Logic to determine OS type
 ##############################################
@@ -6,42 +15,49 @@ OS=""
 if [[ $(uname -s) == Darwin ]]; then OS="MACOS"; fi
 
 if [[ $(uname -s) == Linux ]]; then
-    if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
-        OS="RHEL"
-    fi
-    if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
-        OS="DEBIAN"
-    fi
+  if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
+    OS="RHEL"
+  fi
+  if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
+    OS="DEBIAN"
+  fi
 fi
 
 ##############################################
 ### Get dir this script is in:
 ##############################################
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+#DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+#DIR2="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+# MYCONFIG_ROOT_DIR=$(./_getdir)
+# echo "Python DIR: $MYCONFIG_ROOT_DIR"
 
+echo $MYCONFIG_ROOT_DIR"<<< 0.10"
 ##############################################
 # Source config files common to all OSes
 ##############################################
-source $DIR/COMMON/source_common
+source $MYCONFIG_ROOT_DIR/COMMON/source_common
 
+echo $MYCONFIG_ROOT_DIR"<<< 0.50"
 ##############################################
 # Source config files based on OS type
 ##############################################
 
+echo $MYCONFIG_ROOT_DIR"<<< 1"
+
 case "$OS" in
 MACOS)
-    echo "Shell set up for MACOS"
-    source $DIR/../MACOS/source_macos
-    ;;
+  echo "Shell set up for MACOS"
+  source $MYCONFIG_ROOT_DIR/MACOS/source_macos
+  ;;
 DEBIAN)
-    echo "Shell set up for Debian"
-    source $DIR/../DEBIAN/source_debian
-    ;;
+  echo "Shell set up for Debian"
+  source $MYCONFIG_ROOT_DIR/DEBIAN/source_debian
+  ;;
 RHEL)
-    echo "Shell set up for RHEL"
-    source $DIR/../RHEL/source_rhel
-    ;;
+  echo "Shell set up for RHEL"
+  source $MYCONFIG_ROOT_DIR/RHEL/source_rhel
+  ;;
 *)
-    echo "Source failed to identify this OS. Only 'Common' shell settings applied."
-    ;;
+  echo "Source failed to identify this OS. Only 'Common' shell settings applied."
+  ;;
 esac

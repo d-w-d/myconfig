@@ -1,7 +1,11 @@
-### Get dir this script is in:
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+#!/usr/bin/env false
+
+##############################################################
+### Inherit $MYCONFIG_ROOT_DIR from parent script
+##############################################################
+MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
 ### Source 'em:
-source $DIR/debian_aliases
-source $DIR/debian_functions
-source $DIR/debian_env
+source $MYCONFIG_ROOT_DIR/DEBIAN/debian_aliases
+source $MYCONFIG_ROOT_DIR/DEBIAN/debian_functions
+source $MYCONFIG_ROOT_DIR/DEBIAN/debian_env

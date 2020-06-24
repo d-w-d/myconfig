@@ -1,9 +1,11 @@
+#!/usr/bin/env false
+
 ###################################################
 ### Customize command prompt:
 ###################################################
 
-### See: https://bit.ly/31cn9qa 
-### If __git_ps1 is defined (by sourcing bash_completion previously) 
+### See: https://bit.ly/31cn9qa
+### If __git_ps1 is defined (by sourcing bash_completion previously)
 ### then include active branch in prompt:
 
 DEFAULT=$PS1

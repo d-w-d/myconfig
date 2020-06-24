@@ -1,9 +1,13 @@
+#!/usr/bin/env false
+
 ##############################################################
 ### LOAD USEFUL PATHS & ENV VARS
 ##############################################################
 
-### HOMEBREW PATHS
-export PATH="/usr/local/sbin:$PATH"
+### iTerm2 Utilities
+###   To create ~/.iterm2 dir, you need to run `iterm2 > Install Shell Integration` with
+###   `Also install iTerm2 Utilities` checked
+export PATH="$HOME/.iterm2:$PATH"
 
 ### Latest Yarn
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"

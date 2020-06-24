@@ -1,10 +1,16 @@
-### Get dir this script is in:
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+#!/usr/bin/env false
+
+##############################################################
+### Inherit $MYCONFIG_ROOT_DIR from parent script
+##############################################################
+MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
 # Source 'em:
-source $DIR/common_aliases
-source $DIR/common_env
-source $DIR/common_functions
-source $DIR/common_iterm2
-source $DIR/common_setup_scripts
-source $DIR/common_shell_prompt
+source $MYCONFIG_ROOT_DIR/COMMON/common_aliases
+source $MYCONFIG_ROOT_DIR/COMMON/common_env
+source $MYCONFIG_ROOT_DIR/COMMON/common_functions
+#source $MYCONFIG_ROOT_DIR/COMMON/common_iterm2
+source $MYCONFIG_ROOT_DIR/COMMON/common_setup_scripts
+source $MYCONFIG_ROOT_DIR/COMMON/common_shell_prompt
+
+
