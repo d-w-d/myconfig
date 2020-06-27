@@ -5,8 +5,6 @@
 ##############################################################
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
-echo $MYCONFIG_ROOT_DIR"<<< 0"
-
 ##############################################
 # Logic to determine OS type
 ##############################################
@@ -24,25 +22,15 @@ if [[ $(uname -s) == Linux ]]; then
 fi
 
 ##############################################
-### Get dir this script is in:
-##############################################
-#DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-#DIR2="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-# MYCONFIG_ROOT_DIR=$(./_getdir)
-# echo "Python DIR: $MYCONFIG_ROOT_DIR"
-
-echo $MYCONFIG_ROOT_DIR"<<< 0.10"
-##############################################
 # Source config files common to all OSes
 ##############################################
 source $MYCONFIG_ROOT_DIR/COMMON/source_common
 
-echo $MYCONFIG_ROOT_DIR"<<< 0.50"
 ##############################################
 # Source config files based on OS type
 ##############################################
 
-echo $MYCONFIG_ROOT_DIR"<<< 1"
+clear 
 
 case "$OS" in
 MACOS)
