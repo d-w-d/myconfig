@@ -54,6 +54,12 @@ echo "alias vim='MYVIMRC=/tmp/myconfig/.vimrc vim'" >>$TEMPFILE
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 cd $PREVIOUSDIR
 
+[ ! -d ~/.vim/bundle/Vundle.vim ] && git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+vim +PluginInstall +qall
+
+
+
 ###############################################
 # Printout instructions
 ###############################################
