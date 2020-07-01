@@ -39,21 +39,20 @@ command -v git >/dev/null 2>&1 || abort_install "Git is not installed. Aborting 
 PREVIOUSDIR=$PWD
 if [[ -d /tmp/myconfig ]]; then
     cd /tmp/myconfig
-    git stash
-    git pull
+    git fetch origin
+    git checkout master
+    git reset --hard origin/master
 else
     cd /tmp
     git clone https://github.com/dan-drago/myconfig.git
     cd myconfig
 fi
 
-
 TEMPFILE=$(mktemp)
-cat /tmp/myconfig/entry.sh > $TEMPFILE
-echo "alias vim='MYVIMRC=/tmp/myconfig/.vimrc vim'" >> $TEMPFILE
+cat /tmp/myconfig/entry.sh >$TEMPFILE
+echo "alias vim='MYVIMRC=/tmp/myconfig/.vimrc vim'" >>$TEMPFILE
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 cd $PREVIOUSDIR
-
 
 ###############################################
 # Printout instructions
