@@ -1,5 +1,7 @@
+#!/usr/bin/env false
+
 ##################################################
-# Source this file via alias 'alnvm' 
+# Source this file via alias 'alnvm'
 ##################################################
 
 echo "INITIALIZING NVM"
@@ -13,3 +15,7 @@ npm config set ignore-scripts false     # "unsafe" but practical
 
 # Enable the node REPL to find global node_modules
 export NODE_PATH="$(npm config get prefix)/lib/node_modules"
+
+# Add node executables globally installed by nvm-enables npm 
+export PATH="$PATH:$NVM_BIN"
+

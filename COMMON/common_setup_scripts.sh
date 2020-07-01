@@ -1,3 +1,5 @@
+#!/usr/bin/env false
+
 ################################################################
 ### iTerm Integration
 ### (You first need to run `iTerm2 > Install Shell Integration`
@@ -7,5 +9,5 @@
 
 ### GIT AUTOCOMPLETION
 ### See: https://github.com/bobthecow/git-flow-completion/wiki/Install-Bash-git-completion
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+[[ $SHELL == '/bin/bash' ]] && [[ -f /usr/local/etc/bash_completion ]] && . /usr/local/etc/bash_completion
 

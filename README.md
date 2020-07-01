@@ -1,12 +1,11 @@
 # Myconfig
-
 ## What's This?
 
 This repo is used as a single source of truth for setting up bash/zsh shell environments, with customized settings for MacOS, debian and centos machines. 
 
 ## Quick Start
 
-`curl XXX | _install`
+`curl -o- https://raw.githubusercontent.com/dan-drago/myconfig/master/_install | bash `
 
 ## Technologies Configured
 

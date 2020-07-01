@@ -1,23 +1,18 @@
+#!/usr/bin/env false
+
 ##############################################################
 ### LOAD USEFUL PATHS & ENV VARS
 ##############################################################
 
-### HOMEBREW PATHS
-export PATH="/usr/local/sbin:$PATH"
+### iTerm2 Utilities
+###   To create ~/.iterm2 dir, you need to run `iterm2 > Install Shell Integration` with
+###   `Also install iTerm2 Utilities` checked
+export PATH="$HOME/.iterm2:$PATH"
 
-### Set up goProgramming Paths; see: https://stackoverflow.com/a/10847122
+### Set up goLang Paths; see: https://stackoverflow.com/a/10847122
 export GOPATH=$HOME/work/goProgramming:$HOME/work/goProgramming/bin
 export GOROOT=$HOME/work/goProgramming
 export PATH=$PATH:$GOROOT/bin
-
-### JAVA
-export M2_HOME=$HOME/work/Java/_apache-maven-3.5.4
-export PATH=$PATH:$HOME/work/Java/_apache-maven-3.5.4/bin
-
-### PHP Attempt
-export PATH=$PATH:$HOME/.composer/vendor/bin
-
-### PYTHON
 
 ### HOMEBREW-GDL RECOMMENDED
 # "If you need to have icu4c first in your PATH run:"

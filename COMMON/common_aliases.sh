@@ -1,5 +1,9 @@
-### Get dir this script is in:
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+#!/usr/bin/env false
+
+##############################################################
+### Inherit $MYCONFIG_ROOT_DIR from parent script
+##############################################################
+MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
 ##############################################################
 # Modify 'ls' family (this assumes you use a recent GNU ls).
@@ -7,7 +11,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 alias ls='ls -GF'               # Sort with color and file-type indicator
 alias lsDirsOnly='ls -d'        # List just dir names (not their content).
-alias lsSortBySize='ls -Sr'     # Sort by size, biggest last 
+alias lsSortBySize='ls -Sr'     # Sort by size, biggest last
 alias lt='ls -ltr'              # Sort by date, most recent last.
 
 ##############################################################
@@ -16,13 +20,13 @@ alias lt='ls -ltr'              # Sort by date, most recent last.
 
 alias alcatcolored='highlight -O ansi --force'
 alias alhttp-server='http-server'
-alias alimgcat='~/.local/bin/imgcat --height 10' # For imgcat installed with 
+alias alimgcat='~/.local/bin/imgcat --height 10' # For imgcat installed with
                                                  # `pip3 install --user imgcat`
 alias alipaddress="curl http://ipecho.net/plain; echo"
 alias aljs='cd ~/work/javascript'
 alias allocaltunnel='lt' ### Use e.g. --port 8080
 alias alnpmconfigsetignorescripts="printf '\n\n This alias must be followed by true or false! \n\n';npm config set ignore-scripts"
-alias alnvm="source $DIR/_common_nvm"
+alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm"
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
 alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"commonjs\",\"lib\":[\"es2015\",\"dom\"]}"'

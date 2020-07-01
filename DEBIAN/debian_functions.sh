@@ -1,3 +1,5 @@
+#!/usr/bin/env false
+
 ##################################################################
 ### Useful functions for debian
 ##################################################################
@@ -9,7 +11,11 @@ fun_volt_calc() {
         echo -e "$id:\t$(vcgencmd measure_volts $id)"
     done
 }
-export -f fun_volt_calc
+#export -f fun_volt_calc
+
+function fun_temp {
+    echo "Temp function is working"
+}
 
 # Show all users
 fun_show_all_users() {
