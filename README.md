@@ -5,7 +5,7 @@ This repo is used as a single source of truth for setting up bash/zsh shell envi
 
 ## Quick Start
 
-`curl -o- https://raw.githubusercontent.com/dan-drago/myconfig/master/_install | bash `
+`TMPFILE=$(mktemp); curl -o- https://raw.githubusercontent.com/dan-drago/myconfig/master/install.sh > $TMPFILE; bash --rcfile $TMPFILE `
 
 ## Technologies Configured
 
