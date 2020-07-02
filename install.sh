@@ -20,9 +20,50 @@ function abort_install() {
     exit 1
 }
 
-function myconfig_full_installation() {
-    echo "Full installation place holder"
+function myconfig_full_installation {
+    echo "Installing myconfig to $HOME/.myconfig"
 
+    ### Copy to ~/.myconfig
+    if [[ -d $HOME/.myconfig ]]; then
+        echo """
+        $HOME/.myconfig already exists. Replace it?
+        1. Yes
+        2. No
+        """
+        read -n1 CHOICE
+        if [[ $CHOICE == 1 ]]; then
+            rm -rf $HOME/.myconfig
+            cp -R /tmp/myconfig $HOME/.myconfig
+        fi
+    else
+        cp -R /tmp/myconfig $HOME/.myconfig
+    fi
+
+    ### Add sourcing to bashr
+    bashOrZsh=${$1:-bash}
+    MATCHLINE='######### MYCONFIG #########'
+    STAMP+='###############################'
+    STAMP+='## KEEP THIS BLOCK AS A UNIT ##'
+    STAMP+='###############################'
+    STAMP+=$MATCHLINE
+    STAMP+="source $HOME/.myconfig/entry"
+    STAMP+='###############################'
+    STAMP+='## KEEP THIS BLOCK AS A UNIT ##'
+    STAMP+='###############################'
+    if [[ $(grep "$MATCHLINE" $HOME/.bashrc | wc -l) -ge 1 ]]; then
+
+        echo """
+        It looks like you're already sourcing myconfig from ~/.${bashOrZsh}rc.
+        Would you like to re-insert it?
+        1. Yes
+        2. No
+        """
+        read -n1 CHOICE
+        if [[ $CHOICE == 1 ]];then
+            echo $STAMP >> $HOME/.{$bashOrZsh}rc
+        fi
+    fi
+    echo "Installation complete"
 }
 
 ###############################################
@@ -60,14 +101,14 @@ echo "alias vim='vim -N -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
 echo "cd $PREVIOUSDIR" >>$TEMPFILE
 echo '
 clear
-echo -e """\033[32m 
+echo -e """\033[32m
 Source scripts have been saved to /tmp/myconfig
 Bash has sourced /tmp/myconfig/entry.sh
-Vim is aliased to $(type vim)
+type vim: $(type vim)
 \033[37m
 """
 
-echo -e """\033[32m 
+echo -e """\033[32m
 For full installation of shell configurations:
 
 myconfig_install_bash
@@ -79,5 +120,3 @@ MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 ###############################################
 # Printout instructions
 ###############################################
-
-
