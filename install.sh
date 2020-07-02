@@ -63,7 +63,7 @@ clear
 echo -e """\033[32m 
 Source scripts have been saved to /tmp/myconfig
 Bash has sourced /tmp/myconfig/entry.sh
-Vim is aliased to 'vim -u /tmp/myconfig/.vimrc'
+Vim is aliased to $(type vim)
 \033[37m
 """
 
