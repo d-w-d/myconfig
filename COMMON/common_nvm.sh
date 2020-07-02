@@ -6,7 +6,7 @@
 
 echo "INITIALIZING NVM"
 export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
+source "$HOME/.nvm/nvm.sh"
 nvm use 10
 
 # Safety measure recommended by this dude: https://youtu.be/24tQRwIRP_w?t=961

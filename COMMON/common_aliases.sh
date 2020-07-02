@@ -19,14 +19,14 @@ alias lt='ls -ltr'              # Sort by date, most recent last.
 ##############################################################
 
 alias alcatcolored='highlight -O ansi --force'
-alias alhttp-server='http-server'
+alias alhttpserver='http-server'
 alias alimgcat='~/.local/bin/imgcat --height 10' # For imgcat installed with
                                                  # `pip3 install --user imgcat`
 alias alipaddress="curl http://ipecho.net/plain; echo"
 alias aljs='cd ~/work/javascript'
 alias allocaltunnel='lt' ### Use e.g. --port 8080
 alias alnpmconfigsetignorescripts="printf '\n\n This alias must be followed by true or false! \n\n';npm config set ignore-scripts"
-alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm"
+alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh"
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
 alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"commonjs\",\"lib\":[\"es2015\",\"dom\"]}"'

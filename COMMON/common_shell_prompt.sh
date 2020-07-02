@@ -10,7 +10,7 @@
 
 DEFAULT=$PS1
 
-if [ -n "$(type -t __git_ps1)" ]; then
+if [ $BASH ] && [ -n "$(type -t __git_ps1)" ]; then
     #echo "__git_ps1 is not null; adding to bash prompt"
     ### This is taken from lynda.com git tutorial: export PS1='\W$(__git_ps1 "(%s)") > '
     PS1='\n\[\033[01;32m\][ \W \[\033[01;33m\]$(__git_ps1 "| %s ")\[\033[01;32m\]] \[\033[00m\] '
