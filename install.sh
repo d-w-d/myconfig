@@ -56,7 +56,7 @@ fi
 ### Create bashrc file and start new shell
 TEMPFILE=$(mktemp)
 cat /tmp/myconfig/entry.sh >$TEMPFILE
-echo "alias vim='vim -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
+echo "alias vim='vim -N -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
 echo "cd $PREVIOUSDIR" >>$TEMPFILE
 echo '
 clear
