@@ -50,20 +50,15 @@ else
     cd myconfig
 fi
 
+### Install VIM and plugins quietly in background
+[ ! -d ~/.vim/bundle/Vundle.vim ] && git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u $PWD/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+
+### Create bashrc file and start new shell
 TEMPFILE=$(mktemp)
 cat /tmp/myconfig/entry.sh >$TEMPFILE
 echo "alias vim='vim -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
 echo "cd $PREVIOUSDIR" >>$TEMPFILE
-MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
-
-[ ! -d ~/.vim/bundle/Vundle.vim ] && git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim  > /dev/null 2>&1
-
-vim -N -u $PWD/.vimrc +PluginInstall +qall > /dev/null 2>&1
-
-###############################################
-# Printout instructions
-###############################################
-
+echo '
 clear
 echo -e """\033[32m 
 Source scripts have been saved to /tmp/myconfig
@@ -78,3 +73,11 @@ For full installation of shell configurations:
 myconfig_install_bash
 \033[37m
 """
+' >>$TEMPFILE
+MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
+
+###############################################
+# Printout instructions
+###############################################
+
+
