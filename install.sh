@@ -50,7 +50,7 @@ fi
 
 TEMPFILE=$(mktemp)
 cat /tmp/myconfig/entry.sh >$TEMPFILE
-echo "alias vim='MYVIMRC=/tmp/myconfig/.vimrc vim'" >>$TEMPFILE
+echo "alias vim='vim -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 cd $PREVIOUSDIR
 
@@ -66,7 +66,7 @@ clear
 echo -e """\033[32m 
 Source scripts have been saved to /tmp/myconfig
 Bash has sourced /tmp/myconfig/entry.sh
-Vim is aliased to 'MYVIMRC=/tmp/myconfig/.vimrc vim'
+Vim is aliased to 'vim -u /tmp/myconfig/.vimrc'
 \033[37m
 """
 
