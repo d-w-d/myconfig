@@ -111,10 +111,11 @@ type vim: $(type vim)
 echo -e """\033[32m
 For full installation of shell configurations:
 
-myconfig_install_bash
+myconfig_full_installation
 \033[37m
 """
 ' >>$TEMPFILE
+echo $(type myconfig_full_installation) >> $TEMPFILE
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 
 ###############################################
