@@ -38,11 +38,13 @@ command -v git >/dev/null 2>&1 || abort_install "Git is not installed. Aborting 
 
 PREVIOUSDIR=$PWD
 if [[ -d /tmp/myconfig ]]; then
+    echo "Updating git repo for myconfig..."
     cd /tmp/myconfig
     git fetch origin
     git checkout master
     git reset --hard origin/master
 else
+    echo "Cloning git repo for myconfig..."
     cd /tmp
     git clone https://github.com/dan-drago/myconfig.git
     cd myconfig
@@ -51,10 +53,10 @@ fi
 TEMPFILE=$(mktemp)
 cat /tmp/myconfig/entry.sh >$TEMPFILE
 echo "alias vim='vim -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
+echo "cd $PREVIOUSDIR" >>$TEMPFILE
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
-cd $PREVIOUSDIR
 
-[ ! -d ~/.vim/bundle/Vundle.vim ] && git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim 
+[ ! -d ~/.vim/bundle/Vundle.vim ] && git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim  > /dev/null 2>&1
 
 vim -N -u $PWD/.vimrc +PluginInstall +qall > /dev/null 2>&1
 
