@@ -115,7 +115,11 @@ myconfig_full_installation
 \033[37m
 """
 ' >>$TEMPFILE
-echo $(declare -f myconfig_full_installation) >> $TEMPFILE
+echo """
+    myconfig_full_installation(){
+        $( type myconfig_full_installation | sed '1,3d;$d')
+    }
+""" >> $TEMPFILE
 cat $TEMPFILE > temp.txt
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 
