@@ -40,7 +40,7 @@ function myconfig_full_installation {
     fi
 
     ### Add sourcing to bashr
-    bashOrZsh=${$1:-bash}
+    bashOrZsh=${1:-bash}
     MATCHLINE='######### MYCONFIG #########'
     STAMP+='###############################'
     STAMP+='## KEEP THIS BLOCK AS A UNIT ##'
