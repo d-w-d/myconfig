@@ -115,7 +115,7 @@ myconfig_full_installation
 \033[37m
 """
 ' >>$TEMPFILE
-echo $(declare -f foobar) >> $TEMPFILE
+echo $(declare -f myconfig_full_installation) >> $TEMPFILE
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 
 ###############################################
