@@ -116,6 +116,7 @@ myconfig_full_installation
 """
 ' >>$TEMPFILE
 echo $(declare -f myconfig_full_installation) >> $TEMPFILE
+cat $TEMPFILE > temp.txt
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 
 ###############################################
