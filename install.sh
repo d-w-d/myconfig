@@ -59,7 +59,7 @@ function myconfig_full_installation {
         2. No
         """
         read -n1 CHOICE
-        if [[ $CHOICE == 1 ]];then
+        if [[ $CHOICE == 1 ]]; then
             echo $STAMP >> $HOME/.{$bashOrZsh}rc
         fi
     fi
