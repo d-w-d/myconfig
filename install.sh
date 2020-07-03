@@ -20,7 +20,7 @@ function abort_install() {
     exit 1
 }
 
-function myconfig_full_installation {
+function myconfig_full_installation() {
     echo "Installing myconfig to $HOME/.myconfig"
 
     ### Copy to ~/.myconfig
@@ -60,8 +60,10 @@ function myconfig_full_installation {
         """
         read -n1 CHOICE
         if [[ $CHOICE == 1 ]]; then
-            echo $STAMP >> $HOME/.{$bashOrZsh}rc
+            echo $STAMP >>$HOME/.{$bashOrZsh}rc
         fi
+    else
+        echo $STAMP >>$HOME/.{$bashOrZsh}rc
     fi
     echo "Installation complete"
 }
@@ -117,10 +119,10 @@ myconfig_full_installation
 ' >>$TEMPFILE
 echo """
     myconfig_full_installation(){
-        $( type myconfig_full_installation | sed '1,3d;$d')
+        $(type myconfig_full_installation | sed '1,3d;$d')
     }
-""" >> $TEMPFILE
-cat $TEMPFILE > temp.txt
+""" >>$TEMPFILE
+cat $TEMPFILE >temp.txt
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 
 ###############################################
