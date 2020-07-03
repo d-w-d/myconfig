@@ -48,7 +48,7 @@ function myconfig_full_installation() {
     MATCHLINE='######### MYCONFIG #########\n'
     STAMP+=$MATCHLINE
     STAMP+='###############################\n'
-    STAMP+="source $HOME/.myconfig/entry"
+    STAMP+="source $HOME/.myconfig/entry   \n"
     STAMP+='###############################\n'
     STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n'
     STAMP+='###############################\n'
