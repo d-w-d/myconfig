@@ -62,11 +62,11 @@ function myconfig_full_installation() {
         """
         read -n1 CHOICE
         if [[ $CHOICE == 1 ]]; then
-            echo $STAMP >>$HOME/.${$bashOrZsh}rc
+            echo $STAMP >>$HOME/.${bashOrZsh}rc
         fi
     else
-        echo "Installing to $HOME/.${$bashOrZsh}rc"
-        echo $STAMP >>$HOME/.${$bashOrZsh}rc
+        echo "Installing to $HOME/.${bashOrZsh}rc"
+        echo $STAMP >>$HOME/.${bashOrZsh}rc
     fi
     echo "Installation complete"
 }
