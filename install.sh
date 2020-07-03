@@ -5,7 +5,14 @@
 ###############################################
 
 TERM=ansi
-
+export BLA="\033[30m"
+export RED="\033[31m"
+export GRE="\033[32m"
+export YEL="\033[33m"
+export BLU="\033[34m"
+export MAG="\033[35m"
+export CYA="\033[36m"
+export WHI="\033[37m"
 ###############################################
 # Define helper functions
 ###############################################
@@ -21,19 +28,26 @@ function abort_install() {
 }
 
 function myconfig_full_installation() {
-    echo "Installing myconfig to $HOME/.myconfig"
+    clear
+    echo -e """$CYA
+        Installing myconfig to $HOME/.myconfig...\n\n
+    """
 
     ### Copy to ~/.myconfig
     if [[ -d $HOME/.myconfig ]]; then
-        echo """
+        clear
+        echo -e """$CYA
+        
         $HOME/.myconfig already exists. Replace it?
-        1. Yes
-        2. No
+        ${RED}1. Yes
+        ${GRE}2. No
+
         """
         read -n1 CHOICE
         if [[ $CHOICE == 1 ]]; then
             rm -rf $HOME/.myconfig
             cp -R /tmp/myconfig $HOME/.myconfig
+            printf "\n\n"
         fi
     else
         cp -R /tmp/myconfig $HOME/.myconfig
@@ -45,32 +59,30 @@ function myconfig_full_installation() {
     STAMP+='###############################\n'
     STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n'
     STAMP+='###############################\n'
-    MATCHLINE='######### MYCONFIG #########\n'
-    STAMP+=$MATCHLINE
+    MATCHLINE='########## MYCONFIG ##########'
+    STAMP+=$MATCHLINE"\n"
     STAMP+='###############################\n'
     STAMP+="source $HOME/.myconfig/entry   \n"
     STAMP+='###############################\n'
     STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n'
     STAMP+='###############################\n'
-    echo $STAMP
-    echo "... is to be installed"
     if [[ $(grep "$MATCHLINE" $HOME/.${bashOrZsh}rc | wc -l) -ge 1 ]]; then
 
-        echo """
+        echo -e """${CYA}
         It looks like you're already sourcing myconfig from ~/.${bashOrZsh}rc.
         Would you like to re-insert it?
-        1. Yes
-        2. No
+        ${RED}1. Yes
+        ${GRE}2. No
         """
         read -n1 CHOICE
         if [[ $CHOICE == 1 ]]; then
-            echo $STAMP >>$HOME/.${bashOrZsh}rc
+            printf "$STAMP" >>$HOME/.${bashOrZsh}rc
         fi
     else
-        echo "Installing to $HOME/.${bashOrZsh}rc"
+        echo -e "${CYA}Installing to $HOME/.${bashOrZsh}rc"
         printf "$STAMP" >>$HOME/.${bashOrZsh}rc
     fi
-    echo "Installation complete"
+    echo -e "${CYA}Installation complete"
 }
 
 ###############################################
@@ -86,13 +98,13 @@ command -v git >/dev/null 2>&1 || abort_install "Git is not installed. Aborting 
 
 PREVIOUSDIR=$PWD
 if [[ -d /tmp/myconfig ]]; then
-    echo "Updating git repo for myconfig..."
+    echo -e "${CYA}Updating git repo for myconfig..."
     cd /tmp/myconfig
     git fetch origin
     git checkout master
     git reset --hard origin/master
 else
-    echo "Cloning git repo for myconfig..."
+    echo -e "${CYA}Cloning git repo for myconfig..."
     cd /tmp
     git clone https://github.com/dan-drago/myconfig.git
     cd myconfig
@@ -123,11 +135,13 @@ myconfig_full_installation
 """
 ' >>$TEMPFILE
 echo """
+    ### Re-declare function
     myconfig_full_installation(){
+        ### This will only work from bash shell!
         $(type myconfig_full_installation | sed '1,3d;$d')
     }
 """ >>$TEMPFILE
-cat $TEMPFILE >temp.txt
+cat $TEMPFILE >temp2.sh
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
 
 ###############################################
