@@ -52,7 +52,7 @@ function myconfig_full_installation() {
     STAMP+='###############################'
     echo $STAMP
     echo "... is to be installed"
-    if [[ $(grep "$MATCHLINE" $HOME/.bashrc | wc -l) -ge 1 ]]; then
+    if [[ $(grep "$MATCHLINE" $HOME/.${bashOrZsh}rc | wc -l) -ge 1 ]]; then
 
         echo """
         It looks like you're already sourcing myconfig from ~/.${bashOrZsh}rc.
@@ -62,11 +62,11 @@ function myconfig_full_installation() {
         """
         read -n1 CHOICE
         if [[ $CHOICE == 1 ]]; then
-            echo $STAMP >>$HOME/.{$bashOrZsh}rc
+            echo $STAMP >>$HOME/.${$bashOrZsh}rc
         fi
     else
-        echo "Installing to $HOME/.{$bashOrZsh}rc"
-        echo $STAMP >>$HOME/.{$bashOrZsh}rc
+        echo "Installing to $HOME/.${$bashOrZsh}rc"
+        echo $STAMP >>$HOME/.${$bashOrZsh}rc
     fi
     echo "Installation complete"
 }
