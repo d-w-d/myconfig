@@ -41,15 +41,17 @@ function myconfig_full_installation() {
 
     ### Add sourcing to bashr
     bashOrZsh=${1:-bash}
-    MATCHLINE='######### MYCONFIG #########'
-    STAMP+='###############################'
-    STAMP+='## KEEP THIS BLOCK AS A UNIT ##'
-    STAMP+='###############################'
+    STAMP='\n'
+    STAMP+='###############################\n'
+    STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n'
+    STAMP+='###############################\n'
+    MATCHLINE='######### MYCONFIG #########\n'
     STAMP+=$MATCHLINE
+    STAMP+='###############################\n'
     STAMP+="source $HOME/.myconfig/entry"
-    STAMP+='###############################'
-    STAMP+='## KEEP THIS BLOCK AS A UNIT ##'
-    STAMP+='###############################'
+    STAMP+='###############################\n'
+    STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n'
+    STAMP+='###############################\n'
     echo $STAMP
     echo "... is to be installed"
     if [[ $(grep "$MATCHLINE" $HOME/.${bashOrZsh}rc | wc -l) -ge 1 ]]; then
