@@ -50,6 +50,8 @@ function myconfig_full_installation() {
     STAMP+='###############################'
     STAMP+='## KEEP THIS BLOCK AS A UNIT ##'
     STAMP+='###############################'
+    echo $STAMP
+    echo "... is to be installed"
     if [[ $(grep "$MATCHLINE" $HOME/.bashrc | wc -l) -ge 1 ]]; then
 
         echo """
@@ -63,6 +65,7 @@ function myconfig_full_installation() {
             echo $STAMP >>$HOME/.{$bashOrZsh}rc
         fi
     else
+        echo "Installing to $HOME/.{$bashOrZsh}rc"
         echo $STAMP >>$HOME/.{$bashOrZsh}rc
     fi
     echo "Installation complete"
