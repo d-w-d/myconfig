@@ -68,7 +68,7 @@ function myconfig_full_installation() {
         fi
     else
         echo "Installing to $HOME/.${bashOrZsh}rc"
-        printf $STAMP >>$HOME/.${bashOrZsh}rc
+        printf "$STAMP" >>$HOME/.${bashOrZsh}rc
     fi
     echo "Installation complete"
 }
