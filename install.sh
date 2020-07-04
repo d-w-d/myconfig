@@ -30,25 +30,20 @@ function abort_install() {
 function myconfig_full_installation() {
     clear
     echo -e """$CYA
-        Installing myconfig to $HOME/.myconfig...\n\n
+    Installing myconfig to $HOME/.myconfig...\n\n
     """
 
     ### Copy to ~/.myconfig
     if [[ -d $HOME/.myconfig ]]; then
         clear
-        echo -e """$CYA
-        
-        $HOME/.myconfig already exists. Replace it?
-        ${RED}1. Yes
-        ${GRE}2. No
+        echo -e """${RED}
+
+        $HOME/.myconfig already exists!
+
+        ${CYA}
+        If you want to reinstall myconfig then you must first manually remove the existing directory. You can also update by pulling from master.
 
         """
-        read -n1 CHOICE
-        if [[ $CHOICE == 1 ]]; then
-            rm -rf $HOME/.myconfig
-            cp -R /tmp/myconfig $HOME/.myconfig
-            printf "\n\n"
-        fi
     else
         cp -R /tmp/myconfig $HOME/.myconfig
     fi
@@ -57,14 +52,10 @@ function myconfig_full_installation() {
     bashOrZsh=${1:-bash}
     STAMP='\n'
     STAMP+='###############################\n'
-    STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n'
-    STAMP+='###############################\n'
     MATCHLINE='########## MYCONFIG ##########'
     STAMP+=$MATCHLINE"\n"
     STAMP+='###############################\n'
     STAMP+="source $HOME/.myconfig/entry   \n"
-    STAMP+='###############################\n'
-    STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n'
     STAMP+='###############################\n'
     if [[ $(grep "$MATCHLINE" $HOME/.${bashOrZsh}rc | wc -l) -ge 1 ]]; then
 
@@ -82,6 +73,22 @@ function myconfig_full_installation() {
         echo -e "${CYA}Installing to $HOME/.${bashOrZsh}rc"
         printf "$STAMP" >>$HOME/.${bashOrZsh}rc
     fi
+
+    ### Add tmux configuration
+    if [[ -f $HOME/.tmux.conf ]]; then
+        echo -e """${CYA}
+            .tmux.conf exists already. Replace it?
+
+            ${RED}1. Yes
+            ${GRE}2. No
+        """
+        read -n1 CHOICE
+        if [[ $CHOICE == 1 ]]; then
+            echo ""
+            cp /tmp/myconfig/.tmux.conf $HOME/.tmux.conf
+        fi
+    fi
+
     echo -e "${CYA}Installation complete"
 }
 
@@ -135,11 +142,11 @@ myconfig_full_installation
 """
 ' >>$TEMPFILE
 echo """
-    ### Re-declare function
-    myconfig_full_installation(){
-        ### This will only work from bash shell!
-        $(type myconfig_full_installation | sed '1,3d;$d')
-    }
+### Re-declare function
+myconfig_full_installation(){
+    ### This will only work from bash shell!
+    $(type myconfig_full_installation | sed '1,3d;$d')
+}
 """ >>$TEMPFILE
 cat $TEMPFILE >temp2.sh
 MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
