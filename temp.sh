@@ -1,5 +1,5 @@
 #/usr/bin/env false
 
 echo "This is a temp script for sourcing"
-export ABC="ABCD"
+export ABC="ABCDE"
 MATCHLINE='######## DAN-DRAGO ########'
