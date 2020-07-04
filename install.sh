@@ -30,18 +30,18 @@ function abort_install() {
 function myconfig_full_installation() {
     clear
     echo -e """$CYA
-    Installing myconfig to $HOME/.myconfig...\n\n
+        Installing myconfig to $HOME/.myconfig...\n\n
     """
 
     ### Copy to ~/.myconfig
     if [[ -d $HOME/.myconfig ]]; then
-        clear
         echo -e """${RED}
 
         $HOME/.myconfig already exists!
 
         ${CYA}
-        If you want to reinstall myconfig then you must first manually remove the existing directory. You can also update by pulling from master.
+        You must first manually remove the existing directory to reinstall it. 
+        You can also update by pulling from master.
 
         """
     else
@@ -77,10 +77,10 @@ function myconfig_full_installation() {
     ### Add tmux configuration
     if [[ -f $HOME/.tmux.conf ]]; then
         echo -e """${CYA}
-            .tmux.conf exists already. Replace it?
+        .tmux.conf exists already. Replace it?
 
-            ${RED}1. Yes
-            ${GRE}2. No
+        ${RED}1. Yes
+        ${GRE}2. No
         """
         read -n1 CHOICE
         if [[ $CHOICE == 1 ]]; then
@@ -89,7 +89,17 @@ function myconfig_full_installation() {
         fi
     fi
 
-    echo -e "${CYA}Installation complete"
+    echo -e """${CYA}
+    Installation complete.
+
+    To add bash-it, follow install instructions at: 
+    ${WHI}https://github.com/Bash-it/bash-it 
+    ${CYA}
+    To use the zshell, install ohmyzsh followed by powerlevel10k:
+    
+    ${WHI}https://ohmyz.sh/#install 
+    ${WHI}https://github.com/romkatv/powerlevel10k#manual
+    """
 }
 
 ###############################################
