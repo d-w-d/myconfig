@@ -71,7 +71,6 @@ function myconfig_full_installation() {
             printf "$STAMP" >>$HOME/.${bashOrZsh}rc
         fi
     else
-        echo -e "${CYA}Installing to $HOME/.${bashOrZsh}rc"
         printf "$STAMP" >>$HOME/.${bashOrZsh}rc
     fi
 
