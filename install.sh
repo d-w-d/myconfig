@@ -55,6 +55,7 @@ function myconfig_full_installation() {
     MATCHLINE='########## MYCONFIG ##########'
     STAMP+=$MATCHLINE"\n"
     STAMP+='###############################\n'
+    STAMP+="export MYCONFIG_ROOT_DIR=$HOME/.myconfig"
     STAMP+="source $HOME/.myconfig/entry.sh \n"
     STAMP+='###############################\n'
     if [[ $(grep "$MATCHLINE" $HOME/.${bashOrZsh}rc | wc -l) -ge 1 ]]; then

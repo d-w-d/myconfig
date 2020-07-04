@@ -9,8 +9,6 @@ MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 source $MYCONFIG_ROOT_DIR/COMMON/common_aliases.sh
 source $MYCONFIG_ROOT_DIR/COMMON/common_env.sh
 source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
+source $MYCONFIG_ROOT_DIR/COMMON/common_setup_scripts.sh
 source $MYCONFIG_ROOT_DIR/COMMON/common_shell_prompt.sh
 source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh
-
-
-[[ $BASH ]] && source $MYCONFIG_ROOT_DIR/COMMON/common_setup_scripts.sh

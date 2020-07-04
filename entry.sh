@@ -30,8 +30,6 @@ source $MYCONFIG_ROOT_DIR/COMMON/source_common.sh
 # Source config files based on OS type
 ##################################################
 
-clear
-
 case "$OS" in
 MACOS)
   echo "Shell set up for MACOS"
