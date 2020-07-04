@@ -1,0 +1,128 @@
+#!/usr/bin/env false
+
+##############################################################
+### Inherit $MYCONFIG_ROOT_DIR from parent script
+##############################################################
+MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
+
+##############################################
+# Logic to determine OS type
+##############################################
+
+OS=""
+if [[ $(uname -s) == Darwin ]]; then OS="MACOS"; fi
+
+if [[ $(uname -s) == Linux ]]; then
+  if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
+    OS="RHEL"
+  fi
+  if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
+    OS="DEBIAN"
+  fi
+fi
+
+##################################################
+# Source config files common to all OSes
+##################################################
+source $MYCONFIG_ROOT_DIR/COMMON/source_common.sh
+
+##################################################
+# Source config files based on OS type
+##################################################
+
+clear
+
+case "$OS" in
+MACOS)
+  echo "Shell set up for MACOS"
+  source $MYCONFIG_ROOT_DIR/MACOS/source_macos.sh
+  ;;
+DEBIAN)
+  echo "Shell set up for Debian"
+  source $MYCONFIG_ROOT_DIR/DEBIAN/source_debian.sh
+  ;;
+RHEL)
+  echo "Shell set up for RHEL"
+  source $MYCONFIG_ROOT_DIR/RHEL/source_rhel.sh
+  ;;
+*)
+  echo "Source failed to identify this OS. Only 'Common' shell settings applied."
+  ;;
+esac
+
+##################################################
+# Source settings specific to this machine
+##################################################
+
+[ -f $MYCONFIG_ROOT_DIR/misc.sh ] && source $MYCONFIG_ROOT_DIR/misc.sh
+
+
+
+
+alias vim='vim -N -u /tmp/myconfig/.vimrc'
+cd /tmp/myconfig
+
+clear
+echo -e """\033[32m
+Source scripts have been saved to /tmp/myconfig
+Bash has sourced /tmp/myconfig/entry.sh
+type vim: $(type vim)
+\033[37m
+"""
+
+echo -e """\033[32m
+For full installation of shell configurations:
+
+myconfig_full_installation
+\033[37m
+"""
+
+
+    myconfig_full_installation(){
+            echo "Installing myconfig to $HOME/.myconfig";
+    if [[ -d $HOME/.myconfig ]]; then
+        echo """
+        $HOME/.myconfig already exists. Replace it?
+        1. Yes
+        2. No
+        """;
+        read -n1 CHOICE;
+        if [[ $CHOICE == 1 ]]; then
+            rm -rf $HOME/.myconfig;
+            cp -R /tmp/myconfig $HOME/.myconfig;
+        fi;
+    else
+        cp -R /tmp/myconfig $HOME/.myconfig;
+    fi;
+    bashOrZsh=${1:-bash};
+    STAMP='\n';
+    STAMP+='###############################\n';
+    STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n';
+    STAMP+='###############################\n';
+    MATCHLINE='######### MYCONFIG #########\n';
+    STAMP+=$MATCHLINE;
+    STAMP+='###############################\n';
+    STAMP+="source $HOME/.myconfig/entry   \n";
+    STAMP+='###############################\n';
+    STAMP+='## KEEP THIS BLOCK AS A UNIT ##\n';
+    STAMP+='###############################\n';
+    echo $STAMP;
+    echo "... is to be installed";
+    if [[ $(grep "$MATCHLINE" $HOME/.${bashOrZsh}rc | wc -l) -ge 1 ]]; then
+        echo """
+        It looks like you're already sourcing myconfig from ~/.${bashOrZsh}rc.
+        Would you like to re-insert it?
+        1. Yes
+        2. No
+        """;
+        read -n1 CHOICE;
+        if [[ $CHOICE == 1 ]]; then
+            echo $STAMP >> $HOME/.${bashOrZsh}rc;
+        fi;
+    else
+        echo "Installing to $HOME/.${bashOrZsh}rc";
+        printf "$STAMP" >> $HOME/.${bashOrZsh}rc;
+    fi;
+    echo "Installation complete"
+    }
+
