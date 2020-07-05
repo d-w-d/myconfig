@@ -28,22 +28,21 @@ function abort_install() {
 }
 
 function myconfig_full_installation() {
+
+    PREVIOUSDIR=$PWD
+
     clear
     echo -e """$CYA
         Installing myconfig to $HOME/.myconfig...\n\n
     """
 
-    ### Copy to ~/.myconfig
+    ### Copy to or update ~/.myconfig
     if [[ -d $HOME/.myconfig ]]; then
-        echo -e """${RED}
-
-        $HOME/.myconfig already exists!
-
-        ${CYA}
-        You must first manually remove the existing directory to reinstall it. 
-        You can also update by pulling from master.
-
-        """
+        cd $HOME/.myconfig
+        git fetch origin
+        git checkout master
+        git reset --hard origin/master
+        cd $PREVIOUSDIR
     else
         cp -R /tmp/myconfig $HOME/.myconfig
     fi
@@ -87,6 +86,21 @@ function myconfig_full_installation() {
         if [[ $CHOICE == 1 ]]; then
             echo ""
             cp /tmp/myconfig/.tmux.conf $HOME/.tmux.conf
+        fi
+    fi
+
+    ### Add vimrc configuration
+    if [[ -f $HOME/.vimrc ]]; then
+        echo -e """${CYA}
+        .vimrc exists already. Replace it?
+
+        ${RED}1. Yes
+        ${GRE}2. No
+        """
+        read -n1 CHOICE
+        if [[ $CHOICE == 1 ]]; then
+            echo ""
+            cp /tmp/myconfig/.vimrc $HOME/.vimrc
         fi
     fi
 
@@ -137,18 +151,19 @@ cat /tmp/myconfig/entry.sh >$TEMPFILE
 echo "alias vim='vim -N -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
 echo "cd $PREVIOUSDIR" >>$TEMPFILE
 echo '
-clear
-echo -e """\033[32m
-Source scripts have been saved to /tmp/myconfig
+echo -e """\033[37m
+=================
+DOWNLOAD COMPLETE
+=================
+\033[32m
+Configuration scripts have been cloned to /tmp/myconfig
+
 Bash has sourced /tmp/myconfig/entry.sh
+
 type vim: $(type vim)
 \033[37m
-"""
 
-echo -e """\033[32m
-For full installation of shell configurations:
-
-myconfig_full_installation
+Run \033[32m myconfig_full_installation \033[31m for full install.
 \033[37m
 """
 ' >>$TEMPFILE

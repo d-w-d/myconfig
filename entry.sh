@@ -6,6 +6,14 @@
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
 ##############################################
+# Params, etc.
+##############################################
+
+### Ohmyzsh instaprompt requires no console I/O
+[ ! $ZSH_VERSION ] && ISVERBOSE=1
+[ $ISVERBOSE ] && echo "Hmmmmm"
+
+#############################################
 # Logic to determine OS type
 ##############################################
 
@@ -13,12 +21,12 @@ OS=""
 if [[ $(uname -s) == Darwin ]]; then OS="MACOS"; fi
 
 if [[ $(uname -s) == Linux ]]; then
-  if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
-    OS="RHEL"
-  fi
-  if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
-    OS="DEBIAN"
-  fi
+    if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
+        OS="RHEL"
+    fi
+    if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
+        OS="DEBIAN"
+    fi
 fi
 
 ##################################################
@@ -32,20 +40,20 @@ source $MYCONFIG_ROOT_DIR/COMMON/source_common.sh
 
 case "$OS" in
 MACOS)
-  echo "Shell set up for MACOS"
-  source $MYCONFIG_ROOT_DIR/MACOS/source_macos.sh
-  ;;
+    [ $ISVERBOSE ] && echo "Shell set up for MACOS"
+    source $MYCONFIG_ROOT_DIR/MACOS/source_macos.sh
+    ;;
 DEBIAN)
-  echo "Shell set up for Debian"
-  source $MYCONFIG_ROOT_DIR/DEBIAN/source_debian.sh
-  ;;
+    [ $ISVERBOSE ] && echo "Shell set up for Debian"
+    source $MYCONFIG_ROOT_DIR/DEBIAN/source_debian.sh
+    ;;
 RHEL)
-  echo "Shell set up for RHEL"
-  source $MYCONFIG_ROOT_DIR/RHEL/source_rhel.sh
-  ;;
+    [ $ISVERBOSE ] && echo "Shell set up for RHEL"
+    source $MYCONFIG_ROOT_DIR/RHEL/source_rhel.sh
+    ;;
 *)
-  echo "Source failed to identify this OS. Only 'Common' shell settings applied."
-  ;;
+    [ $ISVERBOSE ] && echo "Source failed to identify this OS. Only 'Common' shell settings applied."
+    ;;
 esac
 
 ##################################################
@@ -53,7 +61,3 @@ esac
 ##################################################
 
 [ -f $MYCONFIG_ROOT_DIR/misc.sh ] && source $MYCONFIG_ROOT_DIR/misc.sh
-
-
-
-
