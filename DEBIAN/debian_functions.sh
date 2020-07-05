@@ -44,7 +44,7 @@ fun_show_all_users() {
 
 }
 
-export -f fun_show_all_users
+#export -f fun_show_all_users
 
 
 #################################################
@@ -114,5 +114,5 @@ fun_resources_used() {
 
 }
 
-export -f fun_resources_used
+#export -f fun_resources_used
 
