@@ -47,7 +47,7 @@ function myconfig_full_installation() {
         cp -R /tmp/myconfig $HOME/.myconfig
     fi
 
-    ### Add sourcing to bashr
+    ### Add sourcing to bashrc
     bashOrZsh=${1:-bash}
     STAMP='\n'
     STAMP+='###############################\n'
@@ -87,6 +87,8 @@ function myconfig_full_installation() {
             echo ""
             cp /tmp/myconfig/.tmux.conf $HOME/.tmux.conf
         fi
+    else
+        cp /tmp/myconfig/.tmux.conf $HOME/.tmux.conf
     fi
 
     ### Add vimrc configuration
@@ -102,6 +104,8 @@ function myconfig_full_installation() {
             echo ""
             cp /tmp/myconfig/.vimrc $HOME/.vimrc
         fi
+    else
+        cp /tmp/myconfig/.vimrc $HOME/.vimrc
     fi
 
     echo -e """${CYA}
@@ -161,9 +165,9 @@ Configuration scripts have been cloned to /tmp/myconfig
 Bash has sourced /tmp/myconfig/entry.sh
 
 type vim: $(type vim)
-\033[37m
 
-Run \033[32m myconfig_full_installation \033[31m for full install.
+\033[31m
+Run\033[37m myconfig_full_installation\033[31m for full install.
 \033[37m
 """
 ' >>$TEMPFILE
