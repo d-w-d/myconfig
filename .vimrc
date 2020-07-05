@@ -10,6 +10,69 @@ set encoding=utf-8                  " Set encoding
 let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 
 "==================================================
+"==================================================
+"==================================================
+" Non-Leader Shortcuts
+"==================================================
+"==================================================
+"==================================================
+
+" Shortcut to autoformat the doc
+noremap <C-f> :Autoformat<CR>
+
+"==================================================
+" Jump to beginning/end of line
+"==================================================
+" Overwrite: "CTRL-A    2    add N to number at/after cursor"
+map <C-a> ^ 
+imap <C-a> <ESC>I
+" Overwrite: "CTRL-E         scroll N lines upwards (N lines Extra)"
+map <C-e> g_
+imap <C-e> <ESC>A
+
+" Fast exit from insert mode
+imap kj <Esc>
+vmap kj <Esc>
+
+" Fast/smooth vertical scrolling
+nnoremap <S-j> 3jzz
+nnoremap <S-k> 3kzz
+
+" Select all file
+nmap VV ggVG
+
+" Toggle file-tree display
+map <C-n> :NERDTreeToggle<CR>
+
+" More-Width-in-present-window shortcut
+nmap MW :vertical resize +2<cr>
+" Much-More-Width-in-present-window shortcut
+nmap MMW :vertical resize +10<cr>
+" Less-Width-in-present-window shortcut
+nmap LW :vertical resize -2<cr>
+" Much-Less-Width-in-present-window shortcut
+nmap MLW :vertical resize -10<cr>
+" More-Height-in-present-window shortcut
+nmap MH :resize +2<cr>
+" Much-More-Height-in-present-window shortcut
+nmap MMH :resize +10<cr>
+" Less-Height-in-present-window shortcut
+nmap LH :resize -2<cr>
+" Much-Less-Height-in-present-window shortcut
+nmap MLH :resize -10<cr>
+
+
+" Move around in command and insert mode with CTRL-hjkl
+inoremap <C-h> <ESC>i
+inoremap <C-j> <ESC>ja
+inoremap <C-k> <ESC>ka
+inoremap <C-l> <ESC>la
+cnoremap <C-h> <ESC>i
+cnoremap <C-j> <ESC>ja
+cnoremap <C-k> <ESC>ka
+cnoremap <C-l> <ESC>la
+
+"==================================================
 " Leader Shortcuts
 "==================================================
 
@@ -30,7 +93,7 @@ nmap <Leader>d :colorscheme desert<CR>
 nmap com <Leader>c<Space>
 vmap com <Leader>c<Space>
 
-" Enable folding with the spacebar
+" Enable folding with the spacebar; maps to binding given by symplfold plugin
 nnoremap <Leader>f za
 
 "==================================================
@@ -70,7 +133,7 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=blue ctermbg=grey
 "==================================================
 set splitbelow
 set splitright
-set termwinsize=10x0
+set termwinsize=8x0
 
 "==================================================
 " Page numbering
@@ -88,58 +151,6 @@ set shiftwidth=4                " affects what happens when you press >>, << or 
 set expandtab                   " affects what happens when you press the <TAB> key.
 " if 'expandtab' is set, pressing the <TAB> key will
 " insert 'softtabstop' amount of space characters
-
-"==================================================
-" Shortcuts
-"==================================================
-
-" Shortcut to autoformat the doc
-noremap <C-f> :Autoformat<CR>
-
-" Jump to beginning/end of line
-map <C-a> ^
-imap <C-a> <ESC>I
-vmap <C-a> ^
-map <C-e> g_
-imap <C-e> <ESC>A
-vmap <C-e> g_
-
-" Fast exit from insert mode
-imap kj <Esc>
-
-" Fast/smooth vertical scrolling
-nnoremap <S-j> 3jzz
-nnoremap <S-k> 3kzz
-
-" Select all file
-nmap VV ggVG
-
-" Toggle file-tree display
-map <C-n> :NERDTreeToggle<CR>
-
-" More-Width-in-present-window shortcut
-nmap MW :vertical resize +2<cr>
-" Much-More-Width-in-present-window shortcut
-nmap MMW :vertical resize +10<cr>
-" Less-Width-in-present-window shortcut
-nmap LW :vertical resize -2<cr>
-" Much-Less-Width-in-present-window shortcut
-nmap MLW :vertical resize -10<cr>
-" More-Height-in-present-window shortcut
-nmap MH :resize +2<cr>
-" Much-More-Height-in-present-window shortcut
-nmap MMH :resize +10<cr>
-" Less-Height-in-present-window shortcut
-nmap LH :resize -2<cr>
-" Much-Less-Height-in-present-window shortcut
-nmap MLH :resize -10<cr>
-
-
-" Move around in insert mode with CTRL-hjkl
-inoremap <C-h> <ESC>i
-inoremap <C-j> <ESC>ja
-inoremap <C-k> <ESC>ka
-inoremap <C-l> <ESC>la
 
 "==================================================
 " Enable Folding (see: https://bit.ly/2YRCucT)
