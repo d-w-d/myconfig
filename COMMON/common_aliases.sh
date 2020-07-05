@@ -20,6 +20,7 @@ alias lt='ls -ltr'              # Sort by date, most recent last.
 
 alias alcatcolored='highlight -O ansi --force'
 alias alclear="clear && printf '\e[3J'"
+alias klear="clear && printf '\e[3J'"
 alias alhttpserver='http-server'
 alias alimgcat='~/.local/bin/imgcat --height 10' # For imgcat installed with
                                                  # `pip3 install --user imgcat`

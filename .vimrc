@@ -1,28 +1,53 @@
 "==================================================
-" Misc settings
+" Begin Vundle setup
+"==================================================
+"
+" Initiate plugins first in order to call functions, 
+" variables, etc. later
+" See: https://github.com/VundleVim/Vundle.vim for setup instructions
+"
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+" DO NOT EDIT:
+set nocompatible                    " required
+filetype off                        " required
+set rtp+=~/.vim/bundle/Vundle.vim   " set the runtime path to include Vundle and initialize
+call vundle#begin()
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+" EDIT:
+Plugin 'gmarik/Vundle.vim'
+Plugin 'tmhedberg/SimpylFold'
+Plugin 'vim-scripts/indentpython.vim'
+Plugin 'christoomey/vim-tmux-navigator'     " Move between vim windows and tmux panes with  ctrl-j, etc.
+"Plugin 'Yggdroot/indentLine'
+"Plugin 'nathanaelkane/vim-indent-guides'
+Plugin 'Valloric/YouCompleteMe'                                     " autocomplete
+Plugin 'scrooloose/nerdtree'                                        " enables file-tree searching
+Plugin 'kien/ctrlp.vim'                                             " file-word-search utility
+Plugin 'Chiel92/vim-autoformat'                                     " Autoformatting
+Plugin 'kana/vim-submode'
+Plugin 'preservim/nerdcommenter'                                    " used to toggle comments
+Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}     " enables vim status line
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+" DO NOT EDIT:
+call vundle#end()            " required
+filetype plugin indent on    " required
+"==================================================
+" End Vundle setup
 "==================================================
 
-syntax on                           " Turn on syntax
-let mapleader = " "                 " Make spacebar the leader
-set clipboard=unnamed               " enables yanked stuff to be copied to mac clipboard
-set backspace=indent,eol,start      " enables backspaces
-set encoding=utf-8                  " Set encoding
-let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
+"==================================================
+"==================================================
+" Shortcuts
+"==================================================
+"==================================================
 
-"==================================================
-"==================================================
 "==================================================
 " Non-Leader Shortcuts
-"==================================================
-"==================================================
 "==================================================
 
 " Shortcut to autoformat the doc
 noremap <C-f> :Autoformat<CR>
 
-"==================================================
-" Jump to beginning/end of line
-"==================================================
 " Overwrite: "CTRL-A    2    add N to number at/after cursor"
 map <C-a> ^ 
 imap <C-a> <ESC>I
@@ -61,7 +86,6 @@ nmap LH :resize -2<cr>
 " Much-Less-Height-in-present-window shortcut
 nmap MLH :resize -10<cr>
 
-
 " Move around in command and insert mode with CTRL-hjkl
 inoremap <C-h> <ESC>i
 inoremap <C-j> <ESC>ja
@@ -97,10 +121,21 @@ vmap com <Leader>c<Space>
 nnoremap <Leader>f za
 
 "==================================================
+" Misc settings
+"==================================================
+
+syntax on                           " Turn on syntax
+let mapleader = " "                 " Make spacebar the leader
+set clipboard=unnamed               " enables yanked stuff to be copied to mac clipboard
+set backspace=indent,eol,start      " enables backspaces
+set encoding=utf-8                  " Set encoding
+let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
+colorscheme torte
+
+"==================================================
 " Indent Guides Config
 "==================================================
 
-colorscheme torte
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_auto_colors = 0
 let g:indent_guides_guide_size = 1
@@ -131,6 +166,7 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=blue ctermbg=grey
 "==================================================
 " Terminal Settings
 "==================================================
+
 set splitbelow
 set splitright
 set termwinsize=8x0
@@ -177,30 +213,25 @@ au BufNewFile,BufRead *.py set
 "==================================================
 " Highlight white space
 "==================================================
+
 highlight BadWhitespace ctermbg=red guibg=red
 au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
 
+
+
+
 "==================================================
-" Begin Vundle setup
+" Sub-mode pluging functionality
 "==================================================
-set nocompatible                    " required
-filetype off                        " required
-set rtp+=~/.vim/bundle/Vundle.vim   " set the runtime path to include Vundle and initialize
-call vundle#begin()
-"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Plugin 'gmarik/Vundle.vim'
-Plugin 'tmhedberg/SimpylFold'
-Plugin 'vim-scripts/indentpython.vim'
-Plugin 'christoomey/vim-tmux-navigator'     " Move between vim windows and tmux panes with  ctrl-j, etc.
-"Plugin 'Yggdroot/indentLine'
-"Plugin 'nathanaelkane/vim-indent-guides'
-Plugin 'Valloric/YouCompleteMe'                                     " autocomplete
-Plugin 'scrooloose/nerdtree'                                        " enables file-tree searching
-Plugin 'kien/ctrlp.vim'                                             " file-word-search utility
-Plugin 'Chiel92/vim-autoformat'                                     " Autoformatting
-Plugin 'preservim/nerdcommenter'                                    " used to toggle comments
-Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}     " enables vim status line
-"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-call vundle#end()            " required
-filetype plugin indent on    " required
+
+" Horizontal fast scrolling
+call submode#enter_with('fastLeft', 'n', '', '<leader>h', '3h')
+call submode#enter_with('fastRight', 'n', '', '<leader>l', '3l')
+call submode#map('fastLeft', 'n', '', 'h', '3h')
+call submode#map('fastRight', 'n', '', 'l', '3l')
+
+
+
+
+
 
