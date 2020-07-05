@@ -11,7 +11,6 @@ MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
 ### Ohmyzsh instaprompt requires no console I/O
 [ ! $ZSH_VERSION ] && ISVERBOSE=1
-[ $ISVERBOSE ] && echo "Hmmmmm"
 
 #############################################
 # Logic to determine OS type
