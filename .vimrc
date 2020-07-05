@@ -36,6 +36,18 @@ filetype plugin indent on    " required
 "==================================================
 
 "==================================================
+" Misc settings
+"==================================================
+
+syntax on                           " Turn on syntax
+let mapleader = " "                 " Make spacebar the leader
+set clipboard=unnamed               " enables yanked stuff to be copied to mac clipboard
+set backspace=indent,eol,start      " enables backspaces
+set encoding=utf-8                  " Set encoding
+let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
+colorscheme torte
+
+"==================================================
 "==================================================
 " Shortcuts
 "==================================================
@@ -119,18 +131,6 @@ vmap com <Leader>c<Space>
 
 " Enable folding with the spacebar; maps to binding given by symplfold plugin
 nnoremap <Leader>f za
-
-"==================================================
-" Misc settings
-"==================================================
-
-syntax on                           " Turn on syntax
-let mapleader = " "                 " Make spacebar the leader
-set clipboard=unnamed               " enables yanked stuff to be copied to mac clipboard
-set backspace=indent,eol,start      " enables backspaces
-set encoding=utf-8                  " Set encoding
-let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
-colorscheme torte
 
 "==================================================
 " Indent Guides Config
