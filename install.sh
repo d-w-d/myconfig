@@ -112,11 +112,11 @@ function myconfig_full_installation() {
     Configurations Installed.
 
     To properly use these configurations, you'll need:
-    - python3 >=3.4
-    - tmux >=2.1
-    - vim >=7.2 with +clipboard, +python3
-    - zsh
-    - powerline
+
+        - python3   >=3.4
+        - tmux      >=2.1
+        - vim       >=7.4.1578 +clipboard +python3
+        - powerline
      
     To add bash-it, follow install instructions at:
     ${WHI}https://github.com/Bash-it/bash-it
@@ -156,15 +156,44 @@ else
     touch misc.sh
 fi
 
-### Install VIM and plugins quietly in background
+### Clone/update vundle
 if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
     # If Vundle not installed, clone then install plugins
-    echo "Installing vundle and its plugins"
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
+    #echo "Installing vundle and its plugins"
+    #git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 else
     # Install all vundle plugins
-    echo "Installing vundle plugins"
-    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
+    #echo "Installing vundle plugins"
+    #vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
+    cd $HOME/.vim/bundle/Vundle.vim
+    git fetch origin
+    git checkout master
+    git reset --hard origin/master
+fi
+
+# Install Vundle plugins
+echo -e """
+    Do you want to install vundle plugins as a background process?
+        ${RED}1. Yes (with messaging supressed)
+        ${RED}2. Yes (with messaging)
+        ${RED}3. No (with messaging)
+        ${RED}4. Skip plugin installation
+        ${CYA}
+"""
+read -n1 CHOICE
+
+if [[ $CHOICE == 1 ]]; then
+    echo "Vundle is being installed quietly in the background. PID=$PID"
+    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+    PID=$!
+elif [[ $CHOICE == 2 ]]; then
+    echo "Vundle is being installed verbosely in the background. PID=$PID"
+    time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall &
+    PID=$!
+elif [[ $CHOICE == 2 ]]; then
+    echo "Installing vundle plugins as foreground process. Could take a while!"
+    time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall
 fi
 
 ### Create bashrc file and start new shell
