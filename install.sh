@@ -109,16 +109,25 @@ function myconfig_full_installation() {
     fi
 
     echo -e """${CYA}
-    Installation complete.
+    Configurations Installed.
 
+    To properly use these configurations, you'll need:
+    - python3 >=3.4
+    - tmux >=2.1
+    - vim >=7.2 with +clipboard, +python3
+    - zsh
+    - powerline
+     
     To add bash-it, follow install instructions at:
     ${WHI}https://github.com/Bash-it/bash-it
     ${CYA}
-    To use the zshell, install ohmyzsh followed by powerlevel10k:
+    If zsh is installed, consider adding ohmyzsh followed by powerlevel10k:
 
     ${WHI}https://ohmyz.sh/#install
     ${WHI}https://github.com/romkatv/powerlevel10k#manual
+
     """
+
 }
 
 ###############################################
@@ -144,17 +153,18 @@ else
     cd /tmp
     git clone https://github.com/dan-drago/myconfig.git
     cd myconfig
+    touch misc.sh
 fi
 
 ### Install VIM and plugins quietly in background
 if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
     # If Vundle not installed, clone then install plugins
     echo "Installing vundle and its plugins"
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
 else
     # Install all vundle plugins
     echo "Installing vundle plugins"
-    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 
+    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
 fi
 
 ### Create bashrc file and start new shell
