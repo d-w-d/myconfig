@@ -14,6 +14,9 @@ export GOPATH=$HOME/work/goProgramming:$HOME/work/goProgramming/bin
 export GOROOT=$HOME/work/goProgramming
 export PATH=$PATH:$GOROOT/bin
 
+### Python User-installed executables
+export PATH="$HOME/.local/bin:$PATH"
+
 ### HOMEBREW-GDL RECOMMENDED
 # "If you need to have icu4c first in your PATH run:"
 export PATH="/usr/local/opt/icu4c/bin:$PATH"

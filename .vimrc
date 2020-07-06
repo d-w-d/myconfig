@@ -169,7 +169,7 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=blue ctermbg=grey
 
 set splitbelow
 set splitright
-set termwinsize=8x0
+"set termwinsize=8x0
 
 "==================================================
 " Page numbering
