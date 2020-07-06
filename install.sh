@@ -196,6 +196,8 @@ elif [[ $CHOICE == 2 ]]; then
 elif [[ $CHOICE == 3 ]]; then
     echo "Installing vundle plugins as foreground process. Could take a while!"
     time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall
+else
+    echo "OK. Skipping vundle plugins."
 fi
 
 ### Create bashrc file and start new shell
