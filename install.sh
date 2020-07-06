@@ -186,13 +186,15 @@ read -n1 CHOICE
 echo "You  selected $CHOICE...."
 
 if [[ $CHOICE == 1 ]]; then
-    echo "Vundle is being installed quietly in the background. PID=$PID"
+    echo "Vundle is being installed quietly in the background."
     vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
     PID=$!
+    echo "PID=$PID"
 elif [[ $CHOICE == 2 ]]; then
-    echo "Vundle is being installed verbosely in the background. PID=$PID"
+    echo "Vundle is being installed verbosely in the background."
     time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall &
     PID=$!
+    echo "PID=$PID"
 elif [[ $CHOICE == 3 ]]; then
     echo "Installing vundle plugins as foreground process. Could take a while!"
     time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall
