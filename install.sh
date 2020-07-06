@@ -183,6 +183,8 @@ echo -e """
 """
 read -n1 CHOICE
 
+echo "You  selected $CHOICE...."
+
 if [[ $CHOICE == 1 ]]; then
     echo "Vundle is being installed quietly in the background. PID=$PID"
     vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
