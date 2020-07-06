@@ -33,7 +33,7 @@ function myconfig_full_installation() {
 
     clear
     echo -e """$CYA
-        Installing myconfig to $HOME/.myconfig...\n\n
+    Installing myconfig to $HOME/.myconfig...\n\n
     """
 
     ### Copy to or update ~/.myconfig
@@ -111,12 +111,12 @@ function myconfig_full_installation() {
     echo -e """${CYA}
     Installation complete.
 
-    To add bash-it, follow install instructions at: 
-    ${WHI}https://github.com/Bash-it/bash-it 
+    To add bash-it, follow install instructions at:
+    ${WHI}https://github.com/Bash-it/bash-it
     ${CYA}
     To use the zshell, install ohmyzsh followed by powerlevel10k:
-    
-    ${WHI}https://ohmyz.sh/#install 
+
+    ${WHI}https://ohmyz.sh/#install
     ${WHI}https://github.com/romkatv/powerlevel10k#manual
     """
 }
@@ -147,7 +147,13 @@ else
 fi
 
 ### Install VIM and plugins quietly in background
-[ ! -d ~/.vim/bundle/Vundle.vim ] && git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u $PWD/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
+    # If Vundle not installed, clone then install plugins
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+else
+    # Install all vundle plugins
+    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+fi
 
 ### Create bashrc file and start new shell
 TEMPFILE=$(mktemp)
