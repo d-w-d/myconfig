@@ -149,10 +149,12 @@ fi
 ### Install VIM and plugins quietly in background
 if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
     # If Vundle not installed, clone then install plugins
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+    echo "Installing vundle and its plugins"
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 
 else
     # Install all vundle plugins
-    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+    echo "Installing vundle plugins"
+    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 
 fi
 
 ### Create bashrc file and start new shell
