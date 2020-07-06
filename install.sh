@@ -193,7 +193,7 @@ elif [[ $CHOICE == 2 ]]; then
     echo "Vundle is being installed verbosely in the background. PID=$PID"
     time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall &
     PID=$!
-elif [[ $CHOICE == 2 ]]; then
+elif [[ $CHOICE == 3 ]]; then
     echo "Installing vundle plugins as foreground process. Could take a while!"
     time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall
 fi
