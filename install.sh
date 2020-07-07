@@ -176,7 +176,7 @@ fi
 TOPSHELLPID=$$
 # ((  TEMP=$( vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2&>1; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m ====================================================== VUNDLE PLUGINS HAVE FINISHED GETTING INSTALLING/UPDATING ====================================================== \033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP") & )
 # ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $$"); echo "$TEMP" ) &)
-((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m\n================================================\nVUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING\n================================================\n\033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP" ) &)
+((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m\n================================================\nVUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING ${TOPSHELLPID}\n================================================\n\033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP" ) &)
 
 
 
