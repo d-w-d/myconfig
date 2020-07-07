@@ -211,7 +211,7 @@ TOPSHELLPID=$$
     #time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall
 #else
     #echo "OK. Skipping vundle plugins."
-fi
+#fi
 
 ### Create bashrc file and start new shell
 TEMPFILE=$(mktemp)
