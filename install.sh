@@ -234,7 +234,8 @@ myconfig_full_installation(){
 }
 """ >>$TEMPFILE
 cat $TEMPFILE >temp2.sh
-MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
+#MYCONFIG_ROOT_DIR='/tmp/myconfig' bash --rcfile $TEMPFILE
+MYCONFIG_ROOT_DIR='/tmp/myconfig' source $TEMPFILE
 
 ###############################################
 # Printout instructions
