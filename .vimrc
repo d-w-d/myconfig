@@ -72,8 +72,8 @@ imap kj <Esc>
 vmap kj <Esc>
 
 " Fast/smooth vertical scrolling
-nnoremap <S-j> 3jzz
-nnoremap <S-k> 3kzz
+noremap <S-j> 3jzz
+noremap <S-k> 3kzz
 
 " Select all file
 nmap VV ggVG

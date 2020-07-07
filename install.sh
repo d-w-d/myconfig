@@ -172,34 +172,44 @@ else
     git reset --hard origin/master
 fi
 
-# Install Vundle plugins
-echo -e """
-    Do you want to install vundle plugins as a background process?
-        ${RED}1. Yes (with messaging supressed)
-        ${RED}2. Yes (with messaging)
-        ${RED}3. No (with messaging)
-        ${RED}4. Skip plugin installation
-        ${CYA}
-"""
-read -n1 CHOICE
+# Install Vundle plugins as background process and print message when done
+((
+    TEMP=$(
+        vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2&>1; 
+        echo -e "kill -INT $$; 
+        echo '''\033[31m
+            ======================================================
+            VUNDLE PLUGINS HAVE FINISHED GETTING INSTALLING/UPDATING
+            ======================================================
+        \033[37m'''; 
+        kill -INT $TOPSHELLPID" 
+    ); 
+    bash -c "$TEMP"
+)&)
 
-echo "You  selected $CHOICE...."
 
-if [[ $CHOICE == 1 ]]; then
-    echo "Vundle is being installed quietly in the background."
-    vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
-    PID=$!
-    echo "PID=$PID"
-elif [[ $CHOICE == 2 ]]; then
-    echo "Vundle is being installed verbosely in the background."
-    time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall &
-    PID=$!
-    echo "PID=$PID"
-elif [[ $CHOICE == 3 ]]; then
-    echo "Installing vundle plugins as foreground process. Could take a while!"
-    time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall
-else
-    echo "OK. Skipping vundle plugins."
+#echo -e """ Do you want to install vundle plugins as a background process?  ${RED}1. Yes (with messaging supressed) ${RED}2. Yes (with messaging) ${RED}3. No (with messaging) ${RED}4. Skip plugin installation
+        #${CYA}
+#"""
+#read -n1 CHOICE
+
+#echo "You  selected $CHOICE...."
+
+#if [[ $CHOICE == 1 ]]; then
+    #echo "Vundle is being installed quietly in the background."
+    #vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1 &
+    #PID=$!
+    #echo "PID=$PID"
+#elif [[ $CHOICE == 2 ]]; then
+    #echo "Vundle is being installed verbosely in the background."
+    #time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall &
+    #PID=$!
+    #echo "PID=$PID"
+#elif [[ $CHOICE == 3 ]]; then
+    #echo "Installing vundle plugins as foreground process. Could take a while!"
+    #time vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall
+#else
+    #echo "OK. Skipping vundle plugins."
 fi
 
 ### Create bashrc file and start new shell
