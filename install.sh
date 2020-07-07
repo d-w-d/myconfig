@@ -171,12 +171,10 @@ fi
 
 # Install Vundle plugins as background process and print message when done
 TOPSHELLPID=$$
-#((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m\n================================================\nVUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING ${TOPSHELLPID}\n================================================\n\033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP" ) &)
-
 ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
-\n================================================\n
+================================================
 VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING 
-\n================================================\n\033[37m'''; 
+================================================\033[37m'''; 
 "); bash -c "$TEMP" ) &)
 
 
