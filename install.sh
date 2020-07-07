@@ -13,6 +13,7 @@ export BLU="\033[34m"
 export MAG="\033[35m"
 export CYA="\033[36m"
 export WHI="\033[37m"
+
 ###############################################
 # Define helper functions
 ###############################################
@@ -28,7 +29,7 @@ function abort_install() {
 }
 
 function myconfig_full_installation() {
-
+    
     PREVIOUSDIR=$PWD
 
     clear
@@ -159,13 +160,9 @@ fi
 ### Clone/update vundle
 if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
     # If Vundle not installed, clone then install plugins
-    #echo "Installing vundle and its plugins"
-    #git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim >/dev/null 2>&1 && vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
     git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 else
     # Install all vundle plugins
-    #echo "Installing vundle plugins"
-    #vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2>&1
     cd $HOME/.vim/bundle/Vundle.vim
     git fetch origin
     git checkout master
@@ -174,9 +171,13 @@ fi
 
 # Install Vundle plugins as background process and print message when done
 TOPSHELLPID=$$
-# ((  TEMP=$( vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2&>1; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m ====================================================== VUNDLE PLUGINS HAVE FINISHED GETTING INSTALLING/UPDATING ====================================================== \033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP") & )
-# ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $$"); echo "$TEMP" ) &)
-((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m\n================================================\nVUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING ${TOPSHELLPID}\n================================================\n\033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP" ) &)
+#((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m\n================================================\nVUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING ${TOPSHELLPID}\n================================================\n\033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP" ) &)
+
+((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
+\n================================================\n
+VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING 
+\n================================================\n\033[37m'''; 
+kill -INT $TOPSHELLPID"); bash -c "$TEMP" ) &)
 
 
 
