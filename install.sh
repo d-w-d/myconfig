@@ -117,7 +117,7 @@ function myconfig_full_installation() {
         - tmux      >=2.1
         - vim       >=7.4.1578 +clipboard +python3
         - powerline
-     
+
     To add bash-it, follow install instructions at:
     ${WHI}https://github.com/Bash-it/bash-it
     ${CYA}
@@ -173,20 +173,11 @@ else
 fi
 
 # Install Vundle plugins as background process and print message when done
-TOPSHELLPID=$$
-((
-    TEMP=$(
-        vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2&>1; 
-        echo -e "kill -INT $TOPSHELLPID; 
-        echo '''\033[31m
-            ======================================================
-            VUNDLE PLUGINS HAVE FINISHED GETTING INSTALLING/UPDATING
-            ======================================================
-        \033[37m'''; 
-        kill -INT $TOPSHELLPID" 
-    ); 
-    bash -c "$TEMP"
-)&)
+#TOPSHELLPID=$$
+# ((  TEMP=$( vim -N -u /tmp/myconfig/.vimrc +PluginInstall +qall >/dev/null 2&>1; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m ====================================================== VUNDLE PLUGINS HAVE FINISHED GETTING INSTALLING/UPDATING ====================================================== \033[37m'''; kill -INT $TOPSHELLPID"); bash -c "$TEMP") & )
+# ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $$"); echo "$TEMP" ) &)
+((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $$; echo '''\033[31m\n================================================\nVUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING\n================================================\n\033[37m'''; kill -INT $$"); bash -c "$TEMP" ) &)
+
 
 
 #echo -e """ Do you want to install vundle plugins as a background process?  ${RED}1. Yes (with messaging supressed) ${RED}2. Yes (with messaging) ${RED}3. No (with messaging) ${RED}4. Skip plugin installation
