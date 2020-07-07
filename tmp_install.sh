@@ -90,7 +90,7 @@ myconfig_full_installation(){
     echo 'Running full installation'
     bash --rcfile /tmp/myconfig/perm_install.sh
 }
-"
+" >>$TEMPFILE
 echo "
     echo -e '${CYA}
     ===================
