@@ -177,7 +177,7 @@ TOPSHELLPID=$$
 \n================================================\n
 VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING 
 \n================================================\n\033[37m'''; 
-kill -INT $TOPSHELLPID"); bash -c "$TEMP" ) &)
+"); bash -c "$TEMP" ) &)
 
 
 
