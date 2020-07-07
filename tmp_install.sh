@@ -87,6 +87,7 @@ echo "source /tmp/myconfig/UTILS/color_params.sh" >>$TEMPFILE
 echo "
 myconfig_full_installation(){
     # Start is new shell to avoid interruption by vundle messaging
+    echo 'Running full installation'
     bash --rcfile /tmp/myconfig/perm_install.sh
 }
 "
