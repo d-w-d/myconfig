@@ -69,7 +69,7 @@ imap <C-e> <ESC>A
 
 " Fast exit from insert mode
 imap kj <Esc>
-vmap kj <Esc>
+"vmap kj <Esc> # Not in visual; will cancel your selections when changing dirn 
 
 " Fast/smooth vertical scrolling
 noremap <S-j> 3jzz
