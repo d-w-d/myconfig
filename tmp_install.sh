@@ -53,9 +53,7 @@ source /tmp/myconfig/UTILS/color_params.sh
 
 
 ###############################################
-###############################################
-# Begin Main Script Logic
-###############################################
+# Install Vundle & Plugins
 ###############################################
 
 ### Clone/update vundle
@@ -78,7 +76,10 @@ VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
 ================================================\033[37m''';
 "); bash -c "$TEMP" ) &)
 
-### Create temp bashrc amalgum file and source it
+###############################################
+# Create temp bashrc amalgum file and source it
+###############################################
+
 TEMPFILE=$(mktemp)
 cat /tmp/myconfig/entry.sh >$TEMPFILE
 echo "alias vim='vim -N -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
@@ -111,7 +112,6 @@ cat $TEMPFILE >temp.sh
 
 ### Source temp bashrc file
 MYCONFIG_ROOT_DIR='/tmp/myconfig' source $TEMPFILE
-
 
 ### Return to original dir
 cd $PREVIOUSDIR
