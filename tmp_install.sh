@@ -105,7 +105,8 @@ echo "
 myconfig_full_installation(){
     # Start is new shell to avoid interruption by vundle messaging
     echo 'Running full installation'
-    bash --rcfile /tmp/myconfig/perm_install.sh
+    #bash --rcfile /tmp/myconfig/perm_install.sh
+    source /tmp/myconfig/perm_install.sh
 }
 export -f myconfig_full_installation
 " >>$TEMPFILE
