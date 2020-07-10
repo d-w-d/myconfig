@@ -59,8 +59,9 @@ source /tmp/myconfig/UTILS/color_params.sh
 command -v git >/dev/null 2>&1 || abort_install "git not installed"
 
 ### Check that vim is installed
-if command -v vim >/dev/null 2>&1  ;then
-
+echo "Debug0"
+if command -v vim >/dev/null 2>&1 ;then
+    echo "Debug1"
     ### Clone/update vundle
     if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
         # If Vundle not installed, clone then install plugins
@@ -72,7 +73,7 @@ if command -v vim >/dev/null 2>&1  ;then
         git checkout master
         git reset --hard origin/master
     fi
-
+    echo "Debug2"
     ### Install Vundle plugins as background process and print message when done
     TOPSHELLPID=$$
     ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
