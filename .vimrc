@@ -1,8 +1,18 @@
 "==================================================
+" Pre-plugin Misc Setup
+"==================================================
+syntax on                           " Turn on syntax
+let mapleader = " "                 " Make spacebar the leader
+set clipboard=unnamed               " enables yanked stuff to be copied to mac clipboard
+set backspace=indent,eol,start      " enables backspaces
+set encoding=utf-8                  " Set encoding
+colorscheme torte
+
+"==================================================
 " Begin Vundle setup
 "==================================================
 "
-" Initiate plugins first in order to call functions, 
+" Initiate plugins first in order to call functions,
 " variables, etc. later
 " See: https://github.com/VundleVim/Vundle.vim for setup instructions
 "
@@ -21,6 +31,8 @@ Plugin 'christoomey/vim-tmux-navigator'     " Move between vim windows and tmux 
 "Plugin 'Yggdroot/indentLine'
 "Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'Valloric/YouCompleteMe'                                     " autocomplete
+Plugin 'mattn/emmet-vim'                                            " emmet webdev snippets
+Plugin 'mattn/webapi-vim'                                           " emmet webdev snippets
 Plugin 'scrooloose/nerdtree'                                        " enables file-tree searching
 Plugin 'kien/ctrlp.vim'                                             " file-word-search utility
 Plugin 'Chiel92/vim-autoformat'                                     " Autoformatting
@@ -36,16 +48,13 @@ filetype plugin indent on    " required
 "==================================================
 
 "==================================================
-" Misc settings
+" Post-Plugin Misc settings
 "==================================================
 
-syntax on                           " Turn on syntax
-let mapleader = " "                 " Make spacebar the leader
-set clipboard=unnamed               " enables yanked stuff to be copied to mac clipboard
-set backspace=indent,eol,start      " enables backspaces
-set encoding=utf-8                  " Set encoding
+let g:user_emmet_mode='inv'
 let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
-colorscheme torte
+"let g:user_emmet_leader_key='<C-Space>'
+let g:user_emmet_settings = webapi#json#decode(join(readfile(expand('~/.myconfig/.vim-emmet-snippets.json')), "\n"))
 
 "==================================================
 "==================================================
@@ -61,7 +70,7 @@ colorscheme torte
 noremap <C-f> :Autoformat<CR>
 
 " Overwrite: "CTRL-A    2    add N to number at/after cursor"
-map <C-a> ^ 
+map <C-a> ^
 imap <C-a> <ESC>I
 " Overwrite: "CTRL-E         scroll N lines upwards (N lines Extra)"
 map <C-e> g_
@@ -69,7 +78,7 @@ imap <C-e> <ESC>A
 
 " Fast exit from insert mode
 imap kj <Esc>
-"vmap kj <Esc> # Not in visual; will cancel your selections when changing dirn 
+"vmap kj <Esc> # Not in visual; will cancel your selections when changing dirn
 
 " Fast/smooth vertical scrolling
 noremap <S-j> 3jzz
@@ -79,10 +88,6 @@ noremap <S-k> 3kzz
 " See: https://stackoverflow.com/a/21000307/8620332
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
-
-" Fancy paste text onto line below/above
-nnoremap <leader>p m`o<ESC>p``
-nnoremap <leader>P m`O<ESC>p``
 
 " Select all file
 nmap VV ggVG
@@ -121,6 +126,17 @@ cnoremap <C-l> <ESC>la
 " Leader Shortcuts
 "==================================================
 
+" Fancy paste text onto line below/above
+nnoremap <leader>p m`o<ESC>p``
+nnoremap <leader>P m`O<ESC>p``
+
+" Emmet shortcut
+"noremap <C-Space> <C-y>,
+map <NUL> <C-y>,
+imap <NUL> <C-y>,
+"map <Leader>e <C-y>,
+noremap <Leader>g viw
+
 " Toggle relative numbering
 nmap <Leader>nu :set rnu! <cr>
 " Toggle absolute numbering
@@ -145,6 +161,7 @@ nnoremap <Leader>f za
 " Indent Guides Config
 "==================================================
 
+" TODO: fix the mess that is indent highlighting
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_auto_colors = 0
 let g:indent_guides_guide_size = 1
