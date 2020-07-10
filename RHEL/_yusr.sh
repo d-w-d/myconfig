@@ -16,9 +16,9 @@ function abort_install() {
 ### repotrack included in yum-utils package
 command -v repotrack >/dev/null 2>&1 || abort_install "repotrack not found; exiting;"
 ### rpm2cpio included in yum-utils package
-command -v rpm2cpio >/dev/null 2>&1 || echo "rpm2cpio not found; exiting;" && exit 1
+command -v rpm2cpio >/dev/null 2>&1 || abort_install "rpm2cpio not found; exiting;"
 ### Included in centos7
-command -v getopts >/dev/null 2>&1 || echo "getopts not found; exiting;" && exit 1
+command -v getopts >/dev/null 2>&1 || abort_install "getopts not found; exiting;"
 
 ###############################################################
 ### Setup dirs
