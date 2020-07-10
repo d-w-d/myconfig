@@ -56,25 +56,41 @@ source /tmp/myconfig/UTILS/color_params.sh
 # Install Vundle & Plugins
 ###############################################
 
-### Clone/update vundle
-if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
-    # If Vundle not installed, clone then install plugins
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
-else
-    # Install all vundle plugins
-    cd $HOME/.vim/bundle/Vundle.vim
-    git fetch origin
-    git checkout master
-    git reset --hard origin/master
-fi
+command -v git >/dev/null 2>&1 || abort_install "git not installed"
 
-# Install Vundle plugins as background process and print message when done
-TOPSHELLPID=$$
-((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall; echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
-================================================
-VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
-================================================\033[37m''';
-"); bash -c "$TEMP" ) &)
+### Check that vim is installed
+if command -v vim >/dev/null 2>&1  ;then
+
+    ### Clone/update vundle
+    if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
+        # If Vundle not installed, clone then install plugins
+        git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+    else
+        # Install all vundle plugins
+        cd $HOME/.vim/bundle/Vundle.vim
+        git fetch origin
+        git checkout master
+        git reset --hard origin/master
+    fi
+
+    ### Install Vundle plugins as background process and print message when done
+    TOPSHELLPID=$$
+    ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
+    echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
+    ================================================
+    VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
+    ================================================\033[37m''';
+    "); bash -c "$TEMP" ) &)
+
+else
+    echo -e """${RED}
+    VIM isn't available.
+    ${WHI}
+    """
+    if [[ "$OS" == "RHEL" ]];then 
+    echo "Try installing vim with yusr.    
+    fi
+fi
 
 ###############################################
 # Create temp bashrc amalgum file and source it
@@ -90,25 +106,25 @@ myconfig_full_installation(){
     echo 'Running full installation'
     bash --rcfile /tmp/myconfig/perm_install.sh
 }
-export -f myconfig_full_installation 
+export -f myconfig_full_installation
 """ >>$TEMPFILE
 echo """
-    echo -e '${CYA}
-    ===================
-    MYCONFIG DOWNLOADED
-    ===================
-    ${GRE}
-    - Configuration scripts have been cloned to ${WHI}/tmp/myconfig${GRE}
+echo -e '${CYA}
+===================
+MYCONFIG DOWNLOADED
+===================
+${GRE}
+- Configuration scripts have been cloned to ${WHI}/tmp/myconfig${GRE}
 
-    - Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
+- Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
 
-    - Vim status: ${WHI}$(type vim)${GRE}
+- Vim status: ${WHI}$(type vim)${GRE}
 
-    - Vundle plugins are being downloaded. Will notify in this shell when ready.
+- Vundle plugins are being downloaded. Will notify in this shell when ready.
 
-    - Run${RED} myconfig_full_installation${GRE} for full install.
+- Run${RED} myconfig_full_installation${GRE} for full install.
 
-    '
+'
 """ >>$TEMPFILE
 cat $TEMPFILE >temp.sh
 

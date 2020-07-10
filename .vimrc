@@ -75,6 +75,15 @@ imap kj <Esc>
 noremap <S-j> 3jzz
 noremap <S-k> 3kzz
 
+" Enables up/down on single-wrapped lines whilst preserving standard jumpto
+" See: https://stackoverflow.com/a/21000307/8620332
+nnoremap <expr> j v:count ? 'j' : 'gj'
+nnoremap <expr> k v:count ? 'k' : 'gk'
+
+" Fancy paste text onto line below/above
+nnoremap <leader>p m`o<ESC>p``
+nnoremap <leader>P m`O<ESC>p``
+
 " Select all file
 nmap VV ggVG
 

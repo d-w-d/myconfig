@@ -104,10 +104,10 @@ To properly use these configurations, you'll need:
 To add bash-it, follow install instructions at:
 ${WHI}https://github.com/Bash-it/bash-it
 ${CYA}
-If zsh is installed, consider adding ohmyzsh followed by powerlevel10k:
+If zsh is installed, consider adding ohmyzsh and other tools:
 
 ${WHI}https://ohmyz.sh/#install
 ${WHI}https://github.com/romkatv/powerlevel10k#manual
-
+${WHI}https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#oh-my-zsh
 """
 
