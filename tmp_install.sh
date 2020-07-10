@@ -119,7 +119,7 @@ ${GRE}
 
 - Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
 
-- Vim status: ${WHI}$(type vim)${GRE}
+- Vim status: ${WHI}$(type vim 2>&1)${GRE}
 
 - Vundle plugins are being downloaded. Will notify in this shell when ready.
 
