@@ -19,7 +19,7 @@ function abort_install() {
 ###############################################
 
 # Require GIT
-command -v git >/dev/null 2>&1 || abort_install "Git is not installed. Aborting installation."
+hash git >/dev/null 2>&1 || abort_install "Git is not installed. Aborting installation."
 
 ###################################################
 # Clone/Update myconfig Repo
@@ -56,11 +56,11 @@ source /tmp/myconfig/UTILS/color_params.sh
 # Install Vundle & Plugins
 ###############################################
 
-command -v git >/dev/null 2>&1 || abort_install "git not installed"
+hash git >/dev/null 2>&1 || abort_install "git not installed"
 
 ### Check that vim is installed
 echo "Debug0"
-if command -v vim >/dev/null 2>&1 ;then
+if hash vim >/dev/null 2>&1 ;then
     echo "Debug1"
     ### Clone/update vundle
     if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
