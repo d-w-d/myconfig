@@ -100,32 +100,32 @@ TEMPFILE=$(mktemp)
 cat /tmp/myconfig/entry.sh >$TEMPFILE
 echo "alias vim='vim -N -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
 echo "source /tmp/myconfig/UTILS/color_params.sh" >>$TEMPFILE
-echo """
-myconfig_full_installation(){
-    # Start is new shell to avoid interruption by vundle messaging
-    echo 'Running full installation'
-    bash --rcfile /tmp/myconfig/perm_install.sh
-}
-export -f myconfig_full_installation
-""" >>$TEMPFILE
-echo """
-echo -e '${CYA}
-===================
-MYCONFIG DOWNLOADED
-===================
-${GRE}
-- Configuration scripts have been cloned to ${WHI}/tmp/myconfig${GRE}
+echo "
+    myconfig_full_installation(){
+        # Start is new shell to avoid interruption by vundle messaging
+        echo 'Running full installation'
+        bash --rcfile /tmp/myconfig/perm_install.sh
+    }
+    export -f myconfig_full_installation
+" >>$TEMPFILE
+echo "
+    echo -e '${CYA}
+    ===================
+    MYCONFIG DOWNLOADED
+    ===================
+    ${GRE}
+    - Configuration scripts have been cloned to ${WHI}/tmp/myconfig${GRE}
 
-- Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
+    - Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
 
-- Vim status: ${WHI}$(type vim)${GRE}
+    - Vim status: ${WHI}$(type vim)${GRE}
 
-- Vundle plugins are being downloaded. Will notify in this shell when ready.
+    - Vundle plugins are being downloaded. Will notify in this shell when ready.
 
-- Run${RED} myconfig_full_installation${GRE} for full install.
+    - Run${RED} myconfig_full_installation${GRE} for full install.
 
-'
-""" >>$TEMPFILE
+    '
+" >>$TEMPFILE
 cat $TEMPFILE >temp.sh
 
 ### Source temp bashrc file
