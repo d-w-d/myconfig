@@ -91,6 +91,10 @@ else
     cp /tmp/myconfig/.vimrc $HOME/.vimrc
 fi
 
+
+### Finally, source the home-installed myconfig
+source $HOME/.myconfig/entry.sh
+
 echo -e """${CYA}
 Configurations Installed.
 
