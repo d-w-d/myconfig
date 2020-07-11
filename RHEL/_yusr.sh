@@ -67,6 +67,11 @@ install)
         [ -e "$filename" ] || continue
         echo ">>>> $filename"
         rpm2cpio "$filename" | cpio -id --no-preserve-owner
+
+        ### Need to make sure nothing was added to our filesystem that we can't write to
+        ### since later packages will want to add stuff to dirs that previous packages 
+        ### copied over in full
+        chmod -R u+w .
     done
     cd $PREVIOUSDIR
     ;;
