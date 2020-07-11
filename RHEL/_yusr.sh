@@ -66,7 +66,7 @@ install)
     for filename in $HOME/.yusr/rpm/*.rpm; do
         [ -e "$filename" ] || continue
         echo ">>>> $filename"
-        rpm2cpio "$filename" | cpio -id
+        rpm2cpio "$filename" | cpio -id --no-preserve-owner
     done
     cd $PREVIOUSDIR
     ;;
