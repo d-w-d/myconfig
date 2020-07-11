@@ -93,6 +93,7 @@ fi
 
 
 ### Finally, source the home-installed myconfig
+unalias vim
 source $HOME/.myconfig/entry.sh
 
 echo -e """${CYA}
