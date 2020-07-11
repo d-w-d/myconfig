@@ -4,8 +4,8 @@
 ### LOAD USEFUL PATHS & ENV VARS
 ##############################################################
 
-### Path for yusr-installed executables
-[[ -d $HOME/.yusr ]] && export PATH="$HOME/.yusr/sbin:$HOME/.yusr/bin:$HOME/.yusr/usr/bin:$HOME/.yusr/usr/bin:$PATH"
+### Augment path for yusr-installed executables
+export PATH="$HOME/.yusr/sbin:$HOME/.yusr/bin:$HOME/.yusr/usr/bin:$HOME/.yusr/usr/bin:$PATH"
 
-
-[[ -d $HOME/.yusr ]] && L='/lib:/lib64:/usr/lib:/usr/lib64' && export LD_LIBRARY_PATH="$L:$HOME/.yusr/usr/lib:$HOME/.yusr/usr/lib64"
+### Augment path for yusr-installed libraries
+L='/lib:/lib64:/usr/lib:/usr/lib64' && export LD_LIBRARY_PATH="$L:$HOME/.yusr/usr/lib:$HOME/.yusr/usr/lib64"
