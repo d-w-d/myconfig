@@ -58,22 +58,42 @@ install)
     shift # Remove 'install' from the argument list
 
     ### Wrap around repotrack to download rpm's for package and dependencies
-    repotrack -a x86_64 -p $HOME/.yusr/rpm $PACKAGE
+    #repotrack -a x86_64 -p $HOME/.yusr/rpm $PACKAGE > /tmp/temprpms.txt
+    ### Wrap around repotrack to download rpm's for package and dependencies
+    echo "$HOME/.yusr/rpm/filesystem-3.2-25.el7.x86_64.rpm" >/tmp/temprpmfiles.txt
+    repotrack -a x86_64 -p $HOME/.yusr/rpm $PACKAGE >>/tmp/temprpmfiles.txt
 
-    ### Wrap around rpm2cpio to crudely install all rpm files
+    IFS=$'\r\n' GLOBIGNORE='*' command eval "lines=($(cat /tmp/temprpmfiles.txt | grep -E 'x86_64|noarch' | sed 's/Downloading //' | cut -f1 -d' '))"
+    echo "${lines[@]}"
     PREVIOUSDIR=$PWD
     cd $HOME/.yusr
-    for filename in $HOME/.yusr/rpm/*.rpm; do
-        [ -e "$filename" ] || continue
-        echo ">>>> $filename"
-        rpm2cpio "$filename" | cpio -id --no-preserve-owner
-
-        ### Need to make sure nothing was added to our yusr filesystem 
-        ### that we can't write to since later packages will want to add 
-        ### stuff to dirs that previous packages copied over in full
+    for line in "${lines[@]}"; do
+        chmod -R u+w .
+        echo ">>>> $line"
+        rpm2cpio "$line" | cpio -id --no-preserve-owner
+        #for filename in $HOME/.yusr/rpm/*.rpm; do
+        #[ -e "$filename" ] || continue
+        #echo ">>>> $filename"
+        #rpm2cpio "$filename" | cpio -id
+        #done
         chmod -R u+w .
     done
     cd $PREVIOUSDIR
+
+    ### Wrap around rpm2cpio to crudely install all rpm files just downloaded
+    #PREVIOUSDIR=$PWD
+    #cd $HOME/.yusr
+    #for filename in $HOME/.yusr/rpm/*.rpm; do
+    #[ -e "$filename" ] || continue
+    #echo ">>>> $filename"
+    #rpm2cpio "$filename" | cpio -id --no-preserve-owner
+
+    #### Need to make sure nothing was added to our yusr filesystem
+    #### that we can't write to since later packages will want to add
+    #### stuff to dirs that previous packages copied over in full
+    #chmod -R u+w .
+    #done
+    #cd $PREVIOUSDIR
     ;;
 search)
     PACKAGE=$1
