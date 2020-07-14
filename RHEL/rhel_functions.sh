@@ -10,26 +10,36 @@ function fun_install_vim() {
 
     PREVIOUSDIR=$PWD
     ### Build recent ncurses
-    cd /tmp
-    curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
-    tar -xzvf ncurses.tar.gz
-    cd ncurses-6.2
-    ./configure --prefix=$HOME/.yusr/usr/local
-    make
-    make install
+    #cd /tmp
+    #curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
+    #tar -xzvf ncurses.tar.gz
+    #cd ncurses-6.2
+    #./configure --prefix=$HOME/.yusr/usr/local
+    #make
+    #make install
 
     ### Build recent tmux 3.1b
     cd /tmp
     git clone https://github.com/vim/vim.git
     cd vim/src
-    CFLAGS="-I$HOME/.yusr/usr/local/include" LDFLAGS="-L$HOME/.yusr/usr/local/lib" \
-        ./configure \ 
-    --enable-gui="auto" \ 
-    --enable-pythoninterp="yes" \ 
-    --with-python-config-dir="/usr/lib64/python2.7/config" \ 
-    --enable-python3interp="yes" \
-        --enable-gtk2-check \
+
+    IS_DAEMON=$is_daemon gunicorn app_entry:flask_app \
+        --config ..\/.gunicorn.config.py \
+        --pid ..\/.pid.txt \
+        --name $APP_NAME \
+        --bind '127.0.0.1:'$PORT \
+        $is_daemon_flag
+
+    BEGINCONFIG=true \
+        CFLAGS="-I$HOME/.yusr/usr/local/include" \
+        LDFLAGS="-L$HOME/.yusr/usr/local/lib" configure \
         --with-x \
+        --enable-gui=auto \
+        --enable-gui="auto" \
+        --enable-pythoninterp="yes" \
+        --with-python-config-dir="/usr/lib64/python2.7/config" \
+        --enable-python3interp="yes" \
+        --enable-gtk2-check \
         --with-python3-config-dir="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu" \
         --enable-fail-if-missing \
         --prefix="$HOME/.yusr/usr/local"
