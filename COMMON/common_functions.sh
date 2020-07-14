@@ -42,7 +42,7 @@ fun_bg_install_vundle_plugins() {
 
     ### Confirm some prereqs
     [[ ! -d /tmp/myconfig ]] && echo "/tmp/myconfig not found" && return 1
-    hash vim >/dev/null 2>&1 || echo "vim not found" && return 1
+    hash vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
 
     ## Cancel top-shell message then print message (deprecated)
     #TOPSHELLPID=$$
@@ -53,14 +53,16 @@ fun_bg_install_vundle_plugins() {
     #================================================\033[37m''';
     #"); bash -c "$TEMP" ) &)
 
-    ### Install vundle plugins as bg process then print message
+    # Install vundle plugins as bg process then print message
+    # If cmake is absent, then also complete ycm installtion
+    echo "Installing vundle plugins..."
     ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
     echo -e "echo '''\033[31m
     ================================================
     VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
-    ================================================\033[37m''';
-    "; fun_complete_ycm_installation); bash -c "$TEMP" ) &)
-
+    ================================================\n\033[37m''';";
+    hash cmake >/dev/null 2>&1 || fun_complete_ycm_installation  >/dev/null 2>&1;
+    ); bash -c "$TEMP" ) &)
     return 0
 }
 
@@ -81,20 +83,20 @@ fun_complete_ycm_installation() {
 
     ### Confirm prereqs
     [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && return 1
-    hash python3 >/dev/null 2>&1 || echo "python3 not found" && return 1
-    hash pip3 >/dev/null 2>&1 || echo "pip3 not found" && return 1
+    hash python3 >/dev/null 2>&1 || (echo "python3 not found" && return 1)
+    hash pip3 >/dev/null 2>&1 || (echo "pip3 not found" && return 1)
 
-    ### Install vundle plugins as bg process then print message
+    echo "Completing installation of YouCompleteMe..."
     ((TEMP=$(PREVIOUSDIR=$PWD;
     cd $HOME/.vim/bundle/YouCompleteMe;
     git submodule update --init --recursive;
-    python3 -m pip install --user cmake;
-    python3 install.py;
+    python3 -m pip install --user cmake > /dev/null 2>&1;
+    python3 install.py > /dev/null 2>&1;
     echo -e "echo '''\033[31m
     ====================================
     YouCompleteMe Installation Finalized
-    ====================================\033[37m''';
-    "); bash -c "$TEMP" ) &)
+    ====================================\n\033[37m''';
+    "; cd $PREVIOUSDIR); bash -c "$TEMP" ) &)
 
     return 0
 }
