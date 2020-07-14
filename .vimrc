@@ -37,6 +37,7 @@ Plugin 'scrooloose/nerdtree'                                        " enables fi
 Plugin 'kien/ctrlp.vim'                                             " file-word-search utility
 Plugin 'Chiel92/vim-autoformat'                                     " Autoformatting
 Plugin 'kana/vim-submode'
+Plugin 'ekalinin/dockerfile.vim'                                    " Enables :set syntax=Dockerfile
 Plugin 'preservim/nerdcommenter'                                    " used to toggle comments
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}     " enables vim status line
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
