@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 #
 # yusr = yum + user; it's like 'pip install --user' but for yum
+# yusr is a crude wrapper around repotrack, rpm2cpio and cpio
+# It was developed within a docker centos7 image
+
+
+
 
 ###############################################################
 ### Check the prereq commands are available

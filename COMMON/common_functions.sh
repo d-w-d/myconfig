@@ -1,16 +1,116 @@
 #!/usr/bin/env false
+#
+# Define functions useful across all *NIX platforms
 
 #################################################
-### Show all users
+# Determine present OS
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Writes OS to stdout
 #################################################
-fun_show_all_users() {
-    dscl . list /Users
+function fun_which_os {
+    OS="UNKNOWN"
+    if [[ $(uname -s) == Darwin ]]; then OS="MACOS"; fi
+
+    if [[ $(uname -s) == Linux ]]; then
+        if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
+            OS="RHEL"
+        fi
+        if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
+            OS="DEBIAN"
+        fi
+    fi
+    echo $OS
+    return 0
 }
 
-#export -f fun_show_all_users
+[[ $BASH ]] && export -f fun_which_os
 
 #################################################
-### Show resources of some greped running process
+# Install Vundle Plugins as background process
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Eventually writes OS to stdout
+#################################################
+fun_bg_install_vundle_plugins() {
+
+    ### Confirm some prereqs
+    [[ ! -d /tmp/myconfig ]] && echo "/tmp/myconfig not found" && return 1
+    hash vim >/dev/null 2>&1 || echo "vim not found" && return 1
+
+    ## Cancel top-shell message then print message (deprecated)
+    #TOPSHELLPID=$$
+    #((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
+    #echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
+    #================================================
+    #VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
+    #================================================\033[37m''';
+    #"); bash -c "$TEMP" ) &)
+
+    ### Install vundle plugins as bg process then print message
+    ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
+    echo -e "echo '''\033[31m
+    ================================================
+    VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
+    ================================================\033[37m''';
+    "; fun_complete_ycm_installation); bash -c "$TEMP" ) &)
+
+    return 0
+}
+
+[[ $BASH ]] && export -f fun_bg_install_vundle_plugins
+
+########################################################
+# Completes installation of YouCompleteMe Vundle Plugin.
+# Needed because ycm needs cmake for installation,
+# and this may not be available on your machine
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Eventually writes OS to stdout
+########################################################
+fun_complete_ycm_installation() {
+
+    ### Confirm prereqs
+    [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && return 1
+    hash python3 >/dev/null 2>&1 || echo "python3 not found" && return 1
+    hash pip3 >/dev/null 2>&1 || echo "pip3 not found" && return 1
+
+    ### Install vundle plugins as bg process then print message
+    ((TEMP=$(PREVIOUSDIR=$PWD;
+    cd $HOME/.vim/bundle/YouCompleteMe;
+    git submodule update --init --recursive;
+    python3 -m pip install --user cmake;
+    python3 install.py;
+    echo -e "echo '''\033[31m
+    ====================================
+    YouCompleteMe Installation Finalized
+    ====================================\033[37m''';
+    "); bash -c "$TEMP" ) &)
+
+    return 0
+}
+
+[[ $BASH ]] && export -f fun_complete_ycm_installation
+
+
+#################################################
+# TODO: NEES COMLETION/REFINEMENT
+# Show resources of some greped running process
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Eventually writes OS to stdout
 #################################################
 fun_resources_used() {
 
@@ -76,4 +176,4 @@ fun_resources_used() {
 
 }
 
-#export -f fun_resources_used
+[[ $BASH ]] && export -f fun_resources_used

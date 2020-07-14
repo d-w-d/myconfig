@@ -28,3 +28,14 @@ export CPPFLAGS="-I/usr/local/opt/icu4c/include"
 
 # For pkg-config to find icu4c you may need to set:
 export PKG_CONFIG_PATH="/usr/local/opt/icu4c/lib/pkgconfig"
+
+### Create shortcuts for color switching
+### BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
+export BLA="\033[30m"
+export RED="\033[31m"
+export GRE="\033[32m"
+export YEL="\033[33m"
+export BLU="\033[34m"
+export MAG="\033[35m"
+export CYA="\033[36m"
+export WHI="\033[37m"

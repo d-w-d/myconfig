@@ -1,6 +1,11 @@
 #!/usr/bin/env false
 
 ###############################################
+# Make available fun_bg_install_vundle_plugins
+###############################################
+source /tmp/myconfig/COMMON/common_functions.sh
+
+###############################################
 # Define pre-git-cloning helper functions
 ###############################################
 
@@ -42,7 +47,6 @@ else
     touch misc.sh
 fi
 
-
 ###############################################
 # Misc variables/Params
 ###############################################
@@ -51,7 +55,6 @@ fi
 ### BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
 source /tmp/myconfig/UTILS/color_params.sh
 
-
 ###############################################
 # Install Vundle & Plugins
 ###############################################
@@ -59,36 +62,34 @@ source /tmp/myconfig/UTILS/color_params.sh
 hash git >/dev/null 2>&1 || abort_install "git not installed"
 
 ### Check that vim is installed
-echo "Debug0"
-if hash vim >/dev/null 2>&1 ;then
-    echo "Debug1"
+if hash vim >/dev/null 2>&1; then
     ### Clone/update vundle
     if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
-        # If Vundle not installed, clone then install plugins
+        # If Vundle not installed then clone it
         git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
     else
-        # Install all vundle plugins
+        # If Vundle dir exists, update it
         cd $HOME/.vim/bundle/Vundle.vim
         git fetch origin
         git checkout master
         git reset --hard origin/master
     fi
-    echo "Debug2"
     ### Install Vundle plugins as background process and print message when done
-    TOPSHELLPID=$$
-    ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
-    echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
-    ================================================
-    VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
-    ================================================\033[37m''';
-    "); bash -c "$TEMP" ) &)
+    #TOPSHELLPID=$$
+    #((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
+    #echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
+    #================================================
+    #VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
+    #================================================\033[37m''';
+    #"); bash -c "$TEMP" ) &)
+    fun_bg_install_vundle_plugins
 
 else
     echo -e """${RED}
     VIM isn't available.
     ${WHI}
     """
-    if [[ "$OS" == "RHEL" ]];then
+    if [[ "$OS" == "RHEL" ]]; then
         echo "Try installing vim with yusr."
     fi
 fi

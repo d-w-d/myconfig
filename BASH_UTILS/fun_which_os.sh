@@ -1,4 +1,4 @@
-#!/bin/false 
+#!/usr/bin/env false 
 
 
 function fun_which_os {
@@ -16,7 +16,6 @@ function fun_which_os {
     fi
 
     echo $OS
-
 }
 
-export fun_which_os
+export -f fun_which_os
