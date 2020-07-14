@@ -3,6 +3,7 @@
 ###############################################
 # Make available fun_bg_install_vundle_plugins
 ###############################################
+source /tmp/myconfig/COMMON/common_env.sh
 source /tmp/myconfig/COMMON/common_functions.sh
 
 ###############################################
