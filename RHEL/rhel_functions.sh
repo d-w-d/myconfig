@@ -23,13 +23,6 @@ function fun_install_vim() {
     git clone https://github.com/vim/vim.git
     cd vim/src
 
-    IS_DAEMON=$is_daemon gunicorn app_entry:flask_app \
-        --config ..\/.gunicorn.config.py \
-        --pid ..\/.pid.txt \
-        --name $APP_NAME \
-        --bind '127.0.0.1:'$PORT \
-        $is_daemon_flag
-
     BEGINCONFIG=true \
         CFLAGS="-I$HOME/.yusr/usr/local/include" \
         LDFLAGS="-L$HOME/.yusr/usr/local/lib" configure \
