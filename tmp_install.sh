@@ -82,6 +82,8 @@ if hash vim >/dev/null 2>&1; then
     #VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
     #================================================\033[37m''';
     #"); bash -c "$TEMP" ) &)
+    echo "- Vundle plugins are being downloaded. Will notify in this shell when ready."
+
     fun_bg_install_vundle_plugins
 
 else
@@ -122,8 +124,6 @@ ${GRE}
 - Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
 
 - Vim status: ${WHI}$(type vim 2>&1)${GRE}
-
-- Vundle plugins are being downloaded. Will notify in this shell when ready.
 
 - Run${RED} myconfig_full_installation${GRE} for full install.
 
