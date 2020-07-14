@@ -23,9 +23,10 @@ function fun_install_vim() {
     git clone https://github.com/vim/vim.git
     cd vim/src
 
+    make distclean
     BEGINCONFIG=true \
         CFLAGS="-I$HOME/.yusr/usr/local/include" \
-        LDFLAGS="-L$HOME/.yusr/usr/local/lib" configure \
+        LDFLAGS="-L$HOME/.yusr/usr/local/lib" ./configure \
         --with-x \
         --enable-gui=auto \
         --enable-gui="auto" \
