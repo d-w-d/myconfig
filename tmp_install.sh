@@ -64,26 +64,6 @@ hash git >/dev/null 2>&1 || abort_install "git not installed"
 
 ### Check that vim is installed
 if hash vim >/dev/null 2>&1; then
-    ### Clone/update vundle
-    if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
-        # If Vundle not installed then clone it
-        git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
-    else
-        # If Vundle dir exists, update it
-        cd $HOME/.vim/bundle/Vundle.vim
-        git fetch origin
-        git checkout master
-        git reset --hard origin/master
-    fi
-    ### Install Vundle plugins as background process and print message when done
-    #TOPSHELLPID=$$
-    #((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
-    #echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
-    #================================================
-    #VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
-    #================================================\033[37m''';
-    #"); bash -c "$TEMP" ) &)
-    echo "- Vundle plugins are being downloaded. Will notify in this shell when ready."
 
     fun_bg_install_vundle_plugins
 

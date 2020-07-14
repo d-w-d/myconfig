@@ -41,4 +41,10 @@ function fun_install_vim() {
     make install
 
     cd $PREVIOUSDIR
+
+    ### Now that vim is installed, let's download vundle plugins
+    MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
+    source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
+    fun_bg_install_vundle_plugins
+
 }

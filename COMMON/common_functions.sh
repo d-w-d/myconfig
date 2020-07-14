@@ -44,17 +44,20 @@ fun_bg_install_vundle_plugins() {
     [[ ! -d /tmp/myconfig ]] && echo "/tmp/myconfig not found" && return 1
     hash vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
 
-    ## Cancel top-shell message then print message (deprecated)
-    #TOPSHELLPID=$$
-    #((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
-    #echo -e "kill -INT $TOPSHELLPID; echo '''\033[31m
-    #================================================
-    #VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
-    #================================================\033[37m''';
-    #"); bash -c "$TEMP" ) &)
+    ### Clone/update vundle repo
+    if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
+        # If Vundle not installed then clone it
+        git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+    else
+        # If Vundle dir exists, update it
+        cd $HOME/.vim/bundle/Vundle.vim
+        git fetch origin
+        git checkout master
+        git reset --hard origin/master
+    fi
 
-    # Install vundle plugins as bg process then print message
-    # If cmake is absent, then also complete ycm installtion
+    ### Install vundle plugins as bg process then print message
+    ### If cmake is absent, then also complete ycm installtion
     echo "Installing vundle plugins..."
     ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
     echo -e "echo '''\033[31m
