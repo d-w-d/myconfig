@@ -5,7 +5,7 @@
 ##############################################################
 
 ### Create .yusr dir
-[[ ! -d $HOME/.yusr ]] && mkdir $HOME/.yusr
+[[ ! -d $HOME/.yusr ]] && mkdir -p $HOME/.yusr/rpm
 
 ### Augment path for yusr-installed executables
 export PATH="$HOME/.yusr/usr/local/sbin:$HOME/.yusr/usr/local/bin:$HOME/.yusr/sbin:$HOME/.yusr/bin:$HOME/.yusr/usr/bin:$HOME/.yusr/usr/bin:$PATH"
