@@ -4,6 +4,9 @@
 ### LOAD USEFUL PATHS & ENV VARS
 ##############################################################
 
+### Create .yusr dir
+[[ ! -d $HOME/.yusr ]] && mkdir $HOME/.yusr
+
 ### Augment path for yusr-installed executables
 export PATH="$HOME/.yusr/usr/local/sbin:$HOME/.yusr/usr/local/bin:$HOME/.yusr/sbin:$HOME/.yusr/bin:$HOME/.yusr/usr/bin:$HOME/.yusr/usr/bin:$PATH"
 
