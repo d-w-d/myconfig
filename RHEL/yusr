@@ -4,9 +4,6 @@
 # yusr is a crude wrapper around repotrack, rpm2cpio and cpio
 # It was developed within a docker centos7 image
 
-
-
-
 ###############################################################
 ### Check the prereq commands are available
 ###############################################################
@@ -29,7 +26,7 @@ command -v getopts >/dev/null 2>&1 || abort_install "getopts not found; exiting;
 ### Setup dirs
 ###############################################################
 
-[[ ! -d $HOME/.yusr/rpm ]] && mkdir -p $HOME/.yusr/rpm
+[[ ! -d $HOME/.myfs/rpm ]] && mkdir -p $HOME/.myfs/rpm
 
 ###############################################################
 ### Parse commands, args, etc.
@@ -63,20 +60,20 @@ install)
     shift # Remove 'install' from the argument list
 
     ### Wrap around repotrack to download rpm's for package and dependencies
-    #repotrack -a x86_64 -p $HOME/.yusr/rpm $PACKAGE > /tmp/temprpms.txt
+    #repotrack -a x86_64 -p $HOME/.myfs/rpm $PACKAGE > /tmp/temprpms.txt
     ### Wrap around repotrack to download rpm's for package and dependencies
-    echo "$HOME/.yusr/rpm/filesystem-3.2-25.el7.x86_64.rpm" >/tmp/temprpmfiles.txt
-    repotrack -a x86_64 -p $HOME/.yusr/rpm $PACKAGE >>/tmp/temprpmfiles.txt
+    echo "$HOME/.myfs/rpm/filesystem-3.2-25.el7.x86_64.rpm" >/tmp/temprpmfiles.txt
+    repotrack -a x86_64 -p $HOME/.myfs/rpm $PACKAGE >>/tmp/temprpmfiles.txt
 
     IFS=$'\r\n' GLOBIGNORE='*' command eval "lines=($(cat /tmp/temprpmfiles.txt | grep -E 'x86_64|noarch' | sed 's/Downloading //' | cut -f1 -d' '))"
     echo "${lines[@]}"
     PREVIOUSDIR=$PWD
-    cd $HOME/.yusr
+    cd $HOME/.myfs
     for line in "${lines[@]}"; do
         chmod -R u+w .
         echo ">>>> $line"
         rpm2cpio "$line" | cpio -id --no-preserve-owner
-        #for filename in $HOME/.yusr/rpm/*.rpm; do
+        #for filename in $HOME/.myfs/rpm/*.rpm; do
         #[ -e "$filename" ] || continue
         #echo ">>>> $filename"
         #rpm2cpio "$filename" | cpio -id
@@ -87,8 +84,8 @@ install)
 
     ### Wrap around rpm2cpio to crudely install all rpm files just downloaded
     #PREVIOUSDIR=$PWD
-    #cd $HOME/.yusr
-    #for filename in $HOME/.yusr/rpm/*.rpm; do
+    #cd $HOME/.myfs
+    #for filename in $HOME/.myfs/rpm/*.rpm; do
     #[ -e "$filename" ] || continue
     #echo ">>>> $filename"
     #rpm2cpio "$filename" | cpio -id --no-preserve-owner
@@ -111,7 +108,7 @@ esac
 ###############################################################
 ### Download rpm's for package and all dependencies
 ###############################################################
-#repotrack -a x86_64 -p $HOME/.yusr/rpm $PACKAGE
+#repotrack -a x86_64 -p $HOME/.myfs/rpm $PACKAGE
 
 ### Make sure an argument is supplied to script
 #[[ ! $1 ]] && echo "Script needs an argument" && exit 1

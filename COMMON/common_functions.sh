@@ -3,13 +3,13 @@
 # Define functions useful across all *NIX platforms
 
 #################################################
-# Determine present OS
+# Determines operating system of present machine
 # Globals:
 #   None
 # Arguments:
 #   None
 # Outputs:
-#   Writes OS to stdout
+#   Writes content of $OS to stdout
 #################################################
 function fun_which_os {
     OS="UNKNOWN"
@@ -30,13 +30,15 @@ function fun_which_os {
 [[ $BASH ]] && export -f fun_which_os
 
 #################################################
-# Install Vundle Plugins as background process
+# Install Vundle Plugins as background process;
+#   also installs cmake and YCM via call to separate function
 # Globals:
 #   None
 # Arguments:
 #   None
 # Outputs:
-#   Eventually writes OS to stdout
+#   Eventually writes message to stdout stating 
+#   that the installation is complete 
 #################################################
 fun_bg_install_vundle_plugins() {
 
@@ -73,14 +75,15 @@ fun_bg_install_vundle_plugins() {
 
 ########################################################
 # Completes installation of YouCompleteMe Vundle Plugin.
-# Needed because ycm needs cmake for installation,
-# and this may not be available on your machine
+#   Needed because ycm needs cmake for installation,
+#   and this may not be available on your machine.
 # Globals:
 #   None
 # Arguments:
 #   None
 # Outputs:
-#   Eventually writes OS to stdout
+#   Eventually writes message to stdout stating 
+#   that the installation is complete 
 ########################################################
 fun_complete_ycm_installation() {
 
@@ -108,7 +111,7 @@ fun_complete_ycm_installation() {
 
 
 #################################################
-# TODO: NEES COMLETION/REFINEMENT
+# TODO: NEEDS COMPLETION/REFINEMENT
 # Show resources of some greped running process
 # Globals:
 #   None

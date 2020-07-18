@@ -4,11 +4,8 @@
 ### LOAD USEFUL PATHS & ENV VARS
 ##############################################################
 
-### Create .yusr dir
-[[ ! -d $HOME/.yusr ]] && mkdir -p $HOME/.yusr/rpm
-
-### Augment path for yusr-installed executables
-export PATH="$HOME/.yusr/usr/local/sbin:$HOME/.yusr/usr/local/bin:$HOME/.yusr/sbin:$HOME/.yusr/bin:$HOME/.yusr/usr/bin:$HOME/.yusr/usr/bin:$PATH"
+### Create .myfs/rpm dir for use with yusr executable
+[[ ! -d $HOME/.myfs ]] && mkdir -p $HOME/.myfs/rpm
 
 ### Augment path for yusr-installed libraries
-L='/lib:/lib64:/usr/lib:/usr/lib64' && export LD_LIBRARY_PATH="$L:$HOME/.yusr/usr/lib:$HOME/.yusr/usr/lib64"
+L='/lib:/lib64:/usr/lib:/usr/lib64' && export LD_LIBRARY_PATH="$L:$HOME/.myfs/usr/lib:$HOME/.myfs/usr/lib64"

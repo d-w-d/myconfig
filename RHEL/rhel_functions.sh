@@ -2,9 +2,11 @@
 #
 # Functions to only be defined on Centos/RHEL machines
 
+MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
+
 #####################################################
 # Function to build full-featured vim from source
-# and install to ~/.yusr
+# and install to ~/.myfs
 #####################################################
 function fun_install_vim() {
 
@@ -14,7 +16,7 @@ function fun_install_vim() {
     #curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
     #tar -xzvf ncurses.tar.gz
     #cd ncurses-6.2
-    #./configure --prefix=$HOME/.yusr/usr/local
+    #./configure --prefix=$HOME/.myfs/usr/local
     #make
     #make install
 
@@ -25,8 +27,8 @@ function fun_install_vim() {
 
     make distclean
     BEGINCONFIG=true \
-        CFLAGS="-I$HOME/.yusr/usr/local/include" \
-        LDFLAGS="-L$HOME/.yusr/usr/local/lib" ./configure \
+        CFLAGS="-I$HOME/.myfs/usr/local/include" \
+        LDFLAGS="-L$HOME/.myfs/usr/local/lib" ./configure \
         --with-x \
         --enable-gui=auto \
         --enable-gui="auto" \
@@ -36,14 +38,13 @@ function fun_install_vim() {
         --enable-gtk2-check \
         --with-python3-config-dir="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu" \
         --enable-fail-if-missing \
-        --prefix="$HOME/.yusr/usr/local"
+        --prefix="$HOME/.myfs/usr/local"
     make
     make install
 
     cd $PREVIOUSDIR
 
     ### Now that vim is installed, let's download vundle plugins
-    MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
     source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
     fun_bg_install_vundle_plugins
 

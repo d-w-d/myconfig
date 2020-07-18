@@ -9,8 +9,8 @@ MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 # Params, etc.
 ##############################################
 
-source  $MYCONFIG_ROOT_DIR/COMMON/common_env.sh
-source  $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
+source $MYCONFIG_ROOT_DIR/COMMON/common_env.sh
+source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
 
 ### Ohmyzsh instaprompt requires no console I/O
 [ ! $ZSH_VERSION ] && ISVERBOSE=1

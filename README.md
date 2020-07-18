@@ -10,7 +10,6 @@ This repo is for setting up bash/zsh shell environments, with customized setting
 
 ## How It Works
 
-
 ### Three-Phase Installation
 
 This repo works in three phases.
