@@ -1,20 +1,25 @@
 #!/usr/bin/env false
 
 ##############################################################
-### LOAD USEFUL PATHS & ENV VARS
+### Create ~/.myfs. This folder -- "my filesystem" -- is the 
+###  space where utilities in .myconfig can build/copy
+###  libraries and executables 
 ##############################################################
-
-### Create ~/.myfs
-### This folder -- "my filesystem" -- is the space where executables in .myconfig
-### can build/copy libraries and executables using e.g. the yusr script on RHEL/centos
 [[ ! -d $HOME/.myfs ]] && mkdir $HOME/.myfs && cat >$HOME/.myfs/README.ms <<EOL
 # What is .myfs?
 
 This is a dir into which processes run from ~/.myconfig can build/copy filesystem executables, libraries, etc.
 EOL
 
+##############################################################
+### LOAD USEFUL PATHS & ENV VARS
+##############################################################
+
 ### Augment PATH for executables in ~/.myfs
 export PATH="$HOME/.myfs/usr/local/sbin:$HOME/.myfs/usr/local/bin:$HOME/.myfs/sbin:$HOME/.myfs/bin:$HOME/.myfs/usr/bin:$HOME/.myfs/usr/bin:$PATH"
+
+### Augment LD_LIBRARY_PATH for myfs-installed libraries
+L='/lib:/lib64:/usr/lib:/usr/lib64' && export LD_LIBRARY_PATH="$L:$HOME/.myfs/usr/lib:$HOME/.myfs/usr/lib64"
 
 ### iTerm2 Utilities
 ###   To create ~/.iterm2 dir, you need to run `iterm2 > Install Shell Integration` with

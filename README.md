@@ -34,6 +34,29 @@ Phase three is thus for such manual installation of software/configuration depen
 
 For a machine that I expect to do serious work on, I'll want to make sure that we have up-to-date zsh, tmux, and vim with python3 and clipboard support.
 
+
+## Conventions
+
+Whenever possible, I'm trying to follow the [Google style guide](https://google.github.io/styleguide/shellguide.html) for shell scripting.
+
+### Libraries
+
+'Scripts' in the myconfig repo that are only supposed to be sourced are:
+
+1. Referred to as 'libraries'
+2. Given .sh suffixes
+3. Given the shebang `#!/usr/bin/env false` to prevent direct execution
+4. Sourceable by both bash and zsh
+
+### Executable Scripts
+
+Scripts in the myconfig repo that are supposed to be exected are:
+
+1. Referred to as (executable) scripts
+2. Given no suffix
+3. Given the shebang `#!/usr/bin/false bash` (to date at least)
+4. Placed in `.bin` directories within their respective OS dirs
+
 ## Technologies Configured
 
 1. bash
