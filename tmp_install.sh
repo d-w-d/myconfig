@@ -54,11 +54,10 @@ source /tmp/myconfig/COMMON/common_functions.sh
 # Install Vundle & Plugins
 ###############################################
 
-VIM_STATUS= \
-    "- Vim is not installed. Try installing with:
-    ${GRE}myconfig_full_installation
-    ${GRE}myconfig_install_vim${WHI}
-    "
+VIM_STATUS=""
+VIM_STATUS+="- Vim is not installed! Try installing with: \n"
+VIM_STATUS+="${GRE}myconfig_full_installation \n "
+VIM_STATUS+="${GRE}myconfig_install_vim${WHI} \n"
 
 ### Check that vim is installed
 if hash vim >/dev/null 2>&1; then
@@ -75,11 +74,6 @@ if hash vim >/dev/null 2>&1; then
     fi
 
     alias vim="vim -N -u /tmp/myconfig/.vimrc"
-else
-    VIM_STATUS=""
-    VIM_STATUS+="- Vim is not installed! Try installing with: \n"
-    VIM_STATUS+="${GRE}myconfig_full_installation \n "
-    VIM_STATUS+="${GRE}myconfig_install_vim${WHI} \n"
 fi
 
 ########################################################
