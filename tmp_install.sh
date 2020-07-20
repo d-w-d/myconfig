@@ -1,12 +1,6 @@
 #!/usr/bin/env false
 
 ###############################################
-# Make available fun_bg_install_vundle_plugins
-###############################################
-source /tmp/myconfig/COMMON/common_env.sh
-source /tmp/myconfig/COMMON/common_functions.sh
-
-###############################################
 # Define pre-git-cloning helper functions
 ###############################################
 
@@ -49,32 +43,44 @@ else
 fi
 
 ###############################################
-# Misc variables/Params
+# Make available fun_bg_install_vundle_plugins
+# BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
 ###############################################
 
-### Inserts vars for:
-### BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
-source /tmp/myconfig/UTILS/color_params.sh
+source /tmp/myconfig/COMMON/common_env.sh
+source /tmp/myconfig/COMMON/common_functions.sh
 
 ###############################################
 # Install Vundle & Plugins
 ###############################################
 
-hash git >/dev/null 2>&1 || abort_install "git not installed"
+VIM_STATUS= \
+    "- Vim is not installed. Try installing with:
+    ${GRE}myconfig_full_installation
+    ${GRE}myconfig_install_vim${WHI}
+    "
 
 ### Check that vim is installed
 if hash vim >/dev/null 2>&1; then
-
     fun_bg_install_vundle_plugins
 
-else
-    echo -e """${RED}
-    VIM isn't available.
-    ${WHI}
-    """
-    if [[ "$OS" == "RHEL" ]]; then
-        echo "Try installing vim with yusr."
+    if [[ $(vim --version | grep -E '\-python3|\-clipboard') ]]; then
+        VIM_STATUS=''
+        VIM_STATUS+='- Vim is installed BUT does not have BOTH python3 AND clipboard support; \n'
+        VIM_STATUS+='  To install vim with these features, run:\n'
+        VIM_STATUS+='${GRE}myconfig_full_installation \n'
+        VIM_STATUS+='${GRE}myconfig_install_vim${WHI} \n'
+    else
+        VIM_STATUS=$(type vim 2>&1)
     fi
+
+    alias vim='vim -N -u /tmp/myconfig/.vimrc'
+else
+    VIM_STATUS=''
+    VIM_STATUS+='- Vim is not installed! Try installing with: \n'
+    VIM_STATUS+='  To install vim with these features, run: \n'
+    VIM_STATUS+='${GRE}myconfig_full_installation \n '
+    VIM_STATUS+='${GRE}myconfig_install_vim${WHI} \n'
 fi
 
 ########################################################
@@ -89,60 +95,20 @@ export -f myconfig_full_installation
 
 ###############################################
 
-source /tmp/myconfig/entry.sh
-alias vim='vim -N -u /tmp/myconfig/.vimrc'
+MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
 
 echo -e """
-===================
-MYCONFIG DOWNLOADED
-===================
+=======================================
+MYCONFIG HAS BEEN TEMPORARILY INSTALLED
+=======================================
 ${GRE}
 - Configuration scripts have been cloned to ${WHI}/tmp/myconfig${GRE}
 
 - Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
 
-- Vim status: ${WHI}$(type vim 2>&1)${GRE}
+$VIM_STATUS
 
-- Run${RED} myconfig_full_installation${GRE} for full install.
+- Run${RED} myconfig_full_installation${GRE} to copy to $HOME/.myconfig
 ${WHI}
 """
-
-# Create temp bashrc amalgum file and source it
-###############################################
-
-#TEMPFILE=$(mktemp)
-#cat /tmp/myconfig/entry.sh >$TEMPFILE
-#echo "alias vim='vim -N -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
-#echo "source /tmp/myconfig/UTILS/color_params.sh" >>$TEMPFILE
-
-#echo "
-#myconfig_full_installation(){
-#echo 'Running full installation'
-#source /tmp/myconfig/perm_install.sh
-#}
-#export -f myconfig_full_installation
-#" >>$TEMPFILE
-
-#echo "
-#echo -e '${CYA}
-#===================
-#MYCONFIG DOWNLOADED
-#===================
-#${GRE}
-#- Configuration scripts have been cloned to ${WHI}/tmp/myconfig${GRE}
-
-#- Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
-
-#- Vim status: ${WHI}$(type vim 2>&1)${GRE}
-
-#- Run${RED} myconfig_full_installation${GRE} for full install.
-
-#'
-#" >>$TEMPFILE
-#cat $TEMPFILE >temp.sh
-
-#### Source temp bashrc file
-#MYCONFIG_ROOT_DIR='/tmp/myconfig' source $TEMPFILE
-
-#### Return to original dir
-#cd $PREVIOUSDIR
+cd $PREVIOUSDIR
