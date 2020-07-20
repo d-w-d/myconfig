@@ -55,8 +55,8 @@ source /tmp/myconfig/COMMON/common_functions.sh
 ###############################################
 
 VIM_STATUS=""
-VIM_STATUS+="- Vim is not installed! Try installing with: \n"
-VIM_STATUS+="${GRE}myconfig_full_installation \n "
+VIM_STATUS+="${RED}- Vim is not installed! Try installing with: \n"
+VIM_STATUS+="${GRE}myconfig_full_installation \n"
 VIM_STATUS+="${GRE}myconfig_install_vim${WHI} \n"
 
 ### Check that vim is installed
