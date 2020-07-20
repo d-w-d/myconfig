@@ -91,6 +91,7 @@ export -f myconfig_full_installation
 
 MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
 
+klear
 echo -e """
 =======================================
 MYCONFIG HAS BEEN TEMPORARILY INSTALLED
@@ -102,7 +103,6 @@ ${GRE}
 
 $VIM_STATUS
 
-- Run${RED} myconfig_full_installation${GRE} to copy to $HOME/.myconfig
-${WHI}
+- ${GRE}Run${RED} myconfig_full_installation${GRE} to copy to ${WHI}$HOME/.myconfig
 """
 cd $PREVIOUSDIR
