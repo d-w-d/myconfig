@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# Install vim with clipboard and python3 support from source
+# This script was developed on Docker image for mycentos7
+# It assumed packages such as ncurses, ncurses-devel, python3, etc.
+# For a full list of packages assumed available on system, see
+# Dockerfile for mycentos7 image
+
+PREVIOUSDIR=$PWD
+
+klear
+echo -e """${CYA}
+==========================
+INSTALLING VIM FROM SOURCE
+==========================
+
+Sleeping for 3s before starting...
+${WHI}
+"""
+sleep 3
+
+cd /tmp
+git clone https://github.com/vim/vim.git
+cd vim/src
+make distclean
+### Make sure the python3-config-dir points to the dir with makefile corresponding to
+### your installation of python3
+BEGINCONFIG=true \
+    CFLAGS="-I$HOME/.myfs/usr/local/include" \
+    LDFLAGS="-L$HOME/.myfs/usr/local/lib" ./configure \
+    LD_LIBRARY_PATH="$HOME/.myfs/usr/local/lib" \
+    --with-x \
+    --enable-gui="auto" \
+    --enable-gtk2-check \
+    --enable-pythoninterp="yes" \
+    --with-python-config-dir="/usr/lib64/python2.7/config" \
+    --enable-python3interp="yes" \
+    --with-python3-config-dir="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu" \
+    --enable-fail-if-missing \
+    --prefix="$HOME/.myfs/usr/local"
+make
+make install
+
+cd $PREVIOUSDIR
+
+### Check if vim is now installed
+if hash vim >/dev/null 2>&1; then
+    ### Now that vim is installed, let's download vundle plugins
+    echo "Vim installed; now re-downloading vundle plugins"
+    source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
+    fun_bg_install_vundle_plugins
+else
+    echo -e """
+${RED}Vim is not installed. Something must have gone wrong.
+"""
+fi
