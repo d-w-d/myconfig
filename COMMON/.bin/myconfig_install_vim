@@ -1,16 +1,38 @@
 #!/usr/bin/env bash
+#
+# Install vim with clipboard and python3 support from source
+
+PREVIOUSDIR=$PWD
+
+klear
+echo -e """${CYA}
+==========================
+INSTALLING VIM FROM SOURCE
+==========================
+${GRE}
+By default, this script will assume ncurses is available at the system level.
+If it is not, then run this script with flag '--with-ncurses'.
+
+Sleeping for 3s before starting...
+${WHI}
+"""
+sleep 3
 
 #########################################
 ### Vim Requires ncurses
 #########################################
 
-#cd /tmp
-#curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
-#tar -xzvf ncurses.tar.gz
-#cd ncurses-6.2
-#./configure --prefix=$HOME/.myfs/usr/local
-#make
-#make install
+if [[ $1 == '--with-ncurses' ]]; then
+
+    cd /tmp
+    curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
+    tar -xzvf ncurses.tar.gz
+    cd ncurses-6.2
+    make distclean >/dev/null 2>&1
+    ./configure --prefix=$HOME/.myfs/usr/local
+    make
+    make install
+fi
 
 cd /tmp
 git clone https://github.com/vim/vim.git
