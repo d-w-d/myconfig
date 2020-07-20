@@ -13,8 +13,8 @@ echo -e """${CYA}
 INSTALLING VIM FROM SOURCE
 ==========================
 ${GRE}
-By default, this script will assume ncurses is available at the system level.
-If it is not, then run this script with flag '--with-ncurses'.
+By default, this script will build its own ncurses lib.
+This can be skipped with flag '--skip-ncurses'.
 
 Sleeping for 3s before starting...
 ${WHI}
@@ -25,8 +25,10 @@ sleep 3
 ### Vim Requires ncurses
 #########################################
 
-if [[ $1 == '--with-ncurses' ]]; then
-
+if [[ $1 == '--skip-ncurses' ]]; then
+    echo "Skipping ncurses from source..."
+    sleep 2
+else
     echo "Installing ncurses to .myfs"
     sleep 2
     cd /tmp
