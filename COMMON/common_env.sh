@@ -61,5 +61,5 @@ export CYA="\033[36m"
 export WHI="\033[37m"
 
 ### Makes bash history unlimied
-HISTSIZE=
-HISTFILESIZE=
+#HISTSIZE=
+#HISTFILESIZE=
