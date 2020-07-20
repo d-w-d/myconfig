@@ -92,9 +92,7 @@ export -f myconfig_full_installation
 source /tmp/myconfig/entry.sh
 alias vim='vim -N -u /tmp/myconfig/.vimrc'
 
-
-
-echo -e  """
+echo -e """
 ===================
 MYCONFIG DOWNLOADED
 ===================
@@ -109,7 +107,6 @@ ${GRE}
 ${WHI}
 """
 
-
 # Create temp bashrc amalgum file and source it
 ###############################################
 
@@ -120,8 +117,8 @@ ${WHI}
 
 #echo "
 #myconfig_full_installation(){
-    #echo 'Running full installation'
-    #source /tmp/myconfig/perm_install.sh
+#echo 'Running full installation'
+#source /tmp/myconfig/perm_install.sh
 #}
 #export -f myconfig_full_installation
 #" >>$TEMPFILE
