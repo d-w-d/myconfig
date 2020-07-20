@@ -58,7 +58,7 @@ source /tmp/myconfig/COMMON/common_functions.sh
 VIM_STATUS=""
 VIM_STATUS+="${RED}WARNING!${GRE}- Vim is not installed! Try installing with: \n"
 VIM_STATUS+="${CYA}myconfig_full_installation \n"
-VIM_STATUS+="${CYA}myconfig_install_vim${WHI} \n"
+VIM_STATUS+="${CYA}myconfig_install_vim${WHI}"
 
 ### Test if VIM is installed
 if hash vim >/dev/null 2>&1; then
@@ -74,7 +74,7 @@ if hash vim >/dev/null 2>&1; then
         VIM_STATUS+="not have BOTH python3 AND clipboard support; \n"
         VIM_STATUS+="  To install vim with these features, run:\n"
         VIM_STATUS+="${CYA}myconfig_full_installation \n"
-        VIM_STATUS+="${CYA}myconfig_install_vim${WHI} \n"
+        VIM_STATUS+="${CYA}myconfig_install_vim${WHI}"
     else
         VIM_STATUS="- $(type vim 2>&1)"
     fi
@@ -106,6 +106,6 @@ ${GRE}
 
 $VIM_STATUS
 
-- ${GRE}Run${RED} myconfig_full_installation${GRE} to copy to ${WHI}$HOME/.myconfig
+- ${GRE}Run${CYA} myconfig_full_installation${GRE} to copy to ${WHI}$HOME/.myconfig
  """
 cd $PREVIOUSDIR
