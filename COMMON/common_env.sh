@@ -5,7 +5,7 @@
 ###  space where utilities in .myconfig can build/copy
 ###  libraries and executables 
 ##############################################################
-[[ ! -d $HOME/.myfs ]] && mkdir $HOME/.myfs && cat >$HOME/.myfs/README.ms <<EOL
+[[ ! -d $HOME/.myfs ]] && mkdir $HOME/.myfs && cat >$HOME/.myfs/README.md <<EOL
 # What is .myfs?
 
 This is a dir into which processes run from ~/.myconfig can build/copy filesystem executables, libraries, etc.

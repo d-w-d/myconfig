@@ -106,6 +106,7 @@ ${GRE}
 - Vim status: ${WHI}$(type vim 2>&1)${GRE}
 
 - Run${RED} myconfig_full_installation${GRE} for full install.
+${WHI}
 """
 
 
