@@ -17,7 +17,7 @@ git clone https://github.com/vim/vim.git
 cd vim/src
 
 make distclean
-### Make sure the python3-config-dir points to the dir with makefile corresponding to 
+### Make sure the python3-config-dir points to the dir with makefile corresponding to
 ### your installation of python3
 BEGINCONFIG=true \
     CFLAGS="-I$HOME/.myfs/usr/local/include" \
@@ -36,7 +36,14 @@ make install
 
 cd $PREVIOUSDIR
 
-### Now that vim is installed, let's download vundle plugins
-echo "Vim installed; now re-downloading vundle plugins"
-source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
-fun_bg_install_vundle_plugins
+### Check if vim is now installed
+if hash vim >/dev/null 2>&1; then
+    ### Now that vim is installed, let's download vundle plugins
+    echo "Vim installed; now re-downloading vundle plugins"
+    source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
+    fun_bg_install_vundle_plugins
+else
+    echo -e """
+${RED}Vim is not installed. Something must have gone wrong.
+"""
+fi
