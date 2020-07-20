@@ -65,22 +65,21 @@ if hash vim >/dev/null 2>&1; then
     fun_bg_install_vundle_plugins
 
     if [[ $(vim --version | grep -E '\-python3|\-clipboard') ]]; then
-        VIM_STATUS=''
-        VIM_STATUS+='- Vim is installed BUT does not have BOTH python3 AND clipboard support; \n'
-        VIM_STATUS+='  To install vim with these features, run:\n'
-        VIM_STATUS+='${GRE}myconfig_full_installation \n'
-        VIM_STATUS+='${GRE}myconfig_install_vim${WHI} \n'
+        VIM_STATUS=""
+        VIM_STATUS+="- Vim is installed BUT does not have BOTH python3 AND clipboard support; \n"
+        VIM_STATUS+="  To install vim with these features, run:\n"
+        VIM_STATUS+="${GRE}myconfig_full_installation \n"
+        VIM_STATUS+="${GRE}myconfig_install_vim${WHI} \n"
     else
         VIM_STATUS=$(type vim 2>&1)
     fi
 
-    alias vim='vim -N -u /tmp/myconfig/.vimrc'
+    alias vim="vim -N -u /tmp/myconfig/.vimrc"
 else
-    VIM_STATUS=''
-    VIM_STATUS+='- Vim is not installed! Try installing with: \n'
-    VIM_STATUS+='  To install vim with these features, run: \n'
-    VIM_STATUS+='${GRE}myconfig_full_installation \n '
-    VIM_STATUS+='${GRE}myconfig_install_vim${WHI} \n'
+    VIM_STATUS=""
+    VIM_STATUS+="- Vim is not installed! Try installing with: \n"
+    VIM_STATUS+="${GRE}myconfig_full_installation \n "
+    VIM_STATUS+="${GRE}myconfig_install_vim${WHI} \n"
 fi
 
 ########################################################
