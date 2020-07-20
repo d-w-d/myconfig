@@ -24,6 +24,8 @@ sleep 3
 
 if [[ $1 == '--with-ncurses' ]]; then
 
+    echo "Installing ncurses to .myfs"
+
     cd /tmp
     curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
     tar -xzvf ncurses.tar.gz
