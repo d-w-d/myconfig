@@ -56,7 +56,7 @@ source /tmp/myconfig/COMMON/common_functions.sh
 
 ### Default VIM-Status message
 VIM_STATUS=""
-VIM_STATUS+="${RED}WARNING!${GRE}- Vim is not installed! Try installing with: \n"
+VIM_STATUS+="- ${RED}WARNING!${GRE} Vim is not installed! Try installing with: \n"
 VIM_STATUS+="${CYA}myconfig_full_installation \n"
 VIM_STATUS+="${CYA}myconfig_install_vim${WHI}"
 
