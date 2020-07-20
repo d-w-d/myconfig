@@ -104,5 +104,5 @@ ${GRE}
 $VIM_STATUS
 
 - ${GRE}Run${RED} myconfig_full_installation${GRE} to copy to ${WHI}$HOME/.myconfig
-"""
+ """
 cd $PREVIOUSDIR
