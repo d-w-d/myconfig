@@ -7,7 +7,7 @@
 
 PREVIOUSDIR=$PWD
 
-klear
+clear && printf '\e[3J'
 echo -e """${CYA}
 ==========================
 INSTALLING VIM FROM SOURCE
