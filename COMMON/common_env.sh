@@ -15,6 +15,9 @@ EOL
 ### LOAD USEFUL PATHS & ENV VARS
 ##############################################################
 
+### Augment PATH for executables in ~/.myconfig
+export PATH="$HOME/.myconfig/COMMON/.bin:$PATH"
+
 ### Augment PATH for executables in ~/.myfs
 export PATH="$HOME/.myfs/usr/local/sbin:$HOME/.myfs/usr/local/bin:$HOME/.myfs/sbin:$HOME/.myfs/bin:$HOME/.myfs/usr/bin:$HOME/.myfs/usr/bin:$PATH"
 

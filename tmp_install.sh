@@ -77,6 +77,12 @@ else
     fi
 fi
 
+myconfig_full_installation() {
+    echo 'Running full installation'
+    source /tmp/myconfig/perm_install.sh
+}
+export -f myconfig_full_installation
+
 ###############################################
 # Create temp bashrc amalgum file and source it
 ###############################################
@@ -85,15 +91,15 @@ TEMPFILE=$(mktemp)
 cat /tmp/myconfig/entry.sh >$TEMPFILE
 echo "alias vim='vim -N -u /tmp/myconfig/.vimrc'" >>$TEMPFILE
 echo "source /tmp/myconfig/UTILS/color_params.sh" >>$TEMPFILE
-echo "
-myconfig_full_installation(){
-    # Start is new shell to avoid interruption by vundle messaging
-    echo 'Running full installation'
-    #bash --rcfile /tmp/myconfig/perm_install.sh
-    source /tmp/myconfig/perm_install.sh
-}
-export -f myconfig_full_installation
-" >>$TEMPFILE
+
+#echo "
+#myconfig_full_installation(){
+    #echo 'Running full installation'
+    #source /tmp/myconfig/perm_install.sh
+#}
+#export -f myconfig_full_installation
+#" >>$TEMPFILE
+
 echo "
 echo -e '${CYA}
 ===================

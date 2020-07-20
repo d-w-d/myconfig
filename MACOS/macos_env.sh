@@ -4,6 +4,9 @@
 ### LOAD USEFUL PATHS & ENV VARS
 ##############################################################
 
+### Augment PATH for executables in ~/.myconfig
+export PATH="$HOME/.myconfig/MACOS/.bin:$PATH"
+
 ### HOMEBREW PATHS
 export PATH="/usr/local/sbin:$PATH"
 

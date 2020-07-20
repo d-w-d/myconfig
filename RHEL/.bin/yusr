@@ -59,87 +59,30 @@ install)
     PACKAGE=$1
     shift # Remove 'install' from the argument list
 
-    ### Wrap around repotrack to download rpm's for package and dependencies
-    #repotrack -a x86_64 -p $HOME/.myfs/rpm $PACKAGE > /tmp/temprpms.txt
-    ### Wrap around repotrack to download rpm's for package and dependencies
+    ### Make sure filesystem is the first thing to be downloaded
     echo "$HOME/.myfs/rpm/filesystem-3.2-25.el7.x86_64.rpm" >/tmp/temprpmfiles.txt
+    ### Wrap around repotrack to download rpm's for package and dependencies
+    ### Save output to temp file so we know what packages just got downloaded
     repotrack -a x86_64 -p $HOME/.myfs/rpm $PACKAGE >>/tmp/temprpmfiles.txt
-
+    ### Loop through items in temp file to isolate packages in lines array
     IFS=$'\r\n' GLOBIGNORE='*' command eval "lines=($(cat /tmp/temprpmfiles.txt | grep -E 'x86_64|noarch' | sed 's/Downloading //' | cut -f1 -d' '))"
     echo "${lines[@]}"
     PREVIOUSDIR=$PWD
     cd $HOME/.myfs
+
+    ### Loop through items in lines array and extraxt filesystem to .myfs
     for line in "${lines[@]}"; do
         chmod -R u+w .
         echo ">>>> $line"
         rpm2cpio "$line" | cpio -id --no-preserve-owner
-        #for filename in $HOME/.myfs/rpm/*.rpm; do
-        #[ -e "$filename" ] || continue
-        #echo ">>>> $filename"
-        #rpm2cpio "$filename" | cpio -id
-        #done
+        ### Try to make sure nothing is created that we can't edit later
         chmod -R u+w .
     done
     cd $PREVIOUSDIR
-
-    ### Wrap around rpm2cpio to crudely install all rpm files just downloaded
-    #PREVIOUSDIR=$PWD
-    #cd $HOME/.myfs
-    #for filename in $HOME/.myfs/rpm/*.rpm; do
-    #[ -e "$filename" ] || continue
-    #echo ">>>> $filename"
-    #rpm2cpio "$filename" | cpio -id --no-preserve-owner
-
-    #### Need to make sure nothing was added to our yusr filesystem
-    #### that we can't write to since later packages will want to add
-    #### stuff to dirs that previous packages copied over in full
-    #chmod -R u+w .
-    #done
-    #cd $PREVIOUSDIR
     ;;
 search)
     PACKAGE=$1
     shift # Remove 'search' from the argument list
-    ### Wrap around repotrack  to download rpm's for package and dependencies
     yum search $PACKAGE
     ;;
 esac
-
-###############################################################
-### Download rpm's for package and all dependencies
-###############################################################
-#repotrack -a x86_64 -p $HOME/.myfs/rpm $PACKAGE
-
-### Make sure an argument is supplied to script
-#[[ ! $1 ]] && echo "Script needs an argument" && exit 1
-
-### Check that the searchterm is in yum
-#SEARCHTERM=$1
-#echo "Searching yum for $SEARCHTERM"
-#RESULT=$(yum list $SEARCHTERM | grep 'No matching' | wc -l)
-#[[ $RESULT == 1 ]] && echo "$SEARCHTERM not found"  &&   exit 1
-
-#RESULT=$(yum list $SEARCHTERM | grep 'No matching' | wc -l)
-#[[ $(yum list $SEARCHTERM 2>&1 | grep 'No matching' | wc -l) -ge 1 ]] && echo "$SEARCHTERM not found" && exit 1
-
-### Download rpms for that package
-#yumdownloader --destdir ~/rpm --resolve $SEARCHTERM --installroot ~/rpm
-
-### Crudely unpack every rpm downloaded to date
-#echo "DEbug0"
-#PREVIOUSDIR=$PWD
-##[[ ! -d $HOME/centos/rpr ]] && mkdir -p $HOME/centos/rpm
-##cd ~/centos
-#cd /tmp/centos
-
-##for filename in $HOME/rpm/*.rpm; do
-#echo "DEbug1"
-#for filename in /tmp/rpm/*.rpm; do
-####
-#[ -e "$filename" ] || continue
-#echo ">>>> $filename"
-#rpm2cpio "$filename" | cpio -id
-#done
-
-#echo "DEbug2"
-#cd $PREVIOUSDIR
