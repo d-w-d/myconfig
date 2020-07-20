@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 #
 # Install vim with clipboard and python3 support from source
+# This script was developed within the docker image myubuntu18.04
+# It assumes packages such as python3, python3-dev, etc.
+# For a full list of assumed packages, see Dockerfile for myubuntu18.04
 
 PREVIOUSDIR=$PWD
 
@@ -51,9 +54,9 @@ BEGINCONFIG=true \
     --enable-gui="auto" \
     --enable-gtk2-check \
     --enable-pythoninterp="yes" \
-    --with-python-config-dir="/usr/lib64/python2.7/config" \
+    --with-python-config-dir="/usr/lib/python2.7/config-x86_64-linux-gnu" \
     --enable-python3interp="yes" \
-    --with-python3-config-dir="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu" \
+    --with-python3-config-dir="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" \
     --enable-fail-if-missing \
     --prefix="$HOME/.myfs/usr/local"
 make
