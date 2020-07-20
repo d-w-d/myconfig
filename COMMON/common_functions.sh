@@ -29,6 +29,29 @@ function fun_which_os {
 
 [[ $BASH ]] && export -f fun_which_os
 
+##########################################################
+# Determines if a package has been installed on this OS
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Writes content of $OS to stdout
+##########################################################
+function fun_is_package_installed {
+
+    OS=$(fun_which_os)
+    if [[ $OS == 'DEBIAN' ]];then
+        echo "We're on Debian; checking installation via apt"
+        
+
+    fi
+
+}
+
+[[ $BASH ]] && export -f fun_which_os
+
+
 #################################################
 # Install Vundle Plugins as background process;
 #   also installs cmake and YCM via call to separate function
@@ -37,8 +60,8 @@ function fun_which_os {
 # Arguments:
 #   None
 # Outputs:
-#   Eventually writes message to stdout stating 
-#   that the installation is complete 
+#   Eventually writes message to stdout stating
+#   that the installation is complete
 #################################################
 fun_bg_install_vundle_plugins() {
 
@@ -82,8 +105,8 @@ fun_bg_install_vundle_plugins() {
 # Arguments:
 #   None
 # Outputs:
-#   Eventually writes message to stdout stating 
-#   that the installation is complete 
+#   Eventually writes message to stdout stating
+#   that the installation is complete
 ########################################################
 fun_complete_ycm_installation() {
 

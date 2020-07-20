@@ -1,9 +1,9 @@
 #!/usr/bin/env false
 
 ##############################################################
-### Create ~/.myfs. This folder -- "my filesystem" -- is the 
+### Create ~/.myfs. This folder -- "my filesystem" -- is the
 ###  space where utilities in .myconfig can build/copy
-###  libraries and executables 
+###  libraries and executables
 ##############################################################
 [[ ! -d $HOME/.myfs ]] && mkdir $HOME/.myfs && cat >$HOME/.myfs/README.md <<EOL
 # What is .myfs?
@@ -59,3 +59,7 @@ export BLU="\033[34m"
 export MAG="\033[35m"
 export CYA="\033[36m"
 export WHI="\033[37m"
+
+### Makes bash history unlimied
+HISTSIZE=
+HISTFILESIZE=

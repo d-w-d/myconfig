@@ -16,15 +16,13 @@ This repo works in three phases.
 
 ### Phase One
 
-First, the 'quickstart' command above is designed to get you working in a productive bash shell as quickly as possible without messing with that user's configuration files. It clones this repo to `/tmp/myconfig`, triggers the installation of vundle and its plugins in the background, and then aliases vim to use all my settings/plugins. This is referred to as the 'temporary install'.
+First, the 'quickstart' command above is designed to get you working in a productive bash shell as quickly as possible without messing with that user's configuration files. It clones this repo to `/tmp/myconfig`, and, if vim is installed, it triggers the installation of vundle and its plugins in the background, and then aliases vim to use all my settings/plugins. This is referred to as the 'temporary install'.
 
 The temporary installation leaves you in a bash shell with handy aliases for that operating system (e.g. `alportsinuse` will list ports in use on that machine, `klear` will clear the terminal history), and a function called `myconfig_full_installation`.
 
-Note: the `tmp_installation.sh` library will check if vim is installed; if not, it will prompt you on how to install it.   
-
 ### Phase Two
 
-`myconfig_full_installation` *will* mess with the config files in the user's home dir, and so is supposed to only be run in accounts that are designated for me. Basically, it copies `/tmp/myconfig` to `$HOME/.myconfig`, and and then copies commands/files for long-term usage of vim, tmux, bash and zsh according to my preferences.
+`myconfig_full_installation` *will* mess with the config files in the user's home dir, and so is supposed to only be run on accounts that are designated for me. Basically, it copies `/tmp/myconfig` to `$HOME/.myconfig`, and and then copies commands/files for long-term usage of vim, tmux, bash and zsh according to my main rc files.
 
 ### Phase Three
 
@@ -33,6 +31,11 @@ The function `myconfig_FULL_installation` does *not* perform sophisticated check
 Phase three is thus for such manual installation of software/configuration depending on what's available on the machine, and how much I expect to use that machine in the future. Phase three is facilitated by helper scripts available in `myconfig` that, for example, install the latest version of tmux, vim and zsh with/without root permissions.
 
 For a machine that I expect to do serious work on, I'll want to make sure that we have up-to-date zsh, tmux, and vim with python3 and clipboard support.
+
+
+## `.myconfig` vs `.myfs`
+
+The dir `$HOME/.myconfig` has all the libraries/scripts needed to install my tools onto a \*nix system. When `~/.myconfig/entry.sh` is sourced, it will make sure that a user--specific filesystem called `~/.myfs` exists. This is where libraries/executables installed by scripts in `.myconfig` end up.
 
 
 ## Conventions
@@ -53,16 +56,9 @@ Whenever possible, I'm trying to follow the [Google style guide](https://google.
 Scripts in the myconfig repo that are supposed to be exected are:
 
 1. Referred to as (executable) scripts
-2. Given no suffix
+    2. Given no suffix
 3. Given the shebang `#!/usr/bin/false bash` (to date at least)
-4. Placed in `.bin` directories within their respective OS dirs
+    4. Placed in `.bin` directories within their respective OS dirs
 
-## Technologies Configured
-
-1. bash
-2. zsh
-2. vim
-3. tmux
-4. iTerm2
 
 
