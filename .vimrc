@@ -81,9 +81,16 @@ imap <C-e> <ESC>A
 imap kj <Esc>
 "vmap kj <Esc> # Not in visual; will cancel your selections when changing dirn
 
-" Fast/smooth vertical scrolling
+" Faster scrolling with shift
 noremap <S-j> 3jzz
 noremap <S-k> 3kzz
+noremap <S-h> b
+noremap <S-l> w
+
+" Jump to beginning/end of line
+noremap <Leader>b ^
+vnoremap <Leader>e $h
+nnoremap <Leader>e $
 
 " Enables up/down on single-wrapped lines whilst preserving standard jumpto
 " See: https://stackoverflow.com/a/21000307/8620332
@@ -97,21 +104,21 @@ nmap VV ggVG
 map <C-n> :NERDTreeToggle<CR>
 
 " More-Width-in-present-window shortcut
-nmap MW :vertical resize +2<cr>
+nmap <Leader>mw :vertical resize +2<cr>
 " Much-More-Width-in-present-window shortcut
-nmap MMW :vertical resize +10<cr>
+nmap <Leader>mmw :vertical resize +10<cr>
 " Less-Width-in-present-window shortcut
-nmap LW :vertical resize -2<cr>
+nmap <Leader>lw :vertical resize -2<cr>
 " Much-Less-Width-in-present-window shortcut
-nmap MLW :vertical resize -10<cr>
+nmap <Leader>mlw :vertical resize -10<cr>
 " More-Height-in-present-window shortcut
-nmap MH :resize +2<cr>
+nmap <Leader>mh :resize +2<cr>
 " Much-More-Height-in-present-window shortcut
-nmap MMH :resize +10<cr>
+nmap <Leader>mmh :resize +10<cr>
 " Less-Height-in-present-window shortcut
-nmap LH :resize -2<cr>
+nmap <Leader>lh :resize -2<cr>
 " Much-Less-Height-in-present-window shortcut
-nmap MLH :resize -10<cr>
+nmap <Leader>mlh :resize -10<cr>
 
 " Move around in command and insert mode with CTRL-hjkl
 inoremap <C-h> <ESC>i

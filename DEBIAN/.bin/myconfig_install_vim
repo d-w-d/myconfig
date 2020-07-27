@@ -13,22 +13,51 @@ echo -e """${CYA}
 INSTALLING VIM FROM SOURCE
 ==========================
 ${GRE}
-By default, this script will build its own ncurses lib.
-This can be skipped with flag '--skip-ncurses'.
+By default, this script will not build its own ncurses lib.
+You can build ncurses to .myfs by adding --with-ncurses
 
 Sleeping for 3s before starting...
 ${WHI}
 """
 sleep 3
 
+###########################################
+### If sudo user, install all dependencies
+###########################################
+
+if [[ $(groups | grep sudo | wc -l) == 1 ]]; then
+    echo -e """
+        You have sudo permissoins; let's use them to install dependencies for vim!
+    """
+    sleep 3
+
+    sudo apt update -y
+    sudo apt upgrade -y
+    sudo apt install build-essential \
+        man \
+        manpages-dev \
+        git \
+        curl \
+        python \
+        python3 \
+        python-dev \
+        python3-dev \
+        libx11-6 \
+        libx11-dev \
+        libxtst-dev \
+        libxt-dev \
+        libsm-dev \
+        libevent-dev \
+        libncurses5-dev \
+        libncurses5 \
+        libxpm-dev
+fi
+
 #########################################
 ### Vim Requires ncurses
 #########################################
 
-if [[ $1 == '--skip-ncurses' ]]; then
-    echo "Skipping ncurses from source..."
-    sleep 2
-else
+if [[ $1 == '--with-ncurses' ]]; then
     echo "Installing ncurses to .myfs"
     sleep 2
     cd /tmp
@@ -39,6 +68,9 @@ else
     ./configure --prefix=$HOME/.myfs/usr/local
     make
     make install
+else
+    echo "Skipping ncurses from source..."
+    sleep 2
 fi
 
 cd /tmp
