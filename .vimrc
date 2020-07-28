@@ -11,7 +11,7 @@ colorscheme torte
 "==================================================
 " Begin Vundle setup
 "==================================================
-"
+" 
 " Initiate plugins first in order to call functions,
 " variables, etc. later
 " See: https://github.com/VundleVim/Vundle.vim for setup instructions
@@ -69,6 +69,9 @@ let g:user_emmet_settings = webapi#json#decode(join(readfile(expand('~/.myconfig
 
 " Shortcut to autoformat the doc
 noremap <C-f> :Autoformat<CR>
+
+" Make Y behave similarly to C and D
+noremap Y y$
 
 " Overwrite: "CTRL-A    2    add N to number at/after cursor"
 map <C-a> ^
@@ -164,6 +167,60 @@ vmap com <Leader>c<Space>
 
 " Enable folding with the spacebar; maps to binding given by symplfold plugin
 nnoremap <Leader>f za
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Alter Cut-Paste Behavior:
+"   By default in vim, whatever you delete goes into the register used to then paste.
+"   I don't like this because I often want to repeat-paste the same content.
+"   These functions allow me to toggle between default and my own modified
+"   behavior, where 'x' acts like a classic delete key, and 'd' acts like a
+"   classic cut command. Yes, this feels backwards, but actions like 'ddp' are
+"   so classic to vim that I wanted to preserve the cut-like bevior of 'd',
+"   but without the overwrite-upon-paste-over behavior. 
+"   Note: if you want to do 'dd' without copying to register, then you need to
+"   the lines visually and then use 'x' to delete without copying.
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! DisableDefaultCutPasteRegisterBehavior()
+    " On this approach 'x' acts like classic 'delete' key
+    nnoremap x "_x
+    vnoremap x "_d
+    noremap X "_X
+    " On this approach 'd' acts like classic 'cut' 
+    noremap d "xd
+    noremap dd "xdd
+    noremap D "xD
+    noremap y "xy
+    noremap yy "xyy
+    noremap Y "xY
+    noremap p "xp
+    noremap P "xP
+endfunction
+
+function! EnableDefaultCutPasteRegisterBehavior()
+    unmap d
+    unmap dd
+    unmap D
+    unmap x
+    unmap X
+    unmap p
+    unmap P
+    unmap y
+    unmap yy
+    unmap Y
+endfunction
+
+call DisableDefaultCutPasteRegisterBehavior()
+
+function! ToggleSideEffects()
+    if mapcheck("d", "n") == ""
+        call DisableDefaultCutPasteRegisterBehavior()
+        echo 'Default cut-paste-register behavior DISABLED'
+    else
+        call EnableDefaultCutPasteRegisterBehavior()
+        echo 'Default cut-paste-register behavior ENABLED'
+    endif
+endfunction
+nnoremap <Leader>s :call ToggleSideEffects()<CR>
 
 "==================================================
 " Indent Guides Config
