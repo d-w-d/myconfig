@@ -9,9 +9,8 @@ set encoding=utf-8                  " Set encoding
 colorscheme torte
 
 "==================================================
-" Begin Vundle setup
+" Begin Vundle Setup
 "==================================================
-" 
 " Initiate plugins first in order to call functions,
 " variables, etc. later
 " See: https://github.com/VundleVim/Vundle.vim for setup instructions
@@ -80,20 +79,15 @@ imap <C-a> <ESC>I
 map <C-e> g_
 imap <C-e> <ESC>A
 
-" Fast exit from insert mode
+" Fast switching between modes
 imap kj <Esc>
-"vmap kj <Esc> # Not in visual; will cancel your selections when changing dirn
+imap <C-n> <Esc>l
 
 " Faster scrolling with shift
 noremap <S-j> 3jzz
 noremap <S-k> 3kzz
 noremap <S-h> b
 noremap <S-l> w
-
-" Jump to beginning/end of line
-noremap <Leader>b ^
-vnoremap <Leader>e $h
-nnoremap <Leader>e $
 
 " Enables up/down on single-wrapped lines whilst preserving standard jumpto
 " See: https://stackoverflow.com/a/21000307/8620332
@@ -103,8 +97,35 @@ nnoremap <expr> k v:count ? 'k' : 'gk'
 " Select all file
 nmap VV ggVG
 
+" Move around in command and insert mode with CTRL-hjkl
+inoremap <C-h> <ESC>i
+inoremap <C-j> <ESC>ja
+inoremap <C-k> <ESC>ka
+inoremap <C-l> <ESC>la
+cnoremap <C-h> <ESC>i
+cnoremap <C-j> <ESC>ja
+cnoremap <C-k> <ESC>ka
+cnoremap <C-l> <ESC>la
+
+"==================================================
+" Leader Shortcuts
+"==================================================
+
+" Enable easy surrounding of selected text with brackets
+vnoremap <Leader>[  c[]<Esc>P
+vnoremap <Leader>(  c()<Esc>P
+vnoremap <Leader>{  c{}<Esc>P
+
+" Leader+f in visual mode will cause
+vnoremap f :s/\%Vfoo\%V/bar/gc
+
+" Jump to beginning/end of line
+noremap <Leader>b ^
+vnoremap <Leader>e $h
+nnoremap <Leader>e $
+
 " Toggle file-tree display
-map <C-n> :NERDTreeToggle<CR>
+map <Leader>n :NERDTreeToggle<CR>
 
 " More-Width-in-present-window shortcut
 nmap <Leader>mw :vertical resize +2<cr>
@@ -122,21 +143,6 @@ nmap <Leader>mmh :resize +10<cr>
 nmap <Leader>lh :resize -2<cr>
 " Much-Less-Height-in-present-window shortcut
 nmap <Leader>mlh :resize -10<cr>
-
-" Move around in command and insert mode with CTRL-hjkl
-inoremap <C-h> <ESC>i
-inoremap <C-j> <ESC>ja
-inoremap <C-k> <ESC>ka
-inoremap <C-l> <ESC>la
-cnoremap <C-h> <ESC>i
-cnoremap <C-j> <ESC>ja
-cnoremap <C-k> <ESC>ka
-cnoremap <C-l> <ESC>la
-
-"==================================================
-" Leader Shortcuts
-"==================================================
-
 " Fancy paste text onto line below/above
 nnoremap <leader>p m`o<ESC>p``
 nnoremap <leader>P m`O<ESC>p``
@@ -154,7 +160,7 @@ nmap <Leader>nu :set rnu! <cr>
 nmap <Leader>rnu :set nu! <cr>
 
 " Replacement for J = Join
-map <Leader>j :join!<CR>
+vmap <Leader>j :join!<CR>
 
 " Make color scheme light
 nmap <Leader>l :colorscheme morning<CR>
@@ -162,8 +168,8 @@ nmap <Leader>l :colorscheme morning<CR>
 nmap <Leader>d :colorscheme desert<CR>
 
 " Toggle line commenting; see: https://github.com/preservim/nerdcommenter
-nmap com <Leader>c<Space>
-vmap com <Leader>c<Space>
+nmap <Leader>/ <Leader>c<Space>
+vmap <Leader>/ <Leader>c<Space>
 
 " Enable folding with the spacebar; maps to binding given by symplfold plugin
 nnoremap <Leader>f za
@@ -176,26 +182,37 @@ nnoremap <Leader>f za
 "   behavior, where 'x' acts like a classic delete key, and 'd' acts like a
 "   classic cut command. Yes, this feels backwards, but actions like 'ddp' are
 "   so classic to vim that I wanted to preserve the cut-like bevior of 'd',
-"   but without the overwrite-upon-paste-over behavior. 
-"   Note: if you want to do 'dd' without copying to register, then you need to
+"   but without the overwrite-upon-paste-over behavior.
+"
+"   - Note: if you want to do 'dd' without copying to register, then you need to
 "   the lines visually and then use 'x' to delete without copying.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Function to modify cut-paste-register behavior
+" Note: we are writing to '*' register and then copying to the '+' register.
+" '*' seems to be needed on the Mac, but my understanding is that linux and
+" windows also like to use the '+' register for their system clipboards.
 function! DisableDefaultCutPasteRegisterBehavior()
     " On this approach 'x' acts like classic 'delete' key
     nnoremap x "_x
     vnoremap x "_d
     noremap X "_X
-    " On this approach 'd' acts like classic 'cut' 
-    noremap d "xd
-    noremap dd "xdd
-    noremap D "xD
-    noremap y "xy
-    noremap yy "xyy
-    noremap Y "xY
-    noremap p "xp
-    noremap P "xP
+    " On this approach 'd' acts like classic 'cut'
+    vnoremap c "_di
+    noremap C "_d$
+    vnoremap d "*d:let @+=@*<CR>
+    noremap dd "*dd:let @+=@*<CR>
+    noremap D "*D:let @+=@*<CR>
+    noremap y "*y:let @+=@*<CR>
+    noremap yw "*yw:let @+=@*<CR>
+    noremap yiw "*yiw:let @+=@*<CR>
+    noremap yy "*yy:let @+=@*<CR>
+    nnoremap Y "*Y:let @+=@*<CR>
+    vnoremap Y "*y`>:let @+=@*<CR>
+    vnoremap p pgvy
 endfunction
 
+" Function to restore default behavior
 function! EnableDefaultCutPasteRegisterBehavior()
     unmap d
     unmap dd
@@ -209,9 +226,11 @@ function! EnableDefaultCutPasteRegisterBehavior()
     unmap Y
 endfunction
 
+" Call function on vim startup to use modified behavior
 call DisableDefaultCutPasteRegisterBehavior()
 
-function! ToggleSideEffects()
+" Define function to toggle between modified and default behavior
+function! ToggleDefaultCutPasteRegisterBehavior()
     if mapcheck("d", "n") == ""
         call DisableDefaultCutPasteRegisterBehavior()
         echo 'Default cut-paste-register behavior DISABLED'
@@ -220,7 +239,7 @@ function! ToggleSideEffects()
         echo 'Default cut-paste-register behavior ENABLED'
     endif
 endfunction
-nnoremap <Leader>s :call ToggleSideEffects()<CR>
+nnoremap <Leader>s :call ToggleDefaultCutPasteRegisterBehavior()<CR>
 
 "==================================================
 " Indent Guides Config
@@ -320,9 +339,4 @@ call submode#enter_with('fastLeft', 'n', '', '<leader>h', '3h')
 call submode#enter_with('fastRight', 'n', '', '<leader>l', '3l')
 call submode#map('fastLeft', 'n', '', 'h', '3h')
 call submode#map('fastRight', 'n', '', 'l', '3l')
-
-
-
-
-
 
