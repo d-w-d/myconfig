@@ -91,6 +91,22 @@ else
     cp /tmp/myconfig/.vimrc $HOME/.vimrc
 fi
 
+### Add .zshrc  configuration
+if [[ -f $HOME/.zshrc ]]; then
+    echo -e """${CYA}
+    .vimrc exists already. Replace it?
+
+    ${RED}1. Yes
+    ${GRE}2. No
+    """
+    read -n1 CHOICE
+    if [[ $CHOICE == 1 ]]; then
+        echo ""
+        cp /tmp/myconfig/.zshrc $HOME/.zshrc
+    fi
+else
+    cp /tmp/myconfig/.zshrc $HOME/.zshrc
+fi
 
 ### Finally, source the home-installed myconfig
 unalias vim
