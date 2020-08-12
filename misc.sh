@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ########################################
-# Aliases
+# Aliases 
 ########################################
 
 alias almus='ssh ddarg@musforti.astro.umd.edu' 
