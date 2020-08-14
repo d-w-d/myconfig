@@ -3,9 +3,10 @@
 "==================================================
 syntax on                           " Turn on syntax
 let mapleader = " "                 " Make spacebar the leader
-set clipboard=unnamed               " enables yanked stuff to be copied to mac clipboard
+set clipboard=unnamed
 set backspace=indent,eol,start      " enables backspaces
 set encoding=utf-8                  " Set encoding
+set scrolloff=5
 colorscheme torte
 
 "==================================================
@@ -54,7 +55,7 @@ filetype plugin indent on    " required
 let g:user_emmet_mode='inv'
 let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 "let g:user_emmet_leader_key='<C-Space>'
-let g:user_emmet_settings = webapi#json#decode(join(readfile(expand('~/.myconfig/.vim-emmet-snippets.json')), "\n"))
+let g:user_emmet_settings = webapi#json#decode(join(readfile(expand('~/.myconfig/.vim-emmet-snippets.json')), "\\n"))
 
 "==================================================
 "==================================================
@@ -117,7 +118,7 @@ vnoremap <Leader>(  c()<Esc>P
 vnoremap <Leader>{  c{}<Esc>P
 
 " Leader+f in visual mode will cause
-vnoremap f :s/\%Vfoo\%V/bar/gc
+vnoremap f :s/\\%Vfoo\\%V/bar/gc
 
 " Jump to beginning/end of line
 noremap <Leader>b ^
@@ -188,6 +189,25 @@ nnoremap <Leader>f za
 "   the lines visually and then use 'x' to delete without copying.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" Function used to copy yanked content to clipboard on local machine
+" This use the OSC52 escape sequence. It's supported by iTerm2 but not OSX
+" Terminal. 
+function! OscCopy()
+    let encodedText=@"
+    let encodedText=substitute(encodedText, '\\', '\\\\\\\\', "g")
+    let encodedText=substitute(encodedText, "'", "'\\\\\\\\''", "g")
+    let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\\\n'"
+    let encodedText=system(executeCmd)
+    if $TMUX != ""
+        let executeCmd='echo -en "\\x1bPtmux;\\x1b\\x1b]52;;'.encodedText.'\\x1b\\x1b\\\\\\\\\\x1b\\\\" > /dev/tty'
+    else
+        let executeCmd='echo -en "\\x1b]52;;'.encodedText.'\\x1b\\\\" > /dev/tty'
+    endif
+    call system(executeCmd)
+    redraw!
+endfunction
+command! OscCopy :call OscCopy()
+
 " Function to modify cut-paste-register behavior
 " Note: we are writing to '*' register and then copying to the '+' register.
 " '*' seems to be needed on the Mac, but my understanding is that linux and
@@ -200,15 +220,15 @@ function! DisableDefaultCutPasteRegisterBehavior()
     " On this approach 'd' acts like classic 'cut'
     vnoremap c "_di
     noremap C "_d$
-    vnoremap d "*d:let @+=@*<CR>
-    noremap dd "*dd:let @+=@*<CR>
-    noremap D "*D:let @+=@*<CR>
-    noremap y "*y:let @+=@*<CR>
-    noremap yw "*yw:let @+=@*<CR>
-    noremap yiw "*yiw:let @+=@*<CR>
-    noremap yy "*yy:let @+=@*<CR>
-    nnoremap Y "*Y:let @+=@*<CR>
-    vnoremap Y "*y`>:let @+=@*<CR>
+    vnoremap d "*d:let @+=@*<bar>OscCopy<CR>
+    noremap dd "*dd:let @+=@*<bar>OscCopy<CR>
+    noremap D "*D:let @+=@*<bar>OscCopy<CR>
+    noremap y "*y:let @+=@*<bar>OscCopy<CR>
+    noremap yw "*yw:let @+=@*<bar>OscCopy<CR>
+    noremap yiw "*yiw:let @+=@*<bar>OscCopy<CR>
+    noremap yy "*yy:let @+=@*<bar>OscCopy<CR>
+    nnoremap Y "*Y:let @+=@*<bar>OscCopy<CR>
+    vnoremap Y "*y`>:let @+=@*<bar>OscCopy<CR>
     vnoremap p pgvy
 endfunction
 
@@ -239,6 +259,7 @@ function! ToggleDefaultCutPasteRegisterBehavior()
         echo 'Default cut-paste-register behavior ENABLED'
     endif
 endfunction
+" Define shortcut to toggle between default and modified cut-paste behavior
 nnoremap <Leader>s :call ToggleDefaultCutPasteRegisterBehavior()<CR>
 
 "==================================================
@@ -256,22 +277,22 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=blue ctermbg=grey
 "let g:indentLine_setColors = 0
 "let g:indentLine_char = '.'
 "set list
-"set listchars=tab:→\ ,trail:_,space:·
-"set listchars=tab:→\ ,trail:·
-"set listchars=tab:>\ ,eol:$,trail:-
+"set listchars=tab:→\\ ,trail:_,space:·
+"set listchars=tab:→\\ ,trail:·
+"set listchars=tab:>\\ ,eol:$,trail:-
 "set listchars=space:·
 "highlight WhiteSpaceBol guifg=blue
 "highlight WhiteSpaceMol guifg=white
 "match WhiteSpaceMol / /
-"2match WhiteSpaceBol /^ \+/
+"2match WhiteSpaceBol /^ \\+/
 "highlight LeadingSpace ctermbg=red guibg=red
 "highlight TrailingSpace ctermbg=red guibg=red
 "highlight LeadingTab ctermbg=red guibg=green
 "highlight TrailingTab ctermbg=red guibg=green
-"call matchadd('LeadingSpace', '^\s\+', 80)
-"call matchadd('TrailingSpace', '\s\+$', 80)
-"call matchadd('LeadingTab', '^t\+', 99)
-"call matchadd('TrailingTab', '\t\+$', 99)
+"call matchadd('LeadingSpace', '^\\s\\+', 80)
+"call matchadd('TrailingSpace', '\\s\\+$', 80)
+"call matchadd('LeadingTab', '^t\\+', 99)
+"call matchadd('TrailingTab', '\\t\\+$', 99)
 
 "==================================================
 " Terminal Settings
@@ -312,26 +333,26 @@ let g:SimpylFold_docstring_preview=1
 "==================================================
 
 au BufNewFile,BufRead *.py set
-            \ tabstop=4
-            \ softtabstop=4
-            \ shiftwidth=4
-            \ textwidth=79
-            \ expandtab
-            \ autoindent
-            \ fileformat=unix
+            \\ tabstop=4
+            \\ softtabstop=4
+            \\ shiftwidth=4
+            \\ textwidth=79
+            \\ expandtab
+            \\ autoindent
+            \\ fileformat=unix
 
 "==================================================
 " Highlight white space
 "==================================================
 
 highlight BadWhitespace ctermbg=red guibg=red
-au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\\+$/
 
 
 
 
 "==================================================
-" Sub-mode pluging functionality
+" Sub-mode plugging functionality
 "==================================================
 
 " Horizontal fast scrolling
@@ -339,4 +360,7 @@ call submode#enter_with('fastLeft', 'n', '', '<leader>h', '3h')
 call submode#enter_with('fastRight', 'n', '', '<leader>l', '3l')
 call submode#map('fastLeft', 'n', '', 'h', '3h')
 call submode#map('fastRight', 'n', '', 'l', '3l')
+
+
+
 
