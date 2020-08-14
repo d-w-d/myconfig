@@ -55,7 +55,7 @@ filetype plugin indent on    " required
 let g:user_emmet_mode='inv'
 let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 "let g:user_emmet_leader_key='<C-Space>'
-let g:user_emmet_settings = webapi#json#decode(join(readfile(expand('~/.myconfig/.vim-emmet-snippets.json')), "\\n"))
+"let g:user_emmet_settings = webapi#json#decode(join(readfile(expand('~/.myconfig/.vim-emmet-snippets.json')), "\\n"))
 
 "==================================================
 "==================================================

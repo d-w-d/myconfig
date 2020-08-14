@@ -94,7 +94,7 @@ fi
 ### Add .zshrc  configuration
 if [[ -f $HOME/.zshrc ]]; then
     echo -e """${CYA}
-    .vimrc exists already. Replace it?
+    .zshrc exists already. Replace it?
 
     ${RED}1. Yes
     ${GRE}2. No
