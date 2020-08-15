@@ -95,7 +95,7 @@ export -f myconfig_full_installation
 MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
 
 ### Klear terminal history
-clear && printf '\e[3J'
+#clear && printf '\e[3J'
 
 echo -e """
 =======================================
