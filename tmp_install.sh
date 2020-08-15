@@ -94,7 +94,9 @@ export -f myconfig_full_installation
 
 MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
 
-klear
+### Klear terminal history
+clear && printf '\e[3J'
+
 echo -e """
 =======================================
 MYCONFIG HAS BEEN TEMPORARILY INSTALLED

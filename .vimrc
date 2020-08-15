@@ -229,6 +229,7 @@ function! DisableDefaultCutPasteRegisterBehavior()
     noremap yy "*yy:let @+=@*<bar>OscCopy<CR>
     nnoremap Y "*Y:let @+=@*<bar>OscCopy<CR>
     vnoremap Y "*y`>:let @+=@*<bar>OscCopy<CR>
+    " Re-yank what just got pasted in visual mode
     vnoremap p pgvy
 endfunction
 
