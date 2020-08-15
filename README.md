@@ -6,8 +6,6 @@ This repo is for setting up bash/zsh shell environments, with customized setting
 
 ## Quick Start
 
-`TMPFILE=$(mktemp); curl -o- https://raw.githubusercontent.com/dan-drago/myconfig/master/COMMON/common_env.sh > $TMPFILE; curl -o- https://raw.githubusercontent.com/dan-drago/myconfig/master/tmp_install.sh >> $TMPFILE; bash --rcfile $TMPFILE`
-
 `curl -L https://raw.githubusercontent.com/dan-drago/myconfig/master/tmp_install.sh  | bash --rcfile --`
 
 ## How It Works
