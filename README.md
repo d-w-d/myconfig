@@ -6,7 +6,7 @@ This repo is for setting up bash/zsh shell environments, with customized setting
 
 ## Quick Start
 
-`curl -L https://raw.githubusercontent.com/dan-drago/myconfig/master/tmp_install.sh  | bash --rcfile --`
+`source <(curl -L https://raw.githubusercontent.com/dan-drago/myconfig/master/tmp_install.sh)`
 
 ## How It Works
 
