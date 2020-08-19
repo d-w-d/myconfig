@@ -1,7 +1,7 @@
 #!/usr/bin/env false
 
 #############################################################
-### Inherit $MYCONFIG_ROOT_DIR from parent script  
+### Inherit $MYCONFIG_ROOT_DIR from parent script 
 #############################################################
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
