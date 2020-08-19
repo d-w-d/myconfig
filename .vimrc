@@ -192,40 +192,40 @@ nnoremap <Leader>f za
 " Function used to copy yanked content to clipboard on local machine
 " This use the OSC52 escape sequence. It's supported by iTerm2 but not OSX
 " Terminal.
-"function! OscCopy()
-"let encodedText=@"
-"let encodedText=substitute(encodedText, '\\', '\\\\\\\\', "g")
-"let encodedText=substitute(encodedText, "'", "'\\\\\\\\''", "g")
-"let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\\\n'"
-"let encodedText=system(executeCmd)
-"if $TMUX != ""
-"let executeCmd='echo -en "\\x1bPtmux;\\x1b\\x1b]52;;'.encodedText.'\\x1b\\x1b\\\\\\\\\\x1b\\\\" > /dev/tty'
-"else
-"let executeCmd='echo -en "\\x1b]52;;'.encodedText.'\\x1b\\\\" > /dev/tty'
-"endif
-"call system(executeCmd)
-"redraw!
-"endfunction
-"command! OscCopy :call OscCopy()
-
-
 function! OscCopy()
-    let encodedText=@"
-    let encodedText=substitute(encodedText, '\', '\\\\', "g")
-    let encodedText=substitute(encodedText, "'", "'\\\\''", "g")
-    let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\n'"
-    let encodedText=system(executeCmd)
-    if $TMUX != ""
-        "tmux
-        let executeCmd='echo -en "\x1bPtmux;\x1b\x1b]52;;'.encodedText.'\x1b\x1b\\\\\x1b\\" > /dev/tty'
-    else
-        let executeCmd='echo -en "\x1b]52;;'.encodedText.'\x1b\\" > /dev/tty'
-    endif
-    call system(executeCmd)
-    redraw!
+let encodedText=@"
+let encodedText=substitute(encodedText, '\\', '\\\\\\\\', "g")
+let encodedText=substitute(encodedText, "'", "'\\\\\\\\''", "g")
+let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\\\n'"
+let encodedText=system(executeCmd)
+if $TMUX != ""
+let executeCmd='echo -en "\\x1bPtmux;\\x1b\\x1b]52;;'.encodedText.'\\x1b\\x1b\\\\\\\\\\x1b\\\\" > /dev/tty'
+else
+let executeCmd='echo -en "\\x1b]52;;'.encodedText.'\\x1b\\\\" > /dev/tty'
+endif
+call system(executeCmd)
+redraw!
 endfunction
-
 command! OscCopy :call OscCopy()
+
+
+"function! OscCopy()
+    "let encodedText=@"
+    "let encodedText=substitute(encodedText, '\', '\\\\', "g")
+    "let encodedText=substitute(encodedText, "'", "'\\\\''", "g")
+    "let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\n'"
+    "let encodedText=system(executeCmd)
+    "if $TMUX != ""
+        ""tmux
+        "let executeCmd='echo -en "\x1bPtmux;\x1b\x1b]52;;'.encodedText.'\x1b\x1b\\\\\x1b\\" > /dev/tty'
+    "else
+        "let executeCmd='echo -en "\x1b]52;;'.encodedText.'\x1b\\" > /dev/tty'
+    "endif
+    "call system(executeCmd)
+    "redraw!
+"endfunction
+
+"command! OscCopy :call OscCopy()
 
 
 " Function to modify cut-paste-register behavior
