@@ -30,82 +30,85 @@ else
     cp -R /tmp/myconfig $HOME/.myconfig
 fi
 
-### Add sourcing to bashrc
-bashOrZsh=${1:-bash}
-STAMP='\n'
-STAMP+='###############################\n'
-MATCHLINE='########## MYCONFIG ##########'
-STAMP+=$MATCHLINE"\n"
-STAMP+='###############################\n'
-STAMP+="export MYCONFIG_ROOT_DIR=$HOME/.myconfig"
-STAMP+="\n"
-STAMP+="source $HOME/.myconfig/entry.sh \n"
-STAMP+='###############################\n'
-if [[ $(grep "$MATCHLINE" $HOME/.${bashOrZsh}rc | wc -l) -ge 1 ]]; then
 
+### Add bash configuration
+CREATE_SYMLINK=true
+if [[ -f $HOME/.bashrc && ! -L $HOME/.bashrc ]]; then
+    ### Prompt user to replace file with symlink
     echo -e """${CYA}
-    It looks like you're already sourcing myconfig from ~/.${bashOrZsh}rc.
-    Would you like to re-insert it?
-    ${RED}1. Yes
-    ${GRE}2. No
+        A non-symbolic link already exists at $PWD/.bashrc.
+        Replace it with link to ${WHI}~/.myconfig/.bashrc${CYA}?
+
+        ${RED}1. Yes
+        ${GRE}2. No
     """
     read -n1 CHOICE
-    if [[ $CHOICE == 1 ]]; then
-        printf "$STAMP" >>$HOME/.${bashOrZsh}rc
-    fi
-else
-    printf "$STAMP" >>$HOME/.${bashOrZsh}rc
+    [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
+fi
+if [[ $CREATE_SYMLINK ]]; then
+    ### Make sure the symlink points to .myconfig/.bashrc
+    rm $HOME/.bashrc
+    ln -s $HOME/.myconfig/.bashrc $HOME/.bashrc
 fi
 
-### Add tmux configuration
-if [[ -f $HOME/.tmux.conf ]]; then
+### Add bash configuration
+CREATE_SYMLINK=true
+if [[ -f $HOME/.tmux.conf && ! -L $HOME/.tmux.conf ]]; then
+    ### Prompt user to replace file with symlink
     echo -e """${CYA}
-    .tmux.conf exists already. Replace it?
+        A non-symbolic link already exists at $PWD/.tmux.conf.
+        Replace it with link to ${WHI}~/.myconfig/.tmux.conf${CYA}?
 
-    ${RED}1. Yes
-    ${GRE}2. No
+        ${RED}1. Yes
+        ${GRE}2. No
     """
     read -n1 CHOICE
-    if [[ $CHOICE == 1 ]]; then
-        echo ""
-        cp /tmp/myconfig/.tmux.conf $HOME/.tmux.conf
-    fi
-else
-    cp /tmp/myconfig/.tmux.conf $HOME/.tmux.conf
+    [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
+fi
+if [[ $CREATE_SYMLINK ]]; then
+    ### Make sure the symlink points to .myconfig/.tmux.conf
+    rm $HOME/.tmux.conf
+    ln -s $HOME/.myconfig/.tmux.conf $HOME/.tmux.conf
 fi
 
-### Add vimrc configuration
-if [[ -f $HOME/.vimrc ]]; then
+### Add bash configuration
+CREATE_SYMLINK=true
+if [[ -f $HOME/.vimrc && ! -L $HOME/.vimrc ]]; then
+    ### Prompt user to replace file with symlink
     echo -e """${CYA}
-    .vimrc exists already. Replace it?
+        A non-symbolic link already exists at $PWD/.vimrc.
+        Replace it with link to ${WHI}~/.myconfig/.vimrc${CYA}?
 
-    ${RED}1. Yes
-    ${GRE}2. No
+        ${RED}1. Yes
+        ${GRE}2. No
     """
     read -n1 CHOICE
-    if [[ $CHOICE == 1 ]]; then
-        echo ""
-        cp /tmp/myconfig/.vimrc $HOME/.vimrc
-    fi
-else
-    cp /tmp/myconfig/.vimrc $HOME/.vimrc
+    [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
+fi
+if [[ $CREATE_SYMLINK ]]; then
+    ### Make sure the symlink points to .myconfig/.vimrc
+    rm $HOME/.vimrc
+    ln -s $HOME/.myconfig/.vimrc $HOME/.vimrc
 fi
 
-### Add .zshrc  configuration
-if [[ -f $HOME/.zshrc ]]; then
+### Add bash configuration
+CREATE_SYMLINK=true
+if [[ -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
+    ### Prompt user to replace file with symlink
     echo -e """${CYA}
-    .zshrc exists already. Replace it?
+        A non-symbolic link already exists at $PWD/.zshrc.
+        Replace it with link to ${WHI}~/.myconfig/.zshrc${CYA}?
 
-    ${RED}1. Yes
-    ${GRE}2. No
+        ${RED}1. Yes
+        ${GRE}2. No
     """
     read -n1 CHOICE
-    if [[ $CHOICE == 1 ]]; then
-        echo ""
-        cp /tmp/myconfig/.zshrc $HOME/.zshrc
-    fi
-else
-    cp /tmp/myconfig/.zshrc $HOME/.zshrc
+    [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
+fi
+if [[ $CREATE_SYMLINK ]]; then
+    ### Make sure the symlink points to .myconfig/.zshrc
+    rm $HOME/.zshrc
+    ln -s $HOME/.myconfig/.zshrc $HOME/.zshrc
 fi
 
 ### Finally, source the home-installed myconfig
@@ -131,4 +134,3 @@ ${WHI}https://ohmyz.sh/#install
 ${WHI}https://github.com/romkatv/powerlevel10k#manual
 ${WHI}https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#oh-my-zsh
 """
-
