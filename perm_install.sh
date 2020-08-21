@@ -51,7 +51,7 @@ if [[ $CREATE_SYMLINK ]]; then
     ln -s $HOME/.myconfig/.bashrc $HOME/.bashrc
 fi
 
-### Add bash configuration
+### Add tmux configuration
 CREATE_SYMLINK=true
 if [[ -f $HOME/.tmux.conf && ! -L $HOME/.tmux.conf ]]; then
     ### Prompt user to replace file with symlink
@@ -71,7 +71,7 @@ if [[ $CREATE_SYMLINK ]]; then
     ln -s $HOME/.myconfig/.tmux.conf $HOME/.tmux.conf
 fi
 
-### Add bash configuration
+### Add vimrc configuration
 CREATE_SYMLINK=true
 if [[ -f $HOME/.vimrc && ! -L $HOME/.vimrc ]]; then
     ### Prompt user to replace file with symlink
@@ -91,7 +91,7 @@ if [[ $CREATE_SYMLINK ]]; then
     ln -s $HOME/.myconfig/.vimrc $HOME/.vimrc
 fi
 
-### Add bash configuration
+### Add zshrc configuration
 CREATE_SYMLINK=true
 if [[ -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
     ### Prompt user to replace file with symlink
