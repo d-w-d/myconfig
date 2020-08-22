@@ -11,9 +11,3 @@ source $MYCONFIG_ROOT_DIR/entry.sh
 
 
 
-###############################
-########## MYCONFIG ##########
-###############################
-export MYCONFIG_ROOT_DIR=/Users/dwd/.myconfig
-source /Users/dwd/.myconfig/entry.sh 
-###############################
