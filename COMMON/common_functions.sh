@@ -27,7 +27,7 @@ function fun_which_os {
     return 0
 }
 
-[[ $BASH ]] && export -f fun_which_os
+[ $BASH ] && export -f fun_which_os
 
 ##########################################################
 # Determines if a package has been installed on this OS
@@ -49,7 +49,7 @@ function fun_is_package_installed {
 
 }
 
-[[ $BASH ]] && export -f fun_which_os
+[ $BASH ] && export -f fun_which_os
 
 
 #################################################
@@ -94,7 +94,7 @@ fun_bg_install_vundle_plugins() {
     return 0
 }
 
-[[ $BASH ]] && export -f fun_bg_install_vundle_plugins
+[ $BASH ] && export -f fun_bg_install_vundle_plugins
 
 ########################################################
 # Completes installation of YouCompleteMe Vundle Plugin.
@@ -130,7 +130,7 @@ fun_complete_ycm_installation() {
     return 0
 }
 
-[[ $BASH ]] && export -f fun_complete_ycm_installation
+[ $BASH ] && export -f fun_complete_ycm_installation
 
 
 #################################################
@@ -207,4 +207,4 @@ fun_resources_used() {
 
 }
 
-[[ $BASH ]] && export -f fun_resources_used
+[ $BASH ] && export -f fun_resources_used
