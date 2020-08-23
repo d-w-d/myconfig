@@ -252,4 +252,4 @@ __git_ps1_colorize_gitstring ()
     r="$c_clear$r"
 }
 
-[[ $BASH ]] && export -f __git_ps1_colorize_gitstring
+[ $BASH ] && export -f __git_ps1_colorize_gitstring
