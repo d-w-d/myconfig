@@ -6,8 +6,8 @@
 ### etc. where such functionality seems to be preconfigured or easy to set up
 ##########################################################################################
 
-### Centos will give you some s*** right off the bat
-source /etc/bash_completion.d/git
+### Centos will give you stuff right off the bat
+[ $BASH ] && source /etc/bash_completion.d/git
 
 ### Global setting to get git status, etc. to printout with colorization
 git config --global color.ui true
