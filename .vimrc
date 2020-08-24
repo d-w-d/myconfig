@@ -67,6 +67,9 @@ let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 " Non-Leader Shortcuts
 "==================================================
 
+noremap ff <ESC>w:let @/=@*<CR>gn
+noremap FF <ESC>:let @/=@*<CR>bbgN
+
 " Shortcut to autoformat the doc
 noremap <C-f> :Autoformat<CR>
 
@@ -88,7 +91,7 @@ imap <C-n> <Esc>l
 noremap <S-j> 3jzz
 noremap <S-k> 3kzz
 noremap <S-h> b
-noremap <S-l> w
+noremap <S-l> e
 
 " Enables up/down on single-wrapped lines whilst preserving standard jumpto
 " See: https://stackoverflow.com/a/21000307/8620332
@@ -118,10 +121,10 @@ vnoremap <Leader>(  c()<Esc>P
 vnoremap <Leader>{  c{}<Esc>P
 
 " Leader+f in visual mode will cause
-vnoremap f :s/\\%Vfoo\\%V/bar/gc
+vnoremap f :s/\%Vfoo\%V/bar/gc
 
-" When you want to replace lots of instances of the last item you searched for 
-" then call this 
+" When you want to replace lots of instances of the last item you searched for
+" then call this
 noremap <Leader>sub :%s//new-string/gc
 
 
@@ -158,7 +161,7 @@ nnoremap <leader>P m`O<ESC>p``
 map <NUL> <C-y>,
 imap <NUL> <C-y>,
 "map <Leader>e <C-y>,
-noremap <Leader>g viw
+"noremap <Leader>g viw
 
 " Toggle relative numbering
 nmap <Leader>nu :set rnu! <cr>
