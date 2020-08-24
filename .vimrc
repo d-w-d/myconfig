@@ -77,10 +77,10 @@ noremap <C-f> :Autoformat<CR>
 noremap Y y$
 
 " Overwrite: "CTRL-A    2    add N to number at/after cursor"
-map <C-a> ^
+"map <C-a> ^
 imap <C-a> <ESC>I
 " Overwrite: "CTRL-E         scroll N lines upwards (N lines Extra)"
-map <C-e> g_
+"map <C-e> g_
 imap <C-e> <ESC>A
 
 " Fast switching between modes
