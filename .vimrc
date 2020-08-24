@@ -120,6 +120,11 @@ vnoremap <Leader>{  c{}<Esc>P
 " Leader+f in visual mode will cause
 vnoremap f :s/\\%Vfoo\\%V/bar/gc
 
+" When you want to replace lots of instances of the last item you searched for 
+" then call this 
+noremap <Leader>sub :%s//new-string/gc
+
+
 " Jump to beginning/end of line
 noremap <Leader>b ^
 vnoremap <Leader>e $h
@@ -193,36 +198,36 @@ nnoremap <Leader>f za
 " This use the OSC52 escape sequence. It's supported by iTerm2 but not OSX
 " Terminal.
 function! OscCopy()
-let encodedText=@"
-let encodedText=substitute(encodedText, '\\', '\\\\\\\\', "g")
-let encodedText=substitute(encodedText, "'", "'\\\\\\\\''", "g")
-let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\\\n'"
-let encodedText=system(executeCmd)
-if $TMUX != ""
-let executeCmd='echo -en "\\x1bPtmux;\\x1b\\x1b]52;;'.encodedText.'\\x1b\\x1b\\\\\\\\\\x1b\\\\" > /dev/tty'
-else
-let executeCmd='echo -en "\\x1b]52;;'.encodedText.'\\x1b\\\\" > /dev/tty'
-endif
-call system(executeCmd)
-redraw!
+    let encodedText=@"
+    let encodedText=substitute(encodedText, '\\', '\\\\\\\\', "g")
+    let encodedText=substitute(encodedText, "'", "'\\\\\\\\''", "g")
+    let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\\\n'"
+    let encodedText=system(executeCmd)
+    if $TMUX != ""
+        let executeCmd='echo -en "\\x1bPtmux;\\x1b\\x1b]52;;'.encodedText.'\\x1b\\x1b\\\\\\\\\\x1b\\\\" > /dev/tty'
+    else
+        let executeCmd='echo -en "\\x1b]52;;'.encodedText.'\\x1b\\\\" > /dev/tty'
+    endif
+    call system(executeCmd)
+    redraw!
 endfunction
 command! OscCopy :call OscCopy()
 
 
 "function! OscCopy()
-    "let encodedText=@"
-    "let encodedText=substitute(encodedText, '\', '\\\\', "g")
-    "let encodedText=substitute(encodedText, "'", "'\\\\''", "g")
-    "let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\n'"
-    "let encodedText=system(executeCmd)
-    "if $TMUX != ""
-        ""tmux
-        "let executeCmd='echo -en "\x1bPtmux;\x1b\x1b]52;;'.encodedText.'\x1b\x1b\\\\\x1b\\" > /dev/tty'
-    "else
-        "let executeCmd='echo -en "\x1b]52;;'.encodedText.'\x1b\\" > /dev/tty'
-    "endif
-    "call system(executeCmd)
-    "redraw!
+"let encodedText=@"
+"let encodedText=substitute(encodedText, '\', '\\\\', "g")
+"let encodedText=substitute(encodedText, "'", "'\\\\''", "g")
+"let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\n'"
+"let encodedText=system(executeCmd)
+"if $TMUX != ""
+""tmux
+"let executeCmd='echo -en "\x1bPtmux;\x1b\x1b]52;;'.encodedText.'\x1b\x1b\\\\\x1b\\" > /dev/tty'
+"else
+"let executeCmd='echo -en "\x1b]52;;'.encodedText.'\x1b\\" > /dev/tty'
+"endif
+"call system(executeCmd)
+"redraw!
 "endfunction
 
 "command! OscCopy :call OscCopy()
@@ -240,15 +245,27 @@ function! DisableDefaultCutPasteRegisterBehavior()
     " On this approach 'd' acts like classic 'cut'
     vnoremap c "_di
     noremap C "_d$
-    vnoremap d "*d:let @+=@*<bar>OscCopy<CR>
-    noremap dd "*dd:let @+=@*<bar>OscCopy<CR>
-    noremap D "*D:let @+=@*<bar>OscCopy<CR>
-    noremap y "*y:let @+=@*<bar>OscCopy<CR>
-    noremap yw "*yw:let @+=@*<bar>OscCopy<CR>
-    noremap yiw "*yiw:let @+=@*<bar>OscCopy<CR>
-    noremap yy "*yy:let @+=@*<bar>OscCopy<CR>
-    nnoremap Y "*Y:let @+=@*<bar>OscCopy<CR>
-    vnoremap Y "*y`>:let @+=@*<bar>OscCopy<CR>
+    vnoremap d "*d:let @+=@*<CR>
+    noremap dd "*dd:let @+=@*<CR>
+    noremap D "*D:let @+=@*<CR>
+    noremap y "*y:let @+=@*<CR>
+    noremap yw "*yw:let @+=@*<CR>
+    noremap yiw "*yiw:let @+=@*<CR>
+    noremap yy "*yy:let @+=@*<CR>
+    nnoremap Y "*Y:let @+=@*<CR>
+    vnoremap Y "*y`>:let @+=@*<CR>
+    " Unfortunately, this Osc52 approach turned out to be very unreliable
+    " For high-fidelity copying, you need to use X-forwarding on remote
+    " machines
+    "vnoremap d "*d:let @+=@*<bar>OscCopy<CR>
+    "noremap dd "*dd:let @+=@*<bar>OscCopy<CR>
+    "noremap D "*D:let @+=@*<bar>OscCopy<CR>
+    "noremap y "*y:let @+=@*<bar>OscCopy<CR>
+    "noremap yw "*yw:let @+=@*<bar>OscCopy<CR>
+    "noremap yiw "*yiw:let @+=@*<bar>OscCopy<CR>
+    "noremap yy "*yy:let @+=@*<bar>OscCopy<CR>
+    "nnoremap Y "*Y:let @+=@*<bar>OscCopy<CR>
+    "vnoremap Y "*y`>:let @+=@*<bar>OscCopy<CR>
     " Re-yank what just got pasted in visual mode
     vnoremap p pgvy
 endfunction
