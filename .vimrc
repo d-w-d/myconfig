@@ -91,7 +91,8 @@ imap <C-n> <Esc>l
 noremap <S-j> 3jzz
 noremap <S-k> 3kzz
 noremap <S-h> b
-noremap <S-l> e
+noremap <S-l> w
+vnoremap <S-l> e
 
 " Enables up/down on single-wrapped lines whilst preserving standard jumpto
 " See: https://stackoverflow.com/a/21000307/8620332

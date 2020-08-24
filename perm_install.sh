@@ -4,6 +4,7 @@
 # Misc variables/Params
 ###############################################
 
+
 ### Inserts vars for:
 ### BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
 source /tmp/myconfig/UTILS/color_params.sh
@@ -42,7 +43,7 @@ if [[ -f $HOME/.bashrc && ! -L $HOME/.bashrc ]]; then
         ${RED}1. Yes
         ${GRE}2. No
     """
-    read -n1 CHOICE
+    read CHOICE
     [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
 fi
 if [[ $CREATE_SYMLINK ]]; then
@@ -62,7 +63,7 @@ if [[ -f $HOME/.tmux.conf && ! -L $HOME/.tmux.conf ]]; then
         ${RED}1. Yes
         ${GRE}2. No
     """
-    read -n1 CHOICE
+    read CHOICE
     [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
 fi
 if [[ $CREATE_SYMLINK ]]; then
@@ -82,7 +83,7 @@ if [[ -f $HOME/.vimrc && ! -L $HOME/.vimrc ]]; then
         ${RED}1. Yes
         ${GRE}2. No
     """
-    read -n1 CHOICE
+    read CHOICE
     [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
 fi
 if [[ $CREATE_SYMLINK ]]; then
@@ -102,7 +103,7 @@ if [[ -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
         ${RED}1. Yes
         ${GRE}2. No
     """
-    read -n1 CHOICE
+    read CHOICE
     [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
 fi
 if [[ $CREATE_SYMLINK ]]; then
