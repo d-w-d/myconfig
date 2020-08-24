@@ -200,7 +200,7 @@ __git_ps1 ()
     return $exit
 }
 
-export -f __git_ps1
+[ $BASH ] && export -f __git_ps1
 
 
 ### Aux function used above
