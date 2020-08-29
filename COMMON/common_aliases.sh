@@ -30,6 +30,11 @@ alias aljs='cd ~/work/javascript'
 alias allocaltunnel='lt' ### Use e.g. --port 8080
 alias alnpmconfigsetignorescripts="printf '\n\n This alias must be followed by true or false! \n\n';npm config set ignore-scripts"
 alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh"
+
+
+source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh &
+
+
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
 alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"commonjs\",\"lib\":[\"es2015\",\"dom\"]}"'

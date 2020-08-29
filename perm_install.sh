@@ -34,7 +34,7 @@ fi
 
 ### Add bash configuration
 CREATE_SYMLINK=true
-if [[ -f $HOME/.bashrc && ! -L $HOME/.bashrc ]]; then
+if [[ ! $1 && -f $HOME/.bashrc && ! -L $HOME/.bashrc ]]; then
     ### Prompt user to replace file with symlink
     echo -e """${CYA}
         A non-symbolic link already exists at $PWD/.bashrc.
@@ -54,7 +54,7 @@ fi
 
 ### Add tmux configuration
 CREATE_SYMLINK=true
-if [[ -f $HOME/.tmux.conf && ! -L $HOME/.tmux.conf ]]; then
+if [[ ! $1 && -f $HOME/.tmux.conf && ! -L $HOME/.tmux.conf ]]; then
     ### Prompt user to replace file with symlink
     echo -e """${CYA}
         A non-symbolic link already exists at $PWD/.tmux.conf.
@@ -74,7 +74,7 @@ fi
 
 ### Add vimrc configuration
 CREATE_SYMLINK=true
-if [[ -f $HOME/.vimrc && ! -L $HOME/.vimrc ]]; then
+if [[ ! $1 && -f $HOME/.vimrc && ! -L $HOME/.vimrc ]]; then
     ### Prompt user to replace file with symlink
     echo -e """${CYA}
         A non-symbolic link already exists at $PWD/.vimrc.
@@ -94,7 +94,7 @@ fi
 
 ### Add zshrc configuration
 CREATE_SYMLINK=true
-if [[ -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
+if [[ ! $1 && -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
     ### Prompt user to replace file with symlink
     echo -e """${CYA}
         A non-symbolic link already exists at $PWD/.zshrc.

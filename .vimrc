@@ -67,8 +67,10 @@ let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 " Non-Leader Shortcuts
 "==================================================
 
-noremap ff <ESC>w:let @/=@*<CR>gn
-noremap FF <ESC>:let @/=@*<CR>bbgN
+"noremap ff <ESC>w:let @/=@*<CR>gn
+"noremap FF <ESC>:let @/=@*<CR>bbgN
+noremap ff <ESC>wgn
+noremap FF <ESC>bbgN
 
 " Shortcut to autoformat the doc
 noremap <C-f> :Autoformat<CR>

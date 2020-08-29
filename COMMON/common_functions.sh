@@ -3,6 +3,34 @@
 # Define functions useful across all *NIX platforms
 
 #################################################
+# Returns data type regardless of bash or zsh
+# Globals:
+#   None
+# Arguments:
+#  Target data structure
+# Outputs:
+#   Writes type of file to stdout
+#################################################
+function fun_data_type {
+
+    ### Ensure an argument is given pointing to the target data structure
+    [ -z $1 ] && echo "fun_data_type needs an argument!"  &&  return 1
+
+
+    ### Echo result based on active shell
+    if [ $BASH ];then
+        echo $(type -t $1)
+    elif [ $ZSH_VERSION ];then
+        echo whence -w $1 | cut -f2 -d ' '
+    else
+        echo "fun_data_type is only designed to be run from a bash or zsh shell!"  &&  return 1 
+    fi
+    return 0
+}
+
+[[ $BASH ]] && export -f fun_data_type
+
+#################################################
 # Determines operating system of present machine
 # Globals:
 #   None
@@ -27,30 +55,7 @@ function fun_which_os {
     return 0
 }
 
-[ $BASH ] && export -f fun_which_os
-
-##########################################################
-# Determines if a package has been installed on this OS
-# Globals:
-#   None
-# Arguments:
-#   None
-# Outputs:
-#   Writes content of $OS to stdout
-##########################################################
-function fun_is_package_installed {
-
-    OS=$(fun_which_os)
-    if [[ $OS == 'DEBIAN' ]];then
-        echo "We're on Debian; checking installation via apt"
-        
-
-    fi
-
-}
-
-[ $BASH ] && export -f fun_which_os
-
+[[ $BASH ]] && export -f fun_which_os
 
 #################################################
 # Install Vundle Plugins as background process;
@@ -94,7 +99,7 @@ fun_bg_install_vundle_plugins() {
     return 0
 }
 
-[ $BASH ] && export -f fun_bg_install_vundle_plugins
+[[ $BASH ]] && export -f fun_bg_install_vundle_plugins
 
 ########################################################
 # Completes installation of YouCompleteMe Vundle Plugin.
@@ -130,7 +135,7 @@ fun_complete_ycm_installation() {
     return 0
 }
 
-[ $BASH ] && export -f fun_complete_ycm_installation
+[[ $BASH ]] && export -f fun_complete_ycm_installation
 
 
 #################################################
@@ -207,4 +212,4 @@ fun_resources_used() {
 
 }
 
-[ $BASH ] && export -f fun_resources_used
+[[ $BASH ]] && export -f fun_resources_used
