@@ -25,6 +25,31 @@ sleep 3
 ### If sudo user, install all dependencies
 ###########################################
 
+### Need to make sure we have the right python libs for our installations
+### E.g. if `which python3` shows /usr/bin/python3 and `python3 -V` gives
+### `Python 3.6.9` then you need to make sure that we have a config dir with
+### a Makefile in it at `/usr/lib/python3.6/`.
+
+### Default values for Ubuntu 18:
+PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
+PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
+
+### Raspberry Pi OS
+#PYTHON2_CONFIG_DIR="TODO"
+#PYTHON3_CONFIG_DIR="TODO"
+
+[ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ] &&
+    echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
+    return 1
+
+[ ! -f "$PYTHON3_CONFIG_DIR/Makefile" ] &&
+    echo "Can't find $PYTHON3_CONFIG_DIR/Makefile ...exiting." &&
+    return 1
+
+###########################################
+### If sudo user, install all dependencies
+###########################################
+
 if [[ $(groups | grep sudo | wc -l) == 1 ]]; then
     echo -e """
         You have sudo permissoins; let's use them to install dependencies for vim!
@@ -74,6 +99,10 @@ else
     sleep 2
 fi
 
+#########################################
+### Build vim from source
+#########################################
+
 cd /tmp
 git clone https://github.com/vim/vim.git
 cd vim/src
@@ -89,9 +118,9 @@ BEGINCONFIG=true \
     --enable-gui="auto" \
     --enable-gtk2-check \
     --enable-pythoninterp="yes" \
-    --with-python-config-dir="/usr/lib/python2.7/config-x86_64-linux-gnu" \
+    --with-python-config-dir="$PYTHON2_CONFIG_DIR" \
     --enable-python3interp="yes" \
-    --with-python3-config-dir="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu" \
+    --with-python3-config-dir="$PYTHON3_CONFIG_DIR" \
     --enable-fail-if-missing \
     --prefix="$HOME/.myfs/usr/local"
 make

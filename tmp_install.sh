@@ -5,7 +5,7 @@
 ###############################################
 
 function abort_install() {
-    # Provide message as to why we're aboritng install
+    # Provide message as to why we're aborting install
     if [[ $1 ]]; then
         echo $1
     else
