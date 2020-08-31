@@ -6,8 +6,13 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+
+
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+
 
 ########## ########## ########## ########## ##########
 ### END DWD ADJUSTMENT TO OHMYZSH CONFIG
@@ -123,7 +128,12 @@ typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 
 ###
 source  ~/.myconfig/entry.sh
-#
+
+
+### Get auto suggestions
+#source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+
 
 #source ~/.iterm2_shell_integration.zsh
 source ~/powerlevel10k/powerlevel10k.zsh-theme
@@ -142,15 +152,15 @@ bindkey "${key[Up]}" up-line-or-local-history
 bindkey "${key[Down]}" down-line-or-local-history
 
 up-line-or-local-history() {
-    zle set-local-history 1
-    zle up-line-or-history
-    zle set-local-history 0
+zle set-local-history 1
+zle up-line-or-history
+zle set-local-history 0
 }
 zle -N up-line-or-local-history
 down-line-or-local-history() {
-    zle set-local-history 1
-    zle down-line-or-history
-    zle set-local-history 0
+zle set-local-history 1
+zle down-line-or-history
+zle set-local-history 0
 }
 zle -N down-line-or-local-history
 
