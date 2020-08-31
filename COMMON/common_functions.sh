@@ -2,6 +2,30 @@
 #
 # Define functions useful across all *NIX platforms
 
+
+
+#################################################
+# Echos message regarding aborting of
+#   function/Script
+# Globals:
+#   None
+# Arguments:
+#   Optional message
+# Outputs:
+#   Writes type of file to stdout
+#################################################
+function fun_abort_install() {
+    # Provide message as to why we're aborting install
+    if [[ $1 ]]; then
+        echo $1
+    else
+        echo "Aborting install for unspecified reason"
+    fi
+    exit 1
+}
+
+[ $BASH ] && export -f fun_data_type
+
 #################################################
 # Returns data type regardless of bash or zsh
 # Globals:
@@ -23,12 +47,12 @@ function fun_data_type {
     elif [ $ZSH_VERSION ];then
         echo whence -w $1 | cut -f2 -d ' '
     else
-        echo "fun_data_type is only designed to be run from a bash or zsh shell!"  &&  return 1 
+        echo "fun_data_type is only designed to be run from a bash or zsh shell!"  &&  return 1
     fi
     return 0
 }
 
-[[ $BASH ]] && export -f fun_data_type
+[ $BASH ] && export -f fun_data_type
 
 #################################################
 # Determines operating system of present machine
@@ -55,7 +79,7 @@ function fun_which_os {
     return 0
 }
 
-[[ $BASH ]] && export -f fun_which_os
+[ $BASH ] && export -f fun_which_os
 
 #################################################
 # Install Vundle Plugins as background process;
@@ -99,7 +123,7 @@ fun_bg_install_vundle_plugins() {
     return 0
 }
 
-[[ $BASH ]] && export -f fun_bg_install_vundle_plugins
+[ $BASH ] && export -f fun_bg_install_vundle_plugins
 
 ########################################################
 # Completes installation of YouCompleteMe Vundle Plugin.
@@ -125,7 +149,7 @@ fun_complete_ycm_installation() {
     cd $HOME/.vim/bundle/YouCompleteMe;
     git submodule update --init --recursive;
     python3 -m pip install --user cmake > /dev/null 2>&1;
-    python3 install.py > /dev/null 2>&1;
+    python3 install.py --clang-completer > /dev/null 2>&1;
     echo -e "echo '''\033[31m
     ====================================
     YouCompleteMe Installation Finalized
@@ -135,7 +159,7 @@ fun_complete_ycm_installation() {
     return 0
 }
 
-[[ $BASH ]] && export -f fun_complete_ycm_installation
+[ $BASH ] && export -f fun_complete_ycm_installation
 
 
 #################################################
@@ -212,4 +236,4 @@ fun_resources_used() {
 
 }
 
-[[ $BASH ]] && export -f fun_resources_used
+[ $BASH ] && export -f fun_resources_used

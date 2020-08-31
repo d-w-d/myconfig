@@ -9,6 +9,8 @@ set encoding=utf-8                  " Set encoding
 set scrolloff=5
 colorscheme torte
 
+let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+
 "==================================================
 " Begin Vundle Setup
 "==================================================
@@ -65,12 +67,15 @@ let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 
 "==================================================
 " Non-Leader Shortcuts
-"==================================================
+"================================================
 
+"XXX
 "noremap ff <ESC>w:let @/=@*<CR>gn
+"noremap <Leader>x <ESC>:let @/=@*<CR>wgn
 "noremap FF <ESC>:let @/=@*<CR>bbgN
-noremap ff <ESC>wgn
-noremap FF <ESC>bbgN
+"noremap
+noremap ff <ESC>:let @/=@*<CR><ESC>wgn
+noremap FF <ESC>:let @/=@*<CR><ESC>bbgN
 
 " Shortcut to autoformat the doc
 noremap <C-f> :Autoformat<CR>
@@ -250,7 +255,7 @@ function! DisableDefaultCutPasteRegisterBehavior()
     noremap X "_X
     " On this approach 'd' acts like classic 'cut'
     vnoremap c "_di
-    noremap C "_d$
+    noremap C "_d$a
     vnoremap d "*d:let @+=@*<CR>
     noremap dd "*dd:let @+=@*<CR>
     noremap D "*D:let @+=@*<CR>
