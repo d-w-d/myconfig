@@ -5,6 +5,16 @@
 # It assumes packages such as python3, python3-dev, etc.
 # For a full list of assumed packages, see Dockerfile for myubuntu18.04
 
+##############################################################
+### Inherit $MYCONFIG_ROOT_DIR from parent script
+##############################################################
+
+MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
+
+##############################################################
+### Message
+##############################################################
+
 PREVIOUSDIR=$PWD
 
 clear && printf '\e[3J'
