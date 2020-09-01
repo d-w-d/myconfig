@@ -38,6 +38,10 @@ PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
 #PYTHON2_CONFIG_DIR="TODO"
 #PYTHON3_CONFIG_DIR="TODO"
 
+### Ubuntu 20.04 RPi3/4
+#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-aarch64-linux-gnu"
+#PYTHON3_CONFIG_DIR="/usr/lib/python3.8/config-3.8-aarch64-linux-gnu"
+
 [ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ] &&
     echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
     return 1
