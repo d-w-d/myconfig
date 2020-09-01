@@ -149,7 +149,7 @@ fun_complete_ycm_installation() {
     cd $HOME/.vim/bundle/YouCompleteMe;
     git submodule update --init --recursive;
     python3 -m pip install --user cmake > /dev/null 2>&1;
-    python3 install.py --clang-completer --ts-completer > /dev/null 2>&1;
+    python3 install.py --all > /dev/null 2>&1;
     echo -e "echo '''\033[31m
     ====================================
     YouCompleteMe Installation Finalized
