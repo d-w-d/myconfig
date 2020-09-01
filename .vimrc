@@ -3,14 +3,14 @@
 "==================================================
 syntax on                           " Turn on syntax
 let mapleader = " "                 " Make spacebar the leader
-set clipboard=unnamed
+"set clipboard^=unnamed
+set clipboard=unnamedplus
 set backspace=indent,eol,start      " enables backspaces
 set encoding=utf-8                  " Set encoding
 set scrolloff=5
 colorscheme torte
 
-"let g:ycm_global_ycm_extra_conf ='~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py' 
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
 
 "==================================================
 " Begin Vundle Setup
@@ -42,6 +42,7 @@ Plugin 'Chiel92/vim-autoformat'                                     " Autoformat
 Plugin 'kana/vim-submode'
 Plugin 'ekalinin/dockerfile.vim'                                    " Enables :set syntax=Dockerfile
 Plugin 'preservim/nerdcommenter'                                    " used to toggle comments
+Plugin 'fcpg/vim-osc52'
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}     " enables vim status line
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " DO NOT EDIT:
@@ -254,13 +255,16 @@ function! DisableDefaultCutPasteRegisterBehavior()
     nnoremap x "_x
     vnoremap x "_d
     noremap X "_X
-    " On this approach 'd' acts like classic 'cut'
-    vnoremap c "_di
-    noremap C "_d$a
+    " On this approach 'c' does not copy to working registers
+    vnoremap c "_c
+    noremap C "_C
+    " On this approach 'd' acts like classic 'cut' (i.e. copies to working regiesters
     vnoremap d "*d:let @+=@*<CR>
     noremap dd "*dd:let @+=@*<CR>
     noremap D "*D:let @+=@*<CR>
-    noremap y "*y:let @+=@*<CR>
+    "noremap y "*y:let @+=@*<CR>
+    "noremap y "*y:let @+=@*<CR>:call SendViaOSC52(getreg('"*'))<CR>
+    noremap y y:call SendViaOSC52(getreg('"'))<CR>
     noremap yw "*yw:let @+=@*<CR>
     noremap yiw "*yiw:let @+=@*<CR>
     noremap yy "*yy:let @+=@*<CR>
@@ -397,8 +401,6 @@ au BufNewFile,BufRead *.py set
 
 highlight BadWhitespace ctermbg=red guibg=red
 au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\\+$/
-
-
 
 
 "==================================================

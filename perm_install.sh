@@ -4,7 +4,6 @@
 # Misc variables/Params
 ###############################################
 
-
 ### Inserts vars for:
 ### BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
 source /tmp/myconfig/UTILS/color_params.sh
@@ -111,6 +110,28 @@ if [[ $CREATE_SYMLINK ]]; then
     rm $HOME/.zshrc
     ln -s $HOME/.myconfig/.zshrc $HOME/.zshrc
 fi
+
+
+### Add p10k configuration
+CREATE_SYMLINK=true
+if [[ ! $1 && -f $HOME/.p10k.zsh && ! -L $HOME/.p10k.zsh ]]; then
+    ### Prompt user to replace file with symlink
+    echo -e """${CYA}
+        A non-symbolic link already exists at $PWD/.p10k.zsh
+        Replace it with link to ${WHI}~/.myconfig/.p10k.zsh${CYA}?
+
+        ${RED}1. Yes
+        ${GRE}2. No
+    """
+    read CHOICE
+    [[ $CHOICE == 1 ]] && CREATE_SYMLINK=false
+fi
+if [[ $CREATE_SYMLINK ]]; then
+    ### Make sure the symlink points to .myconfig/.zshrc
+    rm $HOME/.p10k.zsh
+    ln -s $HOME/.myconfig/.p10k.zsh $HOME/.p10k.zsh
+fi
+
 
 ### Finally, source the home-installed myconfig
 unalias vim
