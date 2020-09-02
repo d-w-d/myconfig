@@ -193,6 +193,10 @@ vmap <Leader>/ <Leader>c<Space>
 " Enable folding with the spacebar; maps to binding given by symplfold plugin
 nnoremap <Leader>f za
 
+" Copy content of working registers to local clipboard
+" This function is provided by Plugin fcpg/vim-osc52 
+noremap <Leader>c :call SendViaOSC52(getreg('"*'))<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Alter Cut-Paste Behavior:
 "   By default in vim, whatever you delete goes into the register used to then paste.
@@ -206,45 +210,6 @@ nnoremap <Leader>f za
 "   - Note: if you want to do 'dd' without copying to register, then you need to
 "   the lines visually and then use 'x' to delete without copying.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" Function used to copy yanked content to clipboard on local machine
-" This use the OSC52 escape sequence. It's supported by iTerm2 but not OSX
-" Terminal.
-function! OscCopy()
-    let encodedText=@"
-    let encodedText=substitute(encodedText, '\\', '\\\\\\\\', "g")
-    let encodedText=substitute(encodedText, "'", "'\\\\\\\\''", "g")
-    let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\\\n'"
-    let encodedText=system(executeCmd)
-    if $TMUX != ""
-        let executeCmd='echo -en "\\x1bPtmux;\\x1b\\x1b]52;;'.encodedText.'\\x1b\\x1b\\\\\\\\\\x1b\\\\" > /dev/tty'
-    else
-        let executeCmd='echo -en "\\x1b]52;;'.encodedText.'\\x1b\\\\" > /dev/tty'
-    endif
-    call system(executeCmd)
-    redraw!
-endfunction
-command! OscCopy :call OscCopy()
-
-
-"function! OscCopy()
-"let encodedText=@"
-"let encodedText=substitute(encodedText, '\', '\\\\', "g")
-"let encodedText=substitute(encodedText, "'", "'\\\\''", "g")
-"let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\n'"
-"let encodedText=system(executeCmd)
-"if $TMUX != ""
-""tmux
-"let executeCmd='echo -en "\x1bPtmux;\x1b\x1b]52;;'.encodedText.'\x1b\x1b\\\\\x1b\\" > /dev/tty'
-"else
-"let executeCmd='echo -en "\x1b]52;;'.encodedText.'\x1b\\" > /dev/tty'
-"endif
-"call system(executeCmd)
-"redraw!
-"endfunction
-
-"command! OscCopy :call OscCopy()
-
 
 " Function to modify cut-paste-register behavior
 " Note: we are writing to '*' register and then copying to the '+' register.
@@ -262,26 +227,12 @@ function! DisableDefaultCutPasteRegisterBehavior()
     vnoremap d "*d:let @+=@*<CR>
     noremap dd "*dd:let @+=@*<CR>
     noremap D "*D:let @+=@*<CR>
-    "noremap y "*y:let @+=@*<CR>
-    "noremap y "*y:let @+=@*<CR>:call SendViaOSC52(getreg('"*'))<CR>
-    noremap y y:call SendViaOSC52(getreg('"'))<CR>
+    noremap y "*y:let @+=@*<CR>
     noremap yw "*yw:let @+=@*<CR>
     noremap yiw "*yiw:let @+=@*<CR>
     noremap yy "*yy:let @+=@*<CR>
     nnoremap Y "*Y:let @+=@*<CR>
     vnoremap Y "*y`>:let @+=@*<CR>
-    " Unfortunately, this Osc52 approach turned out to be very unreliable
-    " For high-fidelity copying, you need to use X-forwarding on remote
-    " machines
-    "vnoremap d "*d:let @+=@*<bar>OscCopy<CR>
-    "noremap dd "*dd:let @+=@*<bar>OscCopy<CR>
-    "noremap D "*D:let @+=@*<bar>OscCopy<CR>
-    "noremap y "*y:let @+=@*<bar>OscCopy<CR>
-    "noremap yw "*yw:let @+=@*<bar>OscCopy<CR>
-    "noremap yiw "*yiw:let @+=@*<bar>OscCopy<CR>
-    "noremap yy "*yy:let @+=@*<bar>OscCopy<CR>
-    "nnoremap Y "*Y:let @+=@*<bar>OscCopy<CR>
-    "vnoremap Y "*y`>:let @+=@*<bar>OscCopy<CR>
     " Re-yank what just got pasted in visual mode
     vnoremap p pgvy
 endfunction
@@ -402,16 +353,15 @@ au BufNewFile,BufRead *.py set
 highlight BadWhitespace ctermbg=red guibg=red
 au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\\+$/
 
-
 "==================================================
 " Sub-mode plugging functionality
 "==================================================
 
 " Horizontal fast scrolling
-call submode#enter_with('fastLeft', 'n', '', '<leader>h', '3h')
-call submode#enter_with('fastRight', 'n', '', '<leader>l', '3l')
-call submode#map('fastLeft', 'n', '', 'h', '3h')
-call submode#map('fastRight', 'n', '', 'l', '3l')
+"call submode#enter_with('fastLeft', 'n', '', '<leader>h', '3h')
+"call submode#enter_with('fastRight', 'n', '', '<leader>l', '3l')
+"call submode#map('fastLeft', 'n', '', 'h', '3h')
+"call submode#map('fastRight', 'n', '', 'l', '3l')
 
 
 
