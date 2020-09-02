@@ -9,7 +9,7 @@ MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 # Modify 'ls' family (this assumes you use a recent GNU ls).
 ##############################################################
 
-alias ls='ls -GF'               # Sort with color and file-type indicator
+alias ls='ls -F --color'        # Sort with color and file-type indicator
 alias lsDirsOnly='ls -d'        # List just dir names (not their content).
 alias lsSortBySize='ls -Sr'     # Sort by size, biggest last
 alias lt='ls -ltr'              # Sort by date, most recent last.
