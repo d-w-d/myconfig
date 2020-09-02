@@ -136,8 +136,8 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 ### Prevent ZSH going through global history with up/down
 ### FROM: https://superuser.com/a/691603/978730
 ##########################################################
-bindkey "${key[Up]}" up-line-or-local-history
-bindkey "${key[Down]}" down-line-or-local-history
+#bindkey "${key[Up]}" up-line-or-local-history
+#bindkey "${key[Down]}" down-line-or-local-history
 
 up-line-or-local-history() {
 zle set-local-history 1
@@ -151,6 +151,9 @@ zle down-line-or-history
 zle set-local-history 0
 }
 zle -N down-line-or-local-history
+
+bindkey "${key[Up]}" up-line-or-local-history
+bindkey "${key[Down]}" down-line-or-local-history
 
 bindkey "^[[1;5A" up-line-or-history    # [CTRL] + Cursor up
 bindkey "^[[1;5B" down-line-or-history  # [CTRL] + Cursor down
