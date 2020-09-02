@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Install vim with clipboard and python3 support from source
-# This script was developed on Docker image for mycentos7
+# This script was developed on Docker image for a centos7 image.
 # It assumed packages such as ncurses, ncurses-devel, python3, etc.
 # For a full list of packages assumed available on system, see
 # Dockerfile for mycentos7 image

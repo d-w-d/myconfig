@@ -4,48 +4,84 @@
 
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
-#####################################################
-# Function to build full-featured vim from source
-# and install to ~/.myfs
-#####################################################
-function fun_install_vim() {
+#################################################
+# Install Vundle Plugins as background process;
+#   also installs cmake and YCM via call to separate function
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Eventually writes message to stdout stating
+#   that the installation is complete
+#################################################
+fun_bg_install_vundle_plugins() {
 
-    PREVIOUSDIR=$PWD
-    ### Build recent ncurses
-    #cd /tmp
-    #curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
-    #tar -xzvf ncurses.tar.gz
-    #cd ncurses-6.2
-    #./configure --prefix=$HOME/.myfs/usr/local
-    #make
-    #make install
+    ### Confirm some prereqs
+    [[ ! -d /tmp/myconfig ]] && echo "/tmp/myconfig not found" && return 1
+    hash vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
 
-    ### Build recent tmux 3.1b
-    cd /tmp
-    git clone https://github.com/vim/vim.git
-    cd vim/src
+    ### Clone/update vundle repo
+    if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
+        # If Vundle not installed then clone it
+        git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+    else
+        # If Vundle dir exists, update it
+        cd $HOME/.vim/bundle/Vundle.vim
+        git fetch origin
+        git checkout master
+        git reset --hard origin/master
+    fi
 
-    make distclean
-    BEGINCONFIG=true \
-        CFLAGS="-I$HOME/.myfs/usr/local/include" \
-        LDFLAGS="-L$HOME/.myfs/usr/local/lib" ./configure \
-        --with-x \
-        --enable-gui=auto \
-        --enable-gui="auto" \
-        --enable-pythoninterp="yes" \
-        --with-python-config-dir="/usr/lib64/python2.7/config" \
-        --enable-python3interp="yes" \
-        --enable-gtk2-check \
-        --with-python3-config-dir="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu" \
-        --enable-fail-if-missing \
-        --prefix="$HOME/.myfs/usr/local"
-    make
-    make install
-
-    cd $PREVIOUSDIR
-
-    ### Now that vim is installed, let's download vundle plugins
-    source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
-    fun_bg_install_vundle_plugins
-
+    ### Install vundle plugins as bg process then print message
+    ### If cmake is absent, then also complete ycm installtion
+    echo "Installing vundle plugins..."
+    ((TEMP=$(vim -E -N -u /tmp/myconfig/.vimrc +PluginInstall +qall;
+    echo -e "echo '''\033[31m
+    ================================================
+    VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
+    ================================================\n\033[37m''';";
+    hash cmake >/dev/null 2>&1 || fun_complete_ycm_installation  >/dev/null 2>&1;
+    ); bash -c "$TEMP" ) &)
+    return 0
 }
+
+[ $BASH ] && export -f fun_bg_install_vundle_plugins
+
+########################################################
+# Completes installation of YouCompleteMe Vundle Plugin.
+#   Needed because ycm needs cmake for installation,
+#   and this may not be available on your machine.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Eventually writes message to stdout stating
+#   that the installation is complete
+########################################################
+fun_complete_ycm_installation() {
+
+    ### Confirm prereqs
+    [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && return 1
+    hash python3 >/dev/null 2>&1 || (echo "python3 not found" && return 1)
+    hash pip3 >/dev/null 2>&1 || (echo "pip3 not found" && return 1)
+
+    echo "Completing installation of YouCompleteMe..."
+    ((TEMP=$(PREVIOUSDIR=$PWD;
+    cd $HOME/.vim/bundle/YouCompleteMe;
+    git submodule update --init --recursive;
+    python3 -m pip install --user cmake;
+    python3 install.py --all;
+    echo -e "echo '''\033[31m
+    ====================================
+    YouCompleteMe Installation Finalized
+    ====================================\n\033[37m''';
+    "; cd $PREVIOUSDIR); bash -c "$TEMP" ) &)
+
+    return 0
+}
+
+[ $BASH ] && export -f fun_complete_ycm_installation
+
+

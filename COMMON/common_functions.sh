@@ -3,6 +3,22 @@
 # Define functions useful across all *NIX platforms
 
 
+#################################################
+# Function to fully install myconfig to home dir
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Writes message to stdout
+#################################################
+myconfig_full_installation() {
+    [[ $(fun_which_os) == "MACOS" ]] && echo "Don't run this on MacOS!" && return 1
+    echo 'Running full installation'
+    source /tmp/myconfig/perm_install.sh
+}
+
+[ $BASH ] && export -f myconfig_full_installation
 
 #################################################
 # Echos message regarding aborting of
@@ -40,14 +56,13 @@ function fun_data_type {
     ### Ensure an argument is given pointing to the target data structure
     [ -z $1 ] && echo "fun_data_type needs an argument!"  &&  return 1
 
-
     ### Echo result based on active shell
     if [ $BASH ];then
         echo $(type -t $1)
     elif [ $ZSH_VERSION ];then
         echo whence -w $1 | cut -f2 -d ' '
     else
-        echo "fun_data_type is only designed to be run from a bash or zsh shell!"  &&  return 1
+        echo "fun_data_type is only to be run from a bash/zsh"  &&  return 1
     fi
     return 0
 }
@@ -118,64 +133,13 @@ fun_bg_install_vundle_plugins() {
     ================================================
     VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
     ================================================\n\033[37m''';";
-    hash cmake >/dev/null 2>&1 || fun_complete_ycm_installation  >/dev/null 2>&1;
+    fun_complete_ycm_installation  >/dev/null 2>&1;
     ); bash -c "$TEMP" ) &)
     return 0
 }
 
 [ $BASH ] && export -f fun_bg_install_vundle_plugins
 
-########################################################
-# Completes installation of YouCompleteMe Vundle Plugin.
-#   Needed because ycm needs cmake for installation,
-#   and this may not be available on your machine.
-# Globals:
-#   None
-# Arguments:
-#   None
-# Outputs:
-#   Eventually writes message to stdout stating
-#   that the installation is complete
-########################################################
-fun_complete_ycm_installation() {
-
-    ### Confirm prereqs
-    [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && return 1
-    hash python3 >/dev/null 2>&1 || (echo "python3 not found" && return 1)
-    hash pip3 >/dev/null 2>&1 || (echo "pip3 not found" && return 1)
-
-    echo "Completing installation of YouCompleteMe..."
-    ((TEMP=$(PREVIOUSDIR=$PWD;
-    cd $HOME/.vim/bundle/YouCompleteMe;
-    git submodule update --init --recursive;
-    python3 -m pip install --user cmake;
-    python3 install.py --all;
-    echo -e "echo '''\033[31m
-    ====================================
-    YouCompleteMe Installation Finalized
-    ====================================\n\033[37m''';
-    "; cd $PREVIOUSDIR); bash -c "$TEMP" ) &)
-
-    return 0
-}
-
-[ $BASH ] && export -f fun_complete_ycm_installation
-
-
-#################################################
-# Function to fully install myconfig to home dir
-# Globals:
-#   None
-# Arguments:
-#   None
-# Outputs:
-#   Writes message to stdout
-#################################################
-myconfig_full_installation() {
-    echo 'Running full installation'
-    source /tmp/myconfig/perm_install.sh
-}
-[ $BASH ] && export -f myconfig_full_installation
 
 #################################################
 # TODO: NEEDS COMPLETION/REFINEMENT

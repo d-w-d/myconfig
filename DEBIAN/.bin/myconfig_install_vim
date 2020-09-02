@@ -77,6 +77,7 @@ if [[ $(groups | grep sudo | wc -l) == 1 ]]; then
         manpages-dev \
         git \
         curl \
+        cmake \
         python \
         python3 \
         python-dev \
