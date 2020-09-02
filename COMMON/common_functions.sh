@@ -163,6 +163,21 @@ fun_complete_ycm_installation() {
 
 
 #################################################
+# Function to fully install myconfig to home dir
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Writes message to stdout
+#################################################
+myconfig_full_installation() {
+    echo 'Running full installation'
+    source /tmp/myconfig/perm_install.sh
+}
+[ $BASH ] && export -f myconfig_full_installation
+
+#################################################
 # TODO: NEEDS COMPLETION/REFINEMENT
 # Show resources of some greped running process
 # Globals:

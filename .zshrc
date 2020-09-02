@@ -81,8 +81,7 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
-plugins=(zsh-autosuggestions)
+plugins=(git zsh-autosuggestions nvm)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -118,17 +117,11 @@ source $ZSH/oh-my-zsh.sh
 ### BEGIN DWD ADJUSTMENT TO OHMYZSH CONFIG
 ########## ########## ########## ########## ##########
 
-# This is supposed to silence the instant-prompt wanrings given on shell startup.
+# This is supposed to silence the instant-prompt warnings given on shell startup.
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 
-###
+### Get all my stuff in
 source  ~/.myconfig/entry.sh
-
-
-### Get auto suggestions
-#source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-
 
 #source ~/.iterm2_shell_integration.zsh
 source ~/powerlevel10k/powerlevel10k.zsh-theme

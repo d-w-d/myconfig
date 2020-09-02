@@ -5,6 +5,12 @@
 #############################################################
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
+##################################################
+# Source settings specific to this machine
+##################################################
+
+[ -f $MYCONFIG_ROOT_DIR/misc.sh ] && source $MYCONFIG_ROOT_DIR/misc.sh
+
 ##############################################
 # Params, etc.
 ##############################################
@@ -58,8 +64,3 @@ RHEL)
     ;;
 esac
 
-##################################################
-# Source settings specific to this machine
-##################################################
-
-[ -f $MYCONFIG_ROOT_DIR/misc.sh ] && source $MYCONFIG_ROOT_DIR/misc.sh

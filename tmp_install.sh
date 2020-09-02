@@ -84,11 +84,11 @@ fi
 # Provide function to fully install myconfig to home dir
 ########################################################
 
-myconfig_full_installation() {
-    echo 'Running full installation'
-    source /tmp/myconfig/perm_install.sh
-}
-export -f myconfig_full_installation
+#myconfig_full_installation() {
+    #echo 'Running full installation'
+    #source /tmp/myconfig/perm_install.sh
+#}
+#export -f myconfig_full_installation
 
 ###############################################
 
@@ -109,5 +109,5 @@ ${GRE}
 $VIM_STATUS
 
 - ${GRE}Run${CYA} myconfig_full_installation${GRE} to copy to ${WHI}$HOME/.myconfig
- """
+"""
 cd $PREVIOUSDIR
