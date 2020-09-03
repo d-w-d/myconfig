@@ -145,7 +145,6 @@ To properly use these configurations, you'll need:
 - python3   >=3.4
 - tmux      >=2.1
 - vim       >=7.4.1578 +clipboard +python3
-- powerline
 
 To add bash-it, follow install instructions at:
 ${WHI}https://github.com/Bash-it/bash-it
@@ -155,4 +154,5 @@ If zsh is installed, consider adding ohmyzsh and other tools:
 ${WHI}https://ohmyz.sh/#install
 ${WHI}https://github.com/romkatv/powerlevel10k#manual
 ${WHI}https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#oh-my-zsh
+${WHI}https://github.com/lukechilds/zsh-nvm#as-an-oh-my-zsh-custom-plugin
 """

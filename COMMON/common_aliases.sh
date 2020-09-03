@@ -43,7 +43,7 @@ alias alwork='cd ~/work'
 
 
 ### open vim easily with sudo
-alias suvim="sudo -E vim"
+alias suvim="sudo -E $HOME/.myfs/usr/local/bin/vim"
 
 
 ##############################################################
