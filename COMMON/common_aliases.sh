@@ -32,13 +32,19 @@ alias alnpmconfigsetignorescripts="printf '\n\n This alias must be followed by t
 alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh"
 
 
-source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh &
+#source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh &
 
 
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
 alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"commonjs\",\"lib\":[\"es2015\",\"dom\"]}"'
 alias alwork='cd ~/work'
+
+
+
+### open vim easily with sudo
+alias suvim="sudo -E vim"
+
 
 ##############################################################
 # Git Shortcuts
