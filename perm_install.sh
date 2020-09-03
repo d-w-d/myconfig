@@ -149,6 +149,7 @@ To properly use these configurations, you'll need:
 To add bash-it, follow install instructions at:
 ${WHI}https://github.com/Bash-it/bash-it
 ${CYA}
+
 If zsh is installed, consider adding ohmyzsh and other tools:
 
 ${WHI}https://ohmyz.sh/#install
