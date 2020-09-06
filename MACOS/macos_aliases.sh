@@ -4,6 +4,8 @@
 # MAC-Specific Aliases
 ##############################################################
 
+alias ls='ls -FG'        # Sort with color and file-type indicator
+
 alias alcoreapps='open /System/Library/CoreServices/Applications'
 alias alkilltouchbaragent='sudo pkill TouchBarServer'
 alias alnameservers="scutil --dns | grep 'nameserver\[[0-9]*\]'"
