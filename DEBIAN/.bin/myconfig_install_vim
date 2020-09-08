@@ -127,8 +127,8 @@ make distclean
 ### your installation of python3
 BEGINCONFIG=true \
     CFLAGS="-I$HOME/.myfs/usr/local/include" \
-    LDFLAGS="-L$HOME/.myfs/usr/local/lib" ./configure \
-    LD_LIBRARY_PATH="$HOME/.myfs/usr/local/lib" \
+    LDFLAGS="-L$HOME/.myfs/usr/local/lib" \
+    LD_LIBRARY_PATH="$HOME/.myfs/usr/local/lib" ./configure \
     --with-x \
     --enable-gui="auto" \
     --enable-gtk2-check \

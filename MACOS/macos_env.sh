@@ -10,6 +10,10 @@ export PATH="$HOME/.myconfig/MACOS/.bin:$PATH"
 ### HOMEBREW PATHS
 export PATH="/usr/local/sbin:$PATH"
 
+### ADD BINUTILS (e.g. readelf); we add to end of PATH since we don't want
+### to short cut MACOS system commands
+export PATH="$PATH:/usr/local/opt/binutils/bin"
+
 ### Set up goProgramming Paths; see: https://stackoverflow.com/a/10847122
 export GOPATH=$HOME/work/goProgramming:$HOME/work/goProgramming/bin
 export GOROOT=$HOME/work/goProgramming
