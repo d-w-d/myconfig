@@ -29,11 +29,6 @@ L='/lib:/lib64:/usr/lib:/usr/lib64' && export LD_LIBRARY_PATH="$L:$HOME/.myfs/us
 ###   `Also install iTerm2 Utilities` checked
 export PATH="$HOME/.iterm2:$PATH"
 
-### Set up goLang Paths; see: https://stackoverflow.com/a/10847122
-export GOPATH=$HOME/work/goProgramming:$HOME/work/goProgramming/bin
-export GOROOT=$HOME/work/goProgramming
-export PATH=$PATH:$GOROOT/bin
-
 ### Python User-installed executables
 export PATH="$HOME/.local/bin:$PATH"
 

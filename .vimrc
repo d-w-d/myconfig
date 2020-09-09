@@ -35,6 +35,7 @@ Plugin 'christoomey/vim-tmux-navigator'     " Move between vim windows and tmux 
 "Plugin 'Yggdroot/indentLine'
 "Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'Valloric/YouCompleteMe'                                     " autocomplete
+"Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 Plugin 'mattn/emmet-vim'                                            " emmet webdev snippets
 Plugin 'mattn/webapi-vim'                                           " emmet webdev snippets
 Plugin 'scrooloose/nerdtree'                                        " enables file-tree searching
@@ -195,7 +196,7 @@ vmap <Leader>/ <Leader>c<Space>
 nnoremap <Leader>f za
 
 " Copy content of working registers to local clipboard
-" This function is provided by Plugin fcpg/vim-osc52 
+" This function is provided by Plugin fcpg/vim-osc52
 noremap <Leader>c :call SendViaOSC52(getreg('"*'))<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -353,17 +354,4 @@ au BufNewFile,BufRead *.py set
 
 highlight BadWhitespace ctermbg=red guibg=red
 au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\\+$/
-
-"==================================================
-" Sub-mode plugging functionality
-"==================================================
-
-" Horizontal fast scrolling
-"call submode#enter_with('fastLeft', 'n', '', '<leader>h', '3h')
-"call submode#enter_with('fastRight', 'n', '', '<leader>l', '3l')
-"call submode#map('fastLeft', 'n', '', 'h', '3h')
-"call submode#map('fastRight', 'n', '', 'l', '3l')
-
-
-
 

@@ -14,10 +14,12 @@ export PATH="/usr/local/sbin:$PATH"
 ### to short cut MACOS system commands
 export PATH="$PATH:/usr/local/opt/binutils/bin"
 
-### Set up goProgramming Paths; see: https://stackoverflow.com/a/10847122
-export GOPATH=$HOME/work/goProgramming:$HOME/work/goProgramming/bin
-export GOROOT=$HOME/work/goProgramming
-export PATH=$PATH:$GOROOT/bin
+### Set up goLang Paths; see: https://stackoverflow.com/a/10847122
+### NOTE: setting GOROOT messed up my YCM install once, so don't 
+### bother setting this stuff unless/until you get into golang
+#export GOPATH=$HOME/work/golang:$HOME/work/golang/bin
+#export GOROOT=$HOME/work/golang
+#export PATH=$PATH:$GOROOT/bin
 
 ### JAVA
 export M2_HOME=$HOME/work/Java/_apache-maven-3.5.4
