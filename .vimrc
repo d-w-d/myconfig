@@ -73,11 +73,7 @@ let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 " Non-Leader Shortcuts
 "================================================
 
-"XXX
-"noremap ff <ESC>w:let @/=@*<CR>gn
-"noremap <Leader>x <ESC>:let @/=@*<CR>wgn
-"noremap FF <ESC>:let @/=@*<CR>bbgN
-"noremap
+" Find and select next occurance of yanked content
 noremap ff <ESC>:let @/=@*<CR><ESC>wgn
 noremap FF <ESC>:let @/=@*<CR><ESC>bbgN
 
@@ -145,8 +141,9 @@ noremap <Leader>b ^
 vnoremap <Leader>e $h
 nnoremap <Leader>e $
 
-" Toggle file-tree display
-map <Leader>n :NERDTreeToggle<CR>
+" Toggle file-tree display; crudely set menu to width 20
+" This might well lead to crap results if we have multiple splits
+map <Leader>n :NERDTreeToggle <bar> vertical resize 20<CR>
 
 " More-Width-in-present-window shortcut
 nmap <Leader>mw :vertical resize +2<cr>
@@ -225,6 +222,7 @@ function! DisableDefaultCutPasteRegisterBehavior()
     " On this approach 'c' does not copy to working registers
     vnoremap c "_c
     noremap C "_C
+    noremap CC ^"_C
     " On this approach 'd' acts like classic 'cut' (i.e. copies to working regiesters
     vnoremap d "*d:let @+=@*<CR>
     noremap dd "*dd:let @+=@*<CR>

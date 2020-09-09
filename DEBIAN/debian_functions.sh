@@ -27,6 +27,7 @@ fun_complete_ycm_installation() {
     echo "Completing installation of YouCompleteMe..."
     ((TEMP=$(PREVIOUSDIR=$PWD;
     cd $HOME/.vim/bundle/YouCompleteMe;
+    git pull origin master 
     git submodule update --init --recursive;
     python3 -m pip install --user cmake;
     python3 install.py --all;
