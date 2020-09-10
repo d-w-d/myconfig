@@ -6,7 +6,11 @@
 
 ### Inserts vars for:
 ### BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
-source /tmp/myconfig/UTILS/color_params.sh
+if [[ $HOME/.myconfig/UTILS/color_params.sh ]]; then
+    source $HOME/.myconfig/UTILS/color_params.sh
+else
+    source /tmp/myconfig/UTILS/color_params.sh
+fi
 
 ###############################################
 # Main Script Logic
@@ -29,7 +33,6 @@ if [[ -d $HOME/.myconfig ]]; then
 else
     cp -R /tmp/myconfig $HOME/.myconfig
 fi
-
 
 ### Add bash configuration
 CREATE_SYMLINK=true
@@ -111,7 +114,6 @@ if [[ $CREATE_SYMLINK ]]; then
     ln -s $HOME/.myconfig/.zshrc $HOME/.zshrc
 fi
 
-
 ### Add p10k configuration
 CREATE_SYMLINK=true
 if [[ ! $1 && -f $HOME/.p10k.zsh && ! -L $HOME/.p10k.zsh ]]; then
@@ -131,7 +133,6 @@ if [[ $CREATE_SYMLINK ]]; then
     rm $HOME/.p10k.zsh
     ln -s $HOME/.myconfig/.p10k.zsh $HOME/.p10k.zsh
 fi
-
 
 ### Finally, source the home-installed myconfig
 unalias vim

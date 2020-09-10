@@ -15,7 +15,12 @@
 myconfig_full_installation() {
     [[ $(fun_which_os) == "MACOS" ]] && echo "Don't run this on MacOS!" && return 1
     echo 'Running full installation'
-    source /tmp/myconfig/perm_install.sh
+    ### Prefer to source from HOME to avoid having to redownload to tmp
+    if [[ -f $HOME/.myconfig/perm_install.sh ]];then
+        source $HOME/.myconfig/perm_install.sh
+    else
+        source /tmp/myconfig/perm_install.sh
+    fi
 }
 
 [ $BASH ] && export -f myconfig_full_installation
