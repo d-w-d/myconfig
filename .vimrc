@@ -214,27 +214,32 @@ noremap <Leader>c :call SendViaOSC52(getreg('"*'))<CR>
 " Note: we are writing to '*' register and then copying to the '+' register.
 " '*' seems to be needed on the Mac, but my understanding is that linux and
 " windows also like to use the '+' register for their system clipboards.
+" I also add a bunch of marks with ma -> `a (mark a -> goto a) syntax
 function! DisableDefaultCutPasteRegisterBehavior()
     " On this approach 'x' acts like classic 'delete' key
-    nnoremap x "_x
-    vnoremap x "_d
-    noremap X "_X
+    nnoremap x mx"_x
+    vnoremap x mx"_d
+    noremap X mx"_X
     " On this approach 'c' does not copy to working registers
-    vnoremap c "_c
-    noremap C "_C
-    noremap CC ^"_C
+    vnoremap c mc"_c
+    noremap C mc"_C
+    noremap CC ^mc"_C
     " On this approach 'd' acts like classic 'cut' (i.e. copies to working regiesters
-    vnoremap d "*d:let @+=@*<CR>
-    noremap dd "*dd:let @+=@*<CR>
-    noremap D "*D:let @+=@*<CR>
-    noremap y "*y:let @+=@*<CR>
-    noremap yw "*yw:let @+=@*<CR>
-    noremap yiw "*yiw:let @+=@*<CR>
-    noremap yy "*yy:let @+=@*<CR>
-    nnoremap Y "*Y:let @+=@*<CR>
-    vnoremap Y "*y`>:let @+=@*<CR>
+    vnoremap d md"*d:let @+=@*<CR>
+    noremap dd md"*ddmd:let @+=@*<CR>
+    noremap D md"*DmD:let @+=@*<CR>
+    noremap y my"*y:let @+=@*<CR>
+    "noremap y "*y:let @+=@*<CR>:call SendViaOSC52(getreg('"*'))<CR>
+    noremap yw my"*yw:let @+=@*<CR>
+    noremap yiw my"*yiw:let @+=@*<CR>
+    noremap yy my"*yy:let @+=@*<CR>
+    vnoremap Y my"*y`>:let @+=@*<CR>
     " Re-yank what just got pasted in visual mode
-    vnoremap p pgvy
+    vnoremap p mppgvy
+    " Mark where you start visual mode; go there with `v
+    noremap v mvv
+    noremap V mvV
+    noremap <C-v> mv<C-v>
 endfunction
 
 " Function to restore default behavior
