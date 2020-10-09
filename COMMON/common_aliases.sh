@@ -37,7 +37,7 @@ alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh"
 
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
-alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"commonjs\",\"lib\":[\"es2015\",\"dom\"]}"'
+alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2015\",\"dom\"]}"'
 alias alwork='cd ~/work'
 
 

@@ -147,6 +147,26 @@ fun_bg_install_vundle_plugins() {
 
 
 #################################################
+# TODO COMPLETE THIS!
+# Prints to screen ps with nice color
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Eventually writes OS to stdout
+#################################################
+fun_ps() {
+    if [[ $1 ]]; then
+        ps -eo pid,ppid,time,user,tty,%cpu,%mem,vsize,command --sort -%cpu | sed -e $'s/ *[^ ]* /\033[1;33m&\033[0m/g' | grep -E "$1|PID"
+    else
+        ps -eo pid,ppid,time,user,tty,%cpu,%mem,vsize,command --sort -%cpu | sed -e $'s/ *[^ ]* /\033[1;33m&\033[0m/g'
+    fi
+}
+
+[ $BASH ] && export -f fun_ps
+
+#################################################
 # TODO: NEEDS COMPLETION/REFINEMENT
 # Show resources of some greped running process
 # Globals:
