@@ -31,7 +31,7 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'tmhedberg/SimpylFold'
 Plugin 'vim-scripts/indentpython.vim'
-Plugin 'christoomey/vim-tmux-navigator'     " Move between vim windows and tmux panes with  ctrl-j, etc.
+Plugin 'christoomey/vim-tmux-navigator'     " Move between vim windows and tmux panes with ctrl-j, etc.
 "Plugin 'Yggdroot/indentLine'
 "Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'Valloric/YouCompleteMe'                                     " autocomplete
@@ -303,6 +303,14 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=blue ctermbg=grey
 "call matchadd('TrailingSpace', '\\s\\+$', 80)
 "call matchadd('LeadingTab', '^t\\+', 99)
 "call matchadd('TrailingTab', '\\t\\+$', 99)
+
+
+"==================================================
+" YouCompleteMe Settings
+"==================================================
+
+" Toggle YCM information box 
+nmap <silent> <Leader>t <plug>(YCMHover)
 
 "==================================================
 " Terminal Settings

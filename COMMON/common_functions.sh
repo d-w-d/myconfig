@@ -45,7 +45,7 @@ function fun_abort_install() {
     exit 1
 }
 
-[ $BASH ] && export -f fun_data_type
+[ $BASH ] && export -f fun_abort_install
 
 #################################################
 # Returns data type regardless of bash or zsh
