@@ -55,6 +55,11 @@ export MAG="\033[35m"
 export CYA="\033[36m"
 export WHI="\033[37m"
 
+### Make vim the default editor:
+export VISUAL=vim
+export EDITOR=vim
+
+
 ### Makes bash history unlimied
 #HISTSIZE=
 #HISTFILESIZE=
