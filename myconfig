@@ -40,10 +40,10 @@ function _create_myfs() {
     else
         echo -e "${GRE}Creating ~/.myfs"
         local msg=""
-        $msg+="# What's This?\n"
-        $msg+=""
-        $msg+="This is a dir for a filesystem structure for building/installing "
-        $msg+="executables from source using the myconfig library"
+        msg+="# What's This?\n"
+        msg+=""
+        msg+="This is a dir for a filesystem structure for building/installing "
+        msg+="executables from source using the myconfig library"
         mkdir $HOME/.myfs && echo $msg >>$HOME/.myfs/README.md
         return 0
     fi
@@ -67,8 +67,8 @@ function _fully_install_myconfig() {
 
     if [[ $skip_confirmation == false ]]; then
         local msg=""
-        $msg+="${RED} Are you sure you want to install "
-        $msg+="myconfig to $HOME/.myconfig?${WHI} (Y/y)\n"
+        msg+="${RED} Are you sure you want to install "
+        msg+="myconfig to $HOME/.myconfig?${WHI} (Y/y)\n"
         echo -e "$msg"
         read choice
         if [[ ! $choice =~ "Y|y" ]]; then
