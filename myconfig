@@ -1,0 +1,225 @@
+#!/bin/bash
+#
+# Defines the main CLI function 'myconfig' for this project
+
+### Define script-wide global vars
+skip_confirmation=false
+
+### Define aux functions
+function _usage() {
+
+    local msg=""
+    msg+="${WHI}Usage: ${RED}myconfig ${CYA}<command> [<args>]\n${WHI}"
+    msg+="${WHI}Commands:\n${WHI}"
+    msg+="${CYA}help                ${WHI}Print usage of myconfig\n${WHI}"
+    msg+="${CYA}version             ${WHI}Print version\n${WHI}"
+    msg+="${CYA}status              ${WHI}Shows installation status of myconfig\n${WHI}"
+    msg+="${CYA}install [-y] <arg>  ${WHI}Install <arg> from source [confirmed]\n${WHI}"
+    msg+="${CYA}update [-y]         ${WHI}Update myconfig [confirmed]\n${WHI}"
+    echo -e "$msg"
+    return 0
+}
+
+function _install_usage() {
+
+    local msg=""
+    msg+="${GRE}Usage: ${RED}myconfig ${CYA}install [-y]${WHI}\n"
+    msg+="${CYA}self        ${WHI}Permanently install myconfig to ~/.myconfig${WHI}\n"
+    msg+="${CYA}vim         ${WHI}Install vim 8.2 from source${WHI}\n"
+    msg+="${CYA}tmux        ${WHI}Install tmux 3.1b from source${WHI}\n"
+    msg+="${CYA}zsh         ${WHI}Install zsh 5.7.1 from source${WHI}\n"
+    msg+="${CYA}prometheus  ${WHI}Install prometheus from source${WHI}\n"
+    echo -e "$msg"
+}
+
+function _create_myfs() {
+
+    if [[ -d $HOME/.myfs ]]; then
+        echo -e "${RED}~/.myfs already exists"
+        return 1
+    else
+        echo -e "${GRE}Creating ~/.myfs"
+        local msg=""
+        $msg+="# What's This?\n"
+        $msg+=""
+        $msg+="This is a dir for a filesystem structure for building/installing "
+        $msg+="executables from source using the myconfig library"
+        mkdir $HOME/.myfs && echo $msg >>$HOME/.myfs/README.md
+        return 0
+    fi
+}
+
+function _is_myconfig_installed() {
+
+    if [[ -d $HOME/.myconfig ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function _fully_install_myconfig() {
+
+    if _is_myconfig_installed; then
+        echo -e "${RED}myconfig is already installed${WHI}"
+        return 1
+    fi
+
+    if [[ $skip_confirmation == false ]]; then
+        local msg=""
+        $msg+="${RED} Are you sure you want to install "
+        $msg+="myconfig to $HOME/.myconfig?${WHI} (Y/y)\n"
+        echo -e "$msg"
+        read choice
+        if [[ ! $choice =~ "Y|y" ]]; then
+            return 1
+        fi
+    fi
+
+    echo -e "${GRE}OK, let's fully install myconfig...${WHI}"
+    sleep 2
+    _create_myfs
+    local previous_dir=$PWD
+    cd $HOME
+    #git clone https://github.com/d-w-d/myconfig.git .myconfig
+    cd $previous_dir
+
+    ### Replace .rc config files
+    sleep 3
+    echo -e """${RED}
+    ========
+    WARNING!   
+    ========
+
+    If any of the following files exist then they will get moved to ${CYA}~/.myconfig/redundant${WHI}:
+
+    .bashrc
+    .p10k.zsh
+    .tmux.conf
+    .vimrc
+    .zshrc
+
+    ${WHI}"""
+
+    ### Move old config files to myconfig/redundant
+    [[ ! -d $HOME/.myconfig/redundant ]] && mkdir $HOME/.myconfig/redundant
+    [[ -f $HOME/.bashrc ]] &&
+        mv $HOME/.bashrc $HOME/.myconfig/redundant/.bashrc-original
+    [[ -f $HOME/.p10k.zsh ]] &&
+        mv $HOME/.p10k.zsh $HOME/.myconfig/redundant/.p10k.zsh-original
+    [[ -f $HOME/.tmux.conf ]] &&
+        mv $HOME/.tmux.conf $HOME/.myconfig/redundant/.tmux.conf-original
+    [[ -f $HOME/.vimrc ]] &&
+        mv $HOME/.vimrc $HOME/.myconfig/redundant/.vimrc-original
+    [[ -f $HOME/.zshrc ]] &&
+        mv $HOME/.zshrc $HOME/.myconfig/redundant/.zshrc-original
+
+    ### Create symlinks from myconfig to ~
+    ln -s $HOME/.myconfig/.bashrc $HOME/.bashrc
+    ln -s $HOME/.myconfig/.p10k.zsh $HOME/.p10k.zsh
+    ln -s $HOME/.myconfig/.tmux.conf $HOME/.tmux.conf
+    ln -s $HOME/.myconfig/.vimrc $HOME/.vimrc
+    ln -s $HOME/.myconfig/.zshrc $HOME/.zshrc
+
+    ### Final message
+    local msg=""
+    msg+="${GRE}Installation complete! ${WHI}"
+    msg+="${GRE}Run ${CYA}'source ~/.myconfig/entry.sh' ${WHI}"
+    msg+="${GRE}to activate changes. ${WHI}"
+    echo -e "$msg"
+}
+
+function _status() {
+
+    local msg="${WHI}Myconfig status: \n${WHI}"
+
+    # Test if myconfig is installed
+    if is_myconfig_installed; then
+        msg+="${GRE}✓ myconfig is fully installed${WHI}"
+    else
+        msg+="${RED}✗ myconfig is NOT fully installed${WHI}"
+    fi
+
+    # Test if vim has been installed to .myfs
+    if [[ $(which -a vim | grep $HOME/.myfs | wc -l) -gt 0 ]]; then
+        msg+="${GRE}✓ myconfig > vim is installed${WHI}"
+    else
+        msg+="${RED}✗ myconfig > vim is NOT installed${WHI}"
+    fi
+
+    # Test if tmux has been installed to .myfs
+    if [[ $(which -a tmux | grep $HOME/.myfs | wc -l) -gt 0 ]]; then
+        msg+="${GRE}✓ myconfig > tmux is installed${WHI}"
+    else
+        msg+="${RED}✗ myconfig > tmux is NOT installed${WHI}"
+    fi
+
+    echo -e "$msg"
+}
+
+main() {
+
+    ### Handle no args
+    if [[ $# -eq 0 ]]; then
+        _usage
+        return 1
+    fi
+
+    ### Main Loop
+    while [[ $# -gt 0 ]]; do
+        arg1=$1
+        shift # expose next argument
+        case "$arg1" in
+        "--help" | "help")
+            _usage
+            break
+            ;;
+        "--version" | "version")
+            _version
+            break
+            ;;
+        "--status" | "status")
+            _status
+            break
+            ;;
+        "install")
+            echo 'INSTALL CALLED'
+            while [[ $# -gt 0 ]]; do
+                arg2="$1"
+                shift # expose next argument
+                case "$arg2" in
+                "--help" | "help")
+                    echo 'INSTALL --HELP CALLED'
+                    _install_usage
+                    break
+                    ;;
+                "-y")
+                    skip_confirmation=true
+                    echo "-y selected"
+                    ;;
+                "self")
+                    echo "self selected"
+                    _fully_install_myconfig
+                    break
+                    ;;
+                *)
+                    echo >&2 "Invalid option: $@"
+                    _install_usage
+                    return 1
+                    ;;
+                esac
+            done
+            break
+            ;;
+
+        *)
+            echo >&2 "Invalid option: $@"
+            _usage
+            return 1
+            ;;
+        esac
+    done
+}
+
+### Execute main with all arguments passed to script
+main "$@"

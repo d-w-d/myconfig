@@ -2,27 +2,27 @@
 
 ## What's This?
 
-This repo is for setting up bash/zsh shell environments, with customized settings for MacOS, Debian and Centos/RHEL machines.
+This repo is for setting up highly customized bash/zsh shell environments for MacOS, Debian and Centos/RHEL machines.
 
 ## Quick Start
 
-`source <(curl -L https://raw.githubusercontent.com/dan-drago/myconfig/master/tmp_install.sh)`
+`source <(curl -L https://raw.githubusercontent.com/d-w-d/myconfig/master/quickstart.sh)`
 
 ## How It Works
 
-### Three-Phase Installation
+### Two-Phase Installation
 
-This repo works in three phases.
+This repo works in two phases: 'quickstart' and 'full installation'.
 
-### Phase One
+### Bootstrap Install
 
-First, the 'quickstart' command above is designed to get you working in a productive bash shell as quickly as possible without messing with that user's configuration files. It clones this repo to `/tmp/myconfig`, and, if vim is installed, it triggers the installation of vundle and its plugins in the background, and then aliases vim to use all my settings/plugins. This is referred to as the 'temporary install'.
+First, the 'Quick Start' command above is designed to get you working in a productive bash shell as quickly as possible on any Mac, Debian or RHEL machine without adversley affecting whatever user's account you might happen to be using. It clones this repo to `/tmp/myconfig`, and, if vim is installed, it triggers the installation of vundle and its plugins in the background, and then aliases vim to use all my settings/plugins.
 
-The temporary installation leaves you in a bash shell with handy aliases for that operating system (e.g. `alportsinuse` will list ports in use on that machine, `klear` will clear the terminal history), and a function called `myconfig_full_installation`.
+This quick/temporary installation leaves you in a bash shell with handy aliases for that operating system (e.g. `alportsinuse` will list ports in use on that machine, `klear` will clear the terminal history), and a CLI called `myconfig` that you can use to perform a full/permanent installation.
 
-### Phase Two
+### Full Installation
 
-`myconfig_full_installation` *will* mess with the config files in the user's home dir, and so is supposed to only be run on accounts that are designated for me. Basically, it copies `/tmp/myconfig` to `$HOME/.myconfig`, and and then copies commands/files for long-term usage of vim, tmux, bash and zsh according to my main rc files.
+`myconfig install self` *will* mess with the config files in the user's home dir, and so is supposed to only be run on accounts that are designated for me. Basically, it clones this repo to `$HOME/.myconfig`, and enables you to install modern versions of vim, tmux, zsh, git and ohmyzsh.
 
 ### Phase Three
 
@@ -53,12 +53,14 @@ Whenever possible, I'm trying to follow the [Google style guide](https://google.
 
 ### Executable Scripts
 
-Scripts in the myconfig repo that are supposed to be exected are:
+Scripts in myconfig repo that are supposed to be executed are:
 
 1. Referred to as (executable) scripts
     2. Given no suffix
-3. Given the shebang `#!/usr/bin/false bash` (to date at least)
+3. Given the shebang `#!/usr/bin/env bash` (to date at least)
     4. Placed in `.bin` directories within their respective OS dirs
 
+### Hmmm
 
 
+    Why is there an indentation above?

@@ -235,7 +235,7 @@ function! DisableDefaultCutPasteRegisterBehavior()
     noremap yy my"*yy:let @+=@*<CR>
     vnoremap Y my"*y`>:let @+=@*<CR>
     " Re-yank what just got pasted in visual mode
-    vnoremap p mppgvy
+    vnoremap p mppgv"*y
     " Mark where you start visual mode; go there with `v
     noremap v mvv
     noremap V mvV
