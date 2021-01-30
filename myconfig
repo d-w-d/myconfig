@@ -9,8 +9,9 @@ skip_confirmation=false
 function _usage() {
 
     local msg=""
-    msg+="${WHI}Usage: ${RED}myconfig ${CYA}<command> [<args>]\n${WHI}"
-    msg+="${WHI}Commands:\n${WHI}"
+    msg+="${WHI}Usage: ${WHI}\n\n"
+    msg+="${GRE}myconfig ${CYA}<command> [<args>]\n${WHI}"
+    msg+="\n"
     msg+="${CYA}help                ${WHI}Print usage of myconfig\n${WHI}"
     msg+="${CYA}version             ${WHI}Print version\n${WHI}"
     msg+="${CYA}status              ${WHI}Shows installation status of myconfig\n${WHI}"
@@ -22,7 +23,9 @@ function _usage() {
 function _install_usage() {
 
     local msg=""
-    msg+="${GRE}Usage: ${RED}myconfig ${CYA}install [-y]${WHI}\n"
+    msg+="${WHI}Usage: ${WHI}\n\n"
+    msg+="${GRE}myconfig install ${CYA}[-y] <command>${WHI}\n"
+    msg+="\n"
     msg+="${CYA}self        ${WHI}Permanently install myconfig to ~/.myconfig${WHI}\n"
     msg+="${CYA}vim         ${WHI}Install vim 8.2 from source${WHI}\n"
     msg+="${CYA}tmux        ${WHI}Install tmux 3.1b from source${WHI}\n"
@@ -223,13 +226,16 @@ main() {
             break
             ;;
         "install")
-            echo 'INSTALL CALLED'
+
+            # Handle no further install args
+            [[ $# -eq 0 ]] && _install_usage && return 1
+
+            # Handle further install args
             while [[ $# -gt 0 ]]; do
                 arg2="$1"
                 shift # expose next argument
                 case "$arg2" in
                 "--help" | "help")
-                    echo 'INSTALL --HELP CALLED'
                     _install_usage
                     break
                     ;;
@@ -244,6 +250,7 @@ main() {
                     ;;
                 *)
                     echo >&2 "Invalid option: $@"
+                    echo "INSTALL CALLED BARE"
                     _install_usage
                     return 1
                     ;;
