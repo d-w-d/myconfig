@@ -248,7 +248,8 @@ main() {
                     ;;
                 "vim")
                     echo "vim selected"
-                    _install_vim
+                    _is_myconfig_fully_installed && _install_vim
+                    ! _is_myconfig_fully_installed && echo "myconfig not installed"
                     break
                     ;;
                 *)
