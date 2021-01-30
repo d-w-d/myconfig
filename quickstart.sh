@@ -9,6 +9,21 @@ previous_dir=$PWD
 # Require git
 hash git >/dev/null 2>&1 || echo "Git is not installed. Aborting installation."
 
+# Only perform quickstart if myconfig is not already fully installed
+if [[ -d $HOME/.myconfig ]]; then
+    echo -e """${RED}
+
+        Dir ~/.myconfig already exists! 
+
+        Either run \`myconfig update\` to update it, 
+        or remove \`~/.myconfig\` in order to run quickstart afresh.
+
+        Exiting...
+
+    ${WHI}"""
+    return 1
+fi
+
 # Clone/Update myconfig Repo
 if [[ -d /tmp/myconfig ]]; then
     echo -e "Updating git repo for myconfig..."
