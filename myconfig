@@ -72,6 +72,7 @@ function _fully_install_myconfig() {
         echo -e "$msg"
         read choice
         if [[ ! $choice =~ "Y|y" ]]; then
+            echo -e "${RED}Exiting...${WHI}"
             return 1
         fi
     fi
