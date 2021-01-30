@@ -9,8 +9,7 @@ skip_confirmation=false
 function _usage() {
 
     local msg=""
-    msg+="${WHI}Usage: ${WHI}\n\n"
-    msg+="${GRE}myconfig ${CYA}<command> [<args>]\n${WHI}"
+    msg+="${WHI}Usage: ${GRE}myconfig ${CYA}<command> [<args>]\n${WHI}"
     msg+="\n"
     msg+="${CYA}help                ${WHI}Print usage of myconfig\n${WHI}"
     msg+="${CYA}version             ${WHI}Print version\n${WHI}"
@@ -23,8 +22,7 @@ function _usage() {
 function _install_usage() {
 
     local msg=""
-    msg+="${WHI}Usage: ${WHI}\n\n"
-    msg+="${GRE}myconfig install ${CYA}[-y] <command>${WHI}\n"
+    msg+="${WHI}Usage: ${GRE}myconfig install ${CYA}[-y] <command>${WHI}\n"
     msg+="\n"
     msg+="${CYA}self        ${WHI}Permanently install myconfig to ~/.myconfig${WHI}\n"
     msg+="${CYA}vim         ${WHI}Install vim 8.2 from source${WHI}\n"
