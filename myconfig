@@ -171,7 +171,7 @@ function _status() {
     local msg="${WHI}Myconfig status: \n${WHI}"
 
     # Test if myconfig is installed
-    if is_myconfig_installed; then
+    if _is_myconfig_fully_installed; then
         msg+="${GRE}✓ myconfig is fully installed${WHI}"
     else
         msg+="${RED}✗ myconfig is NOT fully installed${WHI}"

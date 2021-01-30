@@ -309,7 +309,7 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=blue ctermbg=grey
 " YouCompleteMe Settings
 "==================================================
 
-" Toggle YCM information box 
+" Toggle YCM information box
 nmap <silent> <Leader>t <plug>(YCMHover)
 
 "==================================================
@@ -365,4 +365,23 @@ au BufNewFile,BufRead *.py set
 
 highlight BadWhitespace ctermbg=red guibg=red
 au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\\+$/
+
+"==================================================
+" Make _ a word boundary;
+" NOTE: use cw to select _-separated words;
+"           cW to select whole thing
+"==================================================
+set iskeyword-=_
+
+
+
+"==================================================
+" Change color when in insert mode
+"==================================================
+autocmd InsertEnter * set cursorline | highlight CursorLine guibg=darkblue ctermbg=darkblue
+autocmd InsertLeave * set nocursorline | highlight clear | colorscheme torte
+
+
+
+
 
