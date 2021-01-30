@@ -7,7 +7,7 @@ MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 [[ -d $HOME/.myfs ]] && export PATH="$HOME/.myfs/usr/local/sbin:$HOME/.myfs/usr/local/bin:$HOME/.myfs/sbin:$HOME/.myfs/bin:$HOME/.myfs/usr/bin:$HOME/.myfs/local/bin:$PATH"
 
 ### Augment PATH for executables in ~/.myconfig
-export PATH="$MYCONFIG_ROOT_DIR/COMMON/.bin:$PATH"
+export PATH="$MYCONFIG_ROOT_DIR:$MYCONFIG_ROOT_DIR/COMMON/.bin:$PATH"
 
 ### Augment LD_LIBRARY_PATH for myfs-installed libraries
 L='/lib:/lib64:/usr/lib:/usr/lib64' && export LD_LIBRARY_PATH="$L:$HOME/.myfs/usr/lib:$HOME/.myfs/usr/lib64"
