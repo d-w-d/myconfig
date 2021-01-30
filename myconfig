@@ -246,6 +246,11 @@ main() {
                     _fully_install_myconfig
                     break
                     ;;
+                "vim")
+                    echo "vim selected"
+                    _install_vim
+                    break
+                    ;;
                 *)
                     echo >&2 "Invalid option: $@"
                     echo "INSTALL CALLED BARE"
