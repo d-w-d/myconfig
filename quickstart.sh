@@ -2,14 +2,14 @@
 #
 # Library to temporarily install myconfig to /tmp and enable rapid productivity
 
-### Variables, params, etc.
+# Variables, params, etc.
 vim_status=""
 previous_dir=$PWD
 
-### Require git
+# Require git
 hash git >/dev/null 2>&1 || echo "Git is not installed. Aborting installation."
 
-### Clone/Update myconfig Repo
+# Clone/Update myconfig Repo
 if [[ -d /tmp/myconfig ]]; then
     echo -e "Updating git repo for myconfig..."
     cd /tmp/myconfig
@@ -24,10 +24,10 @@ else
     touch misc.sh
 fi
 
-### Expose tools in /tmp/myconfig to this shell
+# Expose tools in /tmp/myconfig to this shell
 MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
 
-### Test if VIM is installed
+# Test if VIM is installed
 if hash vim >/dev/null 2>&1; then
     # alias vim to use .vimrc in /tmp/myconfig/
     alias vim="vim -N -u /tmp/myconfig/.vimrc"
@@ -44,7 +44,7 @@ if hash vim >/dev/null 2>&1; then
     ================================================\n\033[37m''';";
     ); bash -c "$cmd" ) &)
 
-    ### Check if installed vim has python3 and clipboard support
+    # Check if installed vim has python3 and clipboard support
     if [[ $(vim --version | grep -E '\-python3|\-clipboard') ]]; then
         vim_status=""
         vim_status+="- ${RED}WARNING!${GRE} Vim is installed BUT does "
@@ -59,7 +59,7 @@ else
     vim_status="${RED}vim is not installed${WHI}"
 fi
 
-### Print instructions to user
+# Print instructions to user
 echo -e """${GRE}
 =======================================
 MYCONFIG HAS BEEN ${RED}TEMPORARILY${GRE} INSTALLED
@@ -75,7 +75,7 @@ ${GRE}
 
 """
 
-### Clean up
+# Clean up
 cd $previous_dir
 unset previous_dir
 unset vim_status

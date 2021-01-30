@@ -2,10 +2,10 @@
 #
 # Defines the main CLI function 'myconfig' for this project
 
-### Define script-wide global vars
+# Define script-wide global vars
 skip_confirmation=false
 
-### Define aux functions
+# Define aux functions
 function _usage() {
 
     local msg=""
@@ -17,7 +17,6 @@ function _usage() {
     msg+="${CYA}install [-y] <arg>  ${WHI}Install <arg> from source [confirmed]\n${WHI}"
     msg+="${CYA}update [-y]         ${WHI}Update myconfig [confirmed]\n${WHI}"
     echo -e "$msg"
-    return 0
 }
 
 function _install_usage() {
@@ -43,13 +42,12 @@ function _create_myfs() {
         msg+="# What's This?\n"
         msg+=""
         msg+="This is a dir for a filesystem structure for building/installing "
-        msg+="executables from source using the myconfig library"
+        msg+="executables from source using the myconfig CLI"
         mkdir $HOME/.myfs && echo $msg >>$HOME/.myfs/README.md
-        return 0
     fi
 }
 
-function _is_myconfig_installed() {
+function _is_myconfig_fully_installed() {
 
     if [[ -d $HOME/.myconfig ]]; then
         return 0
@@ -58,9 +56,45 @@ function _is_myconfig_installed() {
     fi
 }
 
+function _update_myconfig() {
+
+    # Exit if not fully installed
+    if ! _is_myconfig_fully_installed; then
+        echo -e "${RED}myconfig is not installed${WHI}"
+        return 1
+    fi
+
+    # Exit if this is the "SSOT" repo
+    if [[ -f $HOME/.myconfig/.SSOT ]]; then
+        echo -e """${RED}
+        This is the SSOT repo; it will NOT update via the myconfig LCI!
+        ${WHI}"""
+        return 1
+    fi
+
+    # Perform update from remote
+    local previous_dir=$PWD
+    cd $HOME/.myconfig/
+    git fetch origin
+    git checkout master
+    git reset --hard origin/master
+    cd $previous_dir
+
+    # Update vundle plugins
+    _update_or_install_vundle_plugins
+
+    # Finish
+    echo -e """${GRE}
+    =================
+    Update completed!
+    =================
+    ${WHI}"""
+
+}
+
 function _fully_install_myconfig() {
 
-    if _is_myconfig_installed; then
+    if _is_myconfig_fully_installed; then
         echo -e "${RED}myconfig is already installed${WHI}"
         return 1
     fi
@@ -83,7 +117,7 @@ function _fully_install_myconfig() {
     _create_myfs
     local previous_dir=$PWD
     cd $HOME
-    #git clone https://github.com/d-w-d/myconfig.git .myconfig
+    git clone https://github.com/d-w-d/myconfig.git .myconfig
     cd $previous_dir
 
     ### Replace .rc config files
@@ -182,6 +216,10 @@ main() {
             ;;
         "--status" | "status")
             _status
+            break
+            ;;
+        "update")
+            _update_myconfig
             break
             ;;
         "install")

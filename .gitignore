@@ -3,4 +3,10 @@
 
 temp*
 settingsOnlyForThisMachine
+redundant
+
+# Library specific to each machine
 misc.sh
+
+# If this file is present, then this is the "master" local repo and myconfig will not perform its update command here (which involves `fetch origin; git checkout origin/master; git reset --hard`)
+.SSOT
