@@ -105,7 +105,7 @@ function _fully_install_myconfig() {
     if [[ $skip_confirmation == false ]]; then
         local msg=""
         msg+="${RED} Are you sure you want to install "
-        msg+="myconfig to $HOME/.myconfig?${WHI} (y/N)\n"
+        msg+="myconfig to ${WHI}$HOME/.myconfig?${RED} (y/N)\n"
         echo -e "$msg"
         read choice
         # Exit unless choice is 'y' or 'Y'
