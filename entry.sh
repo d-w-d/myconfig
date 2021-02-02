@@ -9,7 +9,7 @@ is_verbose=true
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
 ### Ohmyzsh instaprompt requires no console I/O
-[ ! $ZSH_VERSION ] && is_verbose=false
+[ $ZSH_VERSION ] && is_verbose=false
 
 ### Source config files common to all OSes
 source $MYCONFIG_ROOT_DIR/COMMON/source_common.sh
@@ -52,9 +52,5 @@ esac
     echo "#!/usr/bin/env false" >>$MYCONFIG_ROOT_DIR/misc.sh
 source $MYCONFIG_ROOT_DIR/misc.sh
 
-
 ### Cleanup
 unset is_verbose
-
-
-
