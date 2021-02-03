@@ -124,6 +124,9 @@ function _fully_install_myconfig() {
     ### Replace .rcfiles
     _replace_dotrc_files
 
+    ### Unalias vim from \`alias vim="vim -N -u /tmp/myconfig/.vimrc"\`
+    unalias vim  
+
     ### Final message
     local msg=""
     msg+="${GRE}Installation complete! ${WHI}"

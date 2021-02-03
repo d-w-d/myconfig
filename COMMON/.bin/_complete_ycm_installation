@@ -15,24 +15,28 @@
 #   that the installation is complete
 ########################################################
 
-### Confirm prereqs
+### Confirm some prereqs
 [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && exit 1
 hash python3 >/dev/null 2>&1 || (echo "python3 not found" && exit 1)
 hash pip3 >/dev/null 2>&1 || (echo "pip3 not found" && exit 1)
 
-echo "Completing installation of YouCompleteMe..."
-((TEMP=$(PREVIOUSDIR=$PWD;
-         cd $HOME/.vim/bundle/YouCompleteMe;
-         git pull origin master;
-         git submodule update --init --recursive;
-         /usr/env false &&python3 -m pip install --user cmake;
-         python3 install.py --all;
-         echo -e "echo '''\033[31m
-         ====================================
-         YouCompleteMe Installation Finalized
-         ====================================\n\033[37m''';
-         "; cd $PREVIOUSDIR); bash -c "$TEMP" ) &)
+### If cmake doesn't exist, install it with python3
+if [[ $(hash cmake >/dev/null 2>&1) ]];then
 
-exit 0
+fi
 
+previous_dir=$PWD
 
+cd $HOME/.vim/bundle/YouCompleteMe
+
+git pull origin master
+git submodule update --init --recursive
+/usr/env false && python3 -m pip install --user cmake
+python3 install.py --all
+
+echo -e "echo '''\033[31m
+====================================
+YouCompleteMe Installation Finalized
+====================================\n\033[37m''';
+"
+cd $previous_dir

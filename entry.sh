@@ -3,13 +3,13 @@
 # Library to expose myconfig tools to current shell
 
 ### Variables to be cleaned up at end
-is_verbose=true
+local is_verbose=true
 
 ### Inherit $MYCONFIG_ROOT_DIR from parent script, else use default location
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
 ### Ohmyzsh instaprompt requires no console I/O
-[ $ZSH_VERSION ] && is_verbose=false
+[[ $ZSH_VERSION ]] && is_verbose=false
 
 ### Source config files common to all OSes
 source $MYCONFIG_ROOT_DIR/COMMON/source_common.sh
@@ -19,10 +19,10 @@ OS=""
 if [[ $(uname -s) == Darwin ]]; then OS="MACOS"; fi
 
 if [[ $(uname -s) == Linux ]]; then
-    if [[ $(cat /etc/os-release | grep -E "ID_LIKE(.*)rhel" | wc -l) == 1 ]]; then
+    if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)rhel" | wc -l) -eq 1 ]]; then
         OS="RHEL"
     fi
-    if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) == 1 ]]; then
+    if [[ $(cat /etc/os-release | grep -Ei "ID_LIKE(.*)debian" | wc -l) -eq 1 ]]; then
         OS="DEBIAN"
     fi
 fi
@@ -53,4 +53,4 @@ esac
 source $MYCONFIG_ROOT_DIR/misc.sh
 
 ### Cleanup
-unset is_verbose
+#unset is_verbose

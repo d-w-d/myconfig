@@ -27,7 +27,11 @@ sleep 3
 ### `Python 3.6.9` then you need to make sure that we have a config dir with
 ### a Makefile in it at `/usr/lib/python3.6/`.
 
-### The following values are for kept for reference:
+### By default, find python lib dirs automatedly:
+PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python2)
+PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python3)
+
+### The following values are for kept for reference; in some cases, we explicitly set it
 # Ubuntu 18 x86:
 #PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
 #PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
@@ -41,21 +45,25 @@ sleep 3
 #PYTHON3_CONFIG_DIR="/usr/lib/python3.8/config-3.8-aarch64-linux-gnu"
 
 # Ubuntu 20.04 x86
-#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-aarch64-linux-gnu"
-#PYTHON3_CONFIG_DIR="/usr/lib/python3.8/config-3.8-aarch64-linux-gnu"
+#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
+#PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
 
-### Find python lib dirs automatedly:
-PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python2)
-PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python3)
+# Centos8
+#PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
+#PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
+if [[ $(hostnamectl 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]]; then
+    PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
+    PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
+fi
 
 ### Check that these dirs have Makefile
 [[ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ]] &&
     echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
-    return 1
+    exit 1
 
 [[ ! -f "$PYTHON3_CONFIG_DIR/Makefile" ]] &&
     echo "Can't find $PYTHON3_CONFIG_DIR/Makefile ...exiting." &&
-    return 1
+    exit 1
 
 ### If sudo user, install all dependencies
 if [[ $(groups | grep sudo | wc -l) == 1 ]]; then

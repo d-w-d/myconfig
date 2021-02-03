@@ -53,14 +53,21 @@ Whenever possible, I'm trying to follow the [Google style guide](https://google.
 
 ### Executable Scripts
 
-Scripts in myconfig repo that are supposed to be executed are:
+Scripts in the myconfig repo that are supposed to be executed are:
 
 1. Referred to as (executable) scripts
-    2. Given no suffix
-3. Given the shebang `#!/usr/bin/env bash` (to date at least)
-    4. Placed in `.bin` directories within their respective OS dirs
+2. Given no suffix
+3. Given the shebang `#!/usr/bin/env bash`
+4. Placed in `.bin` directories within their respective OS dirs
 
-### Hmmm
+Note: myconfig is designed with the intention that you only ever run executable scripts through the CLI. 
 
 
-    Why is there an indentation above?
+
+
+
+
+
+
+
+
