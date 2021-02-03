@@ -25,7 +25,7 @@ make install
 
 ### install ohmyzsh
 cd $HOME
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)--unattended"
 sleep 3
 
 ### Add autosuggestions git repo
