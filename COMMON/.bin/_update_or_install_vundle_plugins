@@ -20,7 +20,7 @@ fi
 ### Install vundle plugins
 ### NOTE: vim aliases will not work in subprocesses
 echo "Installing vundle plugins..."
-if [[ _is_myconfig_fully_installed ]]; then
+if _is_myconfig_fully_installed ; then
     vim -E -u "$HOME/.myconfig/.vimrc" -N +PluginInstall +qall
 else
     vim -E -u "/tmp/myconfig/.vimrc" -N +PluginInstall +qall
