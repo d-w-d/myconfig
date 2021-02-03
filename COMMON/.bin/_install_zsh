@@ -36,6 +36,7 @@ git clone https://github.com/lukechilds/zsh-nvm.git ~/.zsh-nvm
 ### install powerlevel10k
 cd $HOME
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+sleep 3
 
 ### Fix the fact that installing these will mess with your committed .rc files
 _replace_dotrc_files
