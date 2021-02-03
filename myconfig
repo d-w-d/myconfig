@@ -48,15 +48,6 @@ function _create_myfs() {
     fi
 }
 
-function _is_myconfig_fully_installed() {
-
-    if [[ -d $HOME/.myconfig ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
 function _update_myconfig() {
 
     # Exit if not fully installed
@@ -125,7 +116,7 @@ function _fully_install_myconfig() {
     _replace_dotrc_files
 
     ### Unalias vim from \`alias vim="vim -N -u /tmp/myconfig/.vimrc"\`
-    unalias vim  
+    unalias vim
 
     ### Final message
     local msg=""

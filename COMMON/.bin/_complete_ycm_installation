@@ -1,37 +1,24 @@
 #!/bin/bash
 #
-# This is ...
-
-########################################################
 # Completes installation of YouCompleteMe Vundle Plugin.
-#   Needed because ycm needs cmake for installation,
-#   and this may not be available on your machine.
-# Globals:
-#   None
-# Arguments:
-#   None
-# Outputs:
-#   Eventually writes message to stdout stating
-#   that the installation is complete
-########################################################
+# Needed because ycm needs cmake for installation,
+# and this may not be available on your machine.
 
 ### Confirm some prereqs
 [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && exit 1
 hash python3 >/dev/null 2>&1 || (echo "python3 not found" && exit 1)
-hash pip3 >/dev/null 2>&1 || (echo "pip3 not found" && exit 1)
 
 ### If cmake doesn't exist, install it with python3
-if [[ $(hash cmake >/dev/null 2>&1) ]];then
-
+if [[ $(hash cmake >/dev/null 2>&1) ]]; then
+    hash pip3 >/dev/null 2>&1 || (echo "pip3 not found" && exit 1)
+    python3 -m pip install --user cmake
 fi
 
+### Rerun ycm-install process manually
 previous_dir=$PWD
-
 cd $HOME/.vim/bundle/YouCompleteMe
-
 git pull origin master
 git submodule update --init --recursive
-/usr/env false && python3 -m pip install --user cmake
 python3 install.py --all
 
 echo -e "echo '''\033[31m

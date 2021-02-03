@@ -2,7 +2,6 @@
 #
 # Installs all the vundle plugins in a background subprocess
 
-
 ### Confirm some prereqs
 hash vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
 
@@ -18,11 +17,14 @@ else
     git reset --hard origin/master
 fi
 
-### Install vundle plugins 
+### Install vundle plugins
+### NOTE: vim aliases will not work in subprocesses
 echo "Installing vundle plugins..."
-vim -E -N +PluginInstall +qall
+if [[ _is_myconfig_fully_installed ]]; then
+    vim -E -u "$HOME/.myconfig/.vimrc" -N +PluginInstall +qall
+else
+    vim -E -u "/tmp/myconfig/.vimrc" -N +PluginInstall +qall
+fi
 
 ### Double check complete installation of ycm
 _complete_ycm_installation
-
-

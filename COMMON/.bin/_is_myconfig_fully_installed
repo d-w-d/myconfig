@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# SSOT regarding whehter or not myconfig is installed
+
+if [[ -d $HOME/.myconfig ]]; then
+    exit 0
+else
+    exit 1
+fi
