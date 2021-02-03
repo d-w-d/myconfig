@@ -5,16 +5,6 @@
 # It assumes packages such as python3, python3-dev, etc.
 # For a full list of assumed packages, see Dockerfile for myubuntu18.04
 
-### Aux functions
-
-function _is_arm() {
-    [[ $(uname -m | grep 'arm' | wc -l) -ne 1 ]] && return 1
-}
-
-function _is_x86() {
-    [[ $(uname -m | grep 'x86' | wc -l) -ne 1 ]] && return 1
-}
-
 ### Prereqs
 previous_dir=$PWD
 
@@ -32,17 +22,13 @@ ${WHI}
 """
 sleep 3
 
-###########################################
-### If sudo user, install all dependencies
-###########################################
-
 ### Need to make sure we have the right python libs for our installations
 ### E.g. if `which python3` shows /usr/bin/python3 and `python3 -V` gives
 ### `Python 3.6.9` then you need to make sure that we have a config dir with
 ### a Makefile in it at `/usr/lib/python3.6/`.
 
 ### The following values are for kept for reference:
-# Values for Ubuntu 18:
+# Ubuntu 18 x86:
 #PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
 #PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
 
@@ -50,17 +36,17 @@ sleep 3
 #PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-arm-linux-gnueabihf"
 #PYTHON3_CONFIG_DIR="/usr/lib/python3.7/config-3.7m-arm-linux-gnueabihf"
 
-### Ubuntu 20.04 RPi3/4
+# Ubuntu 20.04 RPi3/4
 #PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-aarch64-linux-gnu"
 #PYTHON3_CONFIG_DIR="/usr/lib/python3.8/config-3.8-aarch64-linux-gnu"
 
-### Ubuntu 20.04 X86
+# Ubuntu 20.04 x86
 #PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-aarch64-linux-gnu"
 #PYTHON3_CONFIG_DIR="/usr/lib/python3.8/config-3.8-aarch64-linux-gnu"
 
 ### Find python lib dirs automatedly:
-PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config" 2>/dev/null | grep python2)
-PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config" 2>/dev/null | grep python3)
+PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python2)
+PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python3)
 
 ### Check that these dirs have Makefile
 [[ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ]] &&
