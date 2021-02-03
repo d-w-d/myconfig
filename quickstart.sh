@@ -13,12 +13,12 @@ hash git >/dev/null 2>&1 || echo "Git is not installed. Aborting installation."
 if [[ -d $HOME/.myconfig ]]; then
     echo -e """${RED}
 
-        Dir ~/.myconfig already exists! 
+    Dir ~/.myconfig already exists!
 
-        Either run \`myconfig update\` to update it, 
-        or remove \`~/.myconfig\` in order to run quickstart afresh.
+    Either run \`myconfig update\` to update it,
+    or remove \`~/.myconfig\` in order to run quickstart afresh.
 
-        Exiting...
+    Exiting...
 
     ${WHI}"""
     return 1
@@ -47,17 +47,23 @@ if hash vim >/dev/null 2>&1; then
     # alias vim to use .vimrc in /tmp/myconfig/
     alias vim="vim -N -u /tmp/myconfig/.vimrc"
 
-    # Download vundle plugins as a background process
-    # NOTE:   this WILL create/update vim-related utilities in user's $HOME dir,
-    #         but will not delete anything
-    echo -e "${WHI}Downloading vim-vundle plugins as background process..."
-    ((cmd=$(/usr/bin/env true;
-    _update_or_install_vundle_plugins >/dev/null 2>&1;
-    echo -e "echo '''\033[31m
-    ================================================
-    VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
-    ================================================\n\033[37m''';";
-    ); bash -c "$cmd" ) &)
+    if [[ $1 == "--verbose" ]];then
+        echo -e "${CYA}Showing vim output explicitly${WHI}"
+        _update_or_install_vundle_plugins
+    else
+        # Download vundle plugins as a background process
+        # NOTE:   this WILL create/update vim-related utilities in user's $HOME dir,
+        #         but will not delete anything
+        echo -e "${WHI}Downloading vim-vundle plugins as background process..."
+        ((cmd=$(/usr/bin/env true;
+        _update_or_install_vundle_plugins >/dev/null 2>&1;
+        echo -e "echo '''\033[31m
+        ================================================
+        VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
+        ================================================\n\033[37m''';";
+        ); bash -c "$cmd" ) &)
+    fi
+
 
     # Check if installed vim has python3 and clipboard support
     if [[ $(vim --version | grep -E '\-python3|\-clipboard') ]]; then
