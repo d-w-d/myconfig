@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+previous_dir=$PWD
+
+####################
+### Install ncurses
+####################
+cd /tmp
+curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
+### tar is assumed
+tar -xzvf ncurses.tar.gz
+cd ncurses-6.2
+### gcc is assumed
+./configure --prefix=$HOME/.myfs/usr/local
+make
+make install
+
+if [[ $1 == '--with-ncurses' ]]; then
+    echo "Installing ncurses to .myfs"
+    sleep 2
+    cd /tmp
+    curl -o ncurses.tar.gz http://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.2.tar.gz
+    tar -xzvf ncurses.tar.gz
+    cd ncurses-6.2
+    make distclean >/dev/null 2>&1
+    ./configure --prefix=$HOME/.myfs/usr/local
+    make
+    make install
+else
+    echo "Skipping ncurses from source..."
+    sleep 2
+fi
+
+####################
+### Install zsh
+####################
+cd /tmp
+curl -Lo zsh.tar.gz https://sourceforge.net/projects/zsh/files/latest/download
+[[ ! -d zsh ]] && mkdir zsh
+tar xf zsh.tar.gz -C zsh --strip-components 1
+cd zsh
+CPPFLAGS="-I$HOME/.myfs/local/include" LDFLAGS="-L$HOME/.myfs/local/lib" ./configure --prefix="$HOME/.myfs/local"
+
+make -j
+make install
+
+cd $previous_dir

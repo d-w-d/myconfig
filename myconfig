@@ -125,7 +125,7 @@ function _fully_install_myconfig() {
     sleep 3
     echo -e """${RED}
     ========
-    WARNING!   
+    WARNING!
     ========
 
     If any of the following files exist then they will get moved to ${CYA}~/.myconfig/redundant${WHI}:
@@ -172,23 +172,23 @@ function _status() {
 
     # Test if myconfig is installed
     if _is_myconfig_fully_installed; then
-        msg+="${GRE}✓ myconfig is fully installed${WHI}"
+        msg+="${GRE}✓ myconfig is fully installed\${WHI}"
     else
-        msg+="${RED}✗ myconfig is NOT fully installed${WHI}"
+        msg+="${RED}✗ myconfig is NOT fully installed\n${WHI}"
     fi
 
     # Test if vim has been installed to .myfs
     if [[ $(which -a vim | grep $HOME/.myfs | wc -l) -gt 0 ]]; then
-        msg+="${GRE}✓ myconfig > vim is installed${WHI}"
+        msg+="${GRE}✓ myconfig > vim is installed\n${WHI}"
     else
-        msg+="${RED}✗ myconfig > vim is NOT installed${WHI}"
+        msg+="${RED}✗ myconfig > vim is NOT installed\n${WHI}"
     fi
 
     # Test if tmux has been installed to .myfs
     if [[ $(which -a tmux | grep $HOME/.myfs | wc -l) -gt 0 ]]; then
-        msg+="${GRE}✓ myconfig > tmux is installed${WHI}"
+        msg+="${GRE}✓ myconfig > tmux is installed\n${WHI}"
     else
-        msg+="${RED}✗ myconfig > tmux is NOT installed${WHI}"
+        msg+="${RED}✗ myconfig > tmux is NOT installed\n${WHI}"
     fi
 
     echo -e "$msg"
@@ -224,7 +224,6 @@ main() {
             break
             ;;
         "install")
-
             # Handle no further install args
             [[ $# -eq 0 ]] && _install_usage && return 1
 
@@ -247,9 +246,36 @@ main() {
                     break
                     ;;
                 "vim")
-                    echo "vim selected"
-                    _is_myconfig_fully_installed && _install_vim
-                    ! _is_myconfig_fully_installed && echo "myconfig not installed"
+                    if [[ _is_myconfig_fully_installed ]]; then
+                        _install_vim
+                    else
+                        local msg=""
+                        msg+="${RED}You must fully install myconfig ${WHI}"
+                        msg+="${RED}before installing vim${WHI}"
+                        echo -e "$msg"
+                    fi
+                    break
+                    ;;
+                "tmux")
+                    if [[ _is_myconfig_fully_installed ]]; then
+                        _install_tmux
+                    else
+                        local msg=""
+                        msg+="${RED}You must fully install myconfig ${WHI}"
+                        msg+="${RED}before installing tmux${WHI}"
+                        echo -e "$msg"
+                    fi
+                    break
+                    ;;
+                "zsh")
+                    if [[ _is_myconfig_fully_installed ]]; then
+                        _install_zsh
+                    else
+                        local msg=""
+                        msg+="${RED}You must fully install myconfig ${WHI}"
+                        msg+="${RED}before installing zsh${WHI}"
+                        echo -e "$msg"
+                    fi
                     break
                     ;;
                 *)

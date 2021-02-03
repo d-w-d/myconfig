@@ -373,15 +373,17 @@ au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\
 "==================================================
 set iskeyword-=_
 
-
-
 "==================================================
 " Change color when in insert mode
 "==================================================
-autocmd InsertEnter * set cursorline | highlight CursorLine guibg=darkblue ctermbg=darkblue
-autocmd InsertLeave * set nocursorline | highlight clear | colorscheme torte
+"autocmd InsertEnter * set cursorline | highlight CursorLine guibg=darkgrey ctermbg=darkgrey | highlight Normal ctermbg=darkred
+"autocmd InsertLeave * set nocursorline | highlight clear | colorscheme torte
 
+"autocmd InsertEnter * colorscheme evening
+"autocmd InsertLeave * colorscheme torte
 
+autocmd InsertEnter * colorscheme industry | set cursorline | highlight CursorLine guibg=darkgrey ctermbg=darkgrey
+autocmd InsertLeave * colorscheme torte
 
 
 
