@@ -246,7 +246,7 @@ main() {
                     break
                     ;;
                 "vim")
-                    if [[ _is_myconfig_fully_installed ]]; then
+                    if _is_myconfig_fully_installed; then
                         _install_vim
                     else
                         local msg=""
@@ -257,7 +257,7 @@ main() {
                     break
                     ;;
                 "tmux")
-                    if [[ _is_myconfig_fully_installed ]]; then
+                    if _is_myconfig_fully_installed; then
                         _install_tmux
                     else
                         local msg=""
@@ -268,7 +268,7 @@ main() {
                     break
                     ;;
                 "zsh")
-                    if [[ _is_myconfig_fully_installed ]]; then
+                    if _is_myconfig_fully_installed; then
                         _install_zsh
                     else
                         local msg=""
