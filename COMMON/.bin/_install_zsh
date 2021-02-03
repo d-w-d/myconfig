@@ -24,6 +24,8 @@ make -j
 make install
 
 ### install ohmyzsh
+### Note: you need to add '--unattended' to prevent it starting new zsh sub-shell
+### right away and preventing execution of the rest of this script
 cd $HOME
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)--unattended"
 sleep 3
