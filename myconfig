@@ -204,10 +204,8 @@ main() {
                     ;;
                 "-y")
                     skip_confirmation=true
-                    echo "-y selected"
                     ;;
                 "self")
-                    echo "self selected"
                     _fully_install_myconfig
                     break
                     ;;
