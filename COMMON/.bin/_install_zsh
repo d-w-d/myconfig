@@ -26,12 +26,16 @@ make install
 ### install ohmyzsh
 cd $HOME
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+sleep 3
 
 ### Add autosuggestions git repo
+cd $HOME
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+sleep 3
 
+cd $HOME
 git clone https://github.com/lukechilds/zsh-nvm.git ~/.zsh-nvm
-
+sleep 3
 
 ### install powerlevel10k
 cd $HOME
