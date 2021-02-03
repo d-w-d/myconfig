@@ -152,8 +152,8 @@ zle set-local-history 0
 }
 zle -N down-line-or-local-history
 
-bindkey "${key[Up]}" up-line-or-local-history
-bindkey "${key[Down]}" down-line-or-local-history
+#bindkey "${key[Up]}" up-line-or-local-history
+#bindkey "${key[Down]}" down-line-or-local-history
 
 bindkey "^[[1;5A" up-line-or-history    # [CTRL] + Cursor up
 bindkey "^[[1;5B" down-line-or-history  # [CTRL] + Cursor down

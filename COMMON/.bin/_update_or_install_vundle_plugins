@@ -25,5 +25,4 @@ vim -E -N +PluginInstall +qall
 ### Double check complete installation of ycm
 _complete_ycm_installation
 
-return 0
 
