@@ -6,11 +6,11 @@
 
 ### Confirm some prereqs
 [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && exit 1
-hash python3 >/dev/null 2>&1 || (echo "python3 not found" && exit 1)
+command -v python3 >/dev/null 2>&1 || (echo "python3 not found" && exit 1)
 
 ### If cmake doesn't exist, install it with python3
-if ! $(hash cmake >/dev/null 2>&1); then
-    hash pip3 >/dev/null 2>&1 || (echo "pip3 not found" && exit 1)
+if ! $(command -v cmake >/dev/null 2>&1); then
+    command -v pip3 >/dev/null 2>&1 || (echo "pip3 not found" && exit 1)
     python3 -m pip install --user cmake
 fi
 

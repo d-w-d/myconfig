@@ -5,9 +5,15 @@
 # It assumes packages such as python3, python3-dev, etc.
 # For a full list of assumed packages, see Dockerfile for myubuntu18.04
 
-### Prereqs
+### Preliminaries
 previous_dir=$PWD
+cflags="-I$HOME/.myfs/usr/local/include"
 
+_is_user_sudoer() {
+    [[ $(groups | grep sudo | wc -l) == 1 ]] && return 1
+}
+
+### Begin
 clear && printf '\e[3J'
 echo -e """${CYA}
 ==========================
@@ -22,56 +28,12 @@ ${WHI}
 """
 sleep 3
 
-### Need to make sure we have the right python libs for our installations
-### E.g. if `which python3` shows /usr/bin/python3 and `python3 -V` gives
-### `Python 3.6.9` then you need to make sure that we have a config dir with
-### a Makefile in it at `/usr/lib/python3.6/`.
-
-### By default, find python lib dirs automatedly:
-PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python2)
-PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python3)
-
-### The following values are for kept for reference; in some cases, we explicitly set it
-# Ubuntu 18 x86:
-#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
-#PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
-
-# Raspberry Pi OS
-#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-arm-linux-gnueabihf"
-#PYTHON3_CONFIG_DIR="/usr/lib/python3.7/config-3.7m-arm-linux-gnueabihf"
-
-# Ubuntu 20.04 RPi3/4
-#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-aarch64-linux-gnu"
-#PYTHON3_CONFIG_DIR="/usr/lib/python3.8/config-3.8-aarch64-linux-gnu"
-
-# Ubuntu 20.04 x86
-#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
-#PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
-
-# Centos8
-#PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
-#PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
-if [[ $(hostnamectl 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]]; then
-    PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
-    PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
-fi
-
-### Check that these dirs have Makefile
-[[ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ]] &&
-    echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
-    exit 1
-
-[[ ! -f "$PYTHON3_CONFIG_DIR/Makefile" ]] &&
-    echo "Can't find $PYTHON3_CONFIG_DIR/Makefile ...exiting." &&
-    exit 1
-
 ### If sudo user, install all dependencies
-if [[ $(groups | grep sudo | wc -l) == 1 ]]; then
+if _is_user_sudoer; then
     echo -e """
     You have sudo permissions; let's use them to install dependencies for vim!
     """
-    sleep 3
-
+    sleep 1
     sudo apt update -y
     sudo apt upgrade -y
     sudo apt install build-essential \
@@ -96,6 +58,61 @@ if [[ $(groups | grep sudo | wc -l) == 1 ]]; then
         libxpm-dev
 fi
 
+### Need to make sure we have the right python libs for our installations
+### E.g. if `which python3` shows /usr/bin/python3 and `python3 -V` gives
+### `Python 3.6.9` then you need to make sure that we have a config dir with
+### a Makefile in it at `/usr/lib/python3.6/`.
+
+### By default, find python lib dirs automatedly:
+PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python2)
+PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python3)
+
+### The following path values are for kept for reference
+# Ubuntu 18 x86:
+#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
+#PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
+
+# Raspberry Pi OS
+#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-arm-linux-gnueabihf"
+#PYTHON3_CONFIG_DIR="/usr/lib/python3.7/config-3.7m-arm-linux-gnueabihf"
+
+# Ubuntu 20.04 RPi3/4
+#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-aarch64-linux-gnu"
+#PYTHON3_CONFIG_DIR="/usr/lib/python3.8/config-3.8-aarch64-linux-gnu"
+
+# Ubuntu 20.04 x86
+#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
+#PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
+
+# Centos8
+# Trickier to find automatedly, so set explicitly
+if [[ $(cat /etc/os-release 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]]; then
+    PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
+    PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
+
+    ### If you're on centos8 and don't have sudo permissions, you might need
+    ### to manually install packages through the yusr tool; if so, you might need
+    ### to also alter the make-config paths to look for resources within .myfs
+    if ! _is_user_sudoer; then
+        yusr install python2_devel
+        PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
+        #cflags="-I$HOME/.myfs/usr/include/python2.7 -I$HOME/.myfs/usr/include/python3.6m"
+        cflags="-I$HOME/.myfs/usr/include/python2.7"
+    fi
+
+fi
+
+### Check that these dirs have a Makefile
+### NOTE:   this is a necessary nut not sufficient condition; 
+###         the config dir also needs various lib files
+[[ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ]] &&
+    echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
+    exit 1
+
+[[ ! -f "$PYTHON3_CONFIG_DIR/Makefile" ]] &&
+    echo "Can't find $PYTHON3_CONFIG_DIR/Makefile ...exiting." &&
+    exit 1
+
 ### Vim Requires ncurses
 if [[ $1 == '--with-ncurses' ]]; then
     echo "Installing ncurses to .myfs"
@@ -110,13 +127,12 @@ fi
 cd /tmp
 git clone https://github.com/vim/vim.git
 cd vim/src
-
 make distclean
 
 ### Make sure the python3-config-dir points to the dir with
 ### makefile corresponding to your installation of python3
 BEGINCONFIG=true \
-    CFLAGS="-I$HOME/.myfs/usr/local/include" \
+    CFLAGS="$cflags" \
     LDFLAGS="-L$HOME/.myfs/usr/local/lib" \
     LD_LIBRARY_PATH="$HOME/.myfs/usr/local/lib" ./configure \
     --with-x \
@@ -127,14 +143,16 @@ BEGINCONFIG=true \
     --enable-python3interp="yes" \
     --with-python3-config-dir="$PYTHON3_CONFIG_DIR" \
     --enable-fail-if-missing \
-    --prefix="$HOME/.myfs/usr/local"
+    --prefix="$HOME/.myfs/usr/local" \
+    --with-local-dir="$HOME/.myfs/usr"
+
 make
 make install
 
 cd $previous_dir
 
 ### Check if vim is now installed
-if hash vim >/dev/null 2>&1; then
+if command -v vim >/dev/null 2>&1; then
     ### Now that vim is installed, let's download vundle plugins
     echo -e "${GRE}Vim installed; now re-downloading vundle plugins${WHI}"
     _update_or_install_vundle_plugins

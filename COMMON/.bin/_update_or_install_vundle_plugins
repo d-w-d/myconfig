@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Installs all the vundle plugins in a background subprocess
+# Installs all the vundle plugins  from command line
 
 ### Confirm some prereqs
-hash vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
+command -v vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
 
 ### Clone/update vundle repo
 if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then

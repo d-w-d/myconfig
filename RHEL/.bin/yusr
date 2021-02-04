@@ -1,39 +1,29 @@
 #!/usr/bin/env bash
 #
 # yusr = yum + user; it's like 'pip install --user' but for yum
-# yusr is a crude wrapper around repotrack, rpm2cpio and cpio
-# It was developed within a docker centos7 image
+# yusr is a crude wrapper around yumdownloader, rpm2cpio and cpio
+# It was developed within a docker centos8 image
 
-###############################################################
 ### Check the prereq commands are available
-###############################################################
-
 function abort_install() {
     echo "${1:-Aborting install for unspecified reasons}"
     echo "This script relies on the admin installing 'yum-utils'"
     echo "If that isn't an option then, well, is it really worth it?"
     exit 1
 }
-
-### repotrack included in yum-utils package
-command -v repotrack >/dev/null 2>&1 || abort_install "repotrack not found; exiting;"
-### rpm2cpio included in yum-utils package
+command -v yumdownloader >/dev/null 2>&1 || abort_install "yumdownloader not found; exiting;"
 command -v rpm2cpio >/dev/null 2>&1 || abort_install "rpm2cpio not found; exiting;"
-### Included in centos7
 command -v getopts >/dev/null 2>&1 || abort_install "getopts not found; exiting;"
 
-###############################################################
 ### Setup dirs
-###############################################################
-
 [[ ! -d $HOME/.myfs/rpm ]] && mkdir -p $HOME/.myfs/rpm
 
 ###############################################################
 ### Parse commands, args, etc.
 ###############################################################
 
-# Parse options to the `yusr` command
-# See: https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/
+### Parse options to the `yusr` command
+### See: https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/
 while getopts ":h" opt; do
     case ${opt} in
     h)
@@ -50,39 +40,37 @@ while getopts ":h" opt; do
     esac
 done
 shift $((OPTIND - 1))
-
 subcommand=$1
 shift # Remove 'yusr' from the argument list
+
+### Parse options to the install sub command
 case "$subcommand" in
-# Parse options to the install sub command
 install)
-    PACKAGE=$1
+    package=$1
     shift # Remove 'install' from the argument list
 
+    ### Logic to download and extract rpm files
+    prev_dir=$PWD
+    cd "$HOME/.myfs/rpm"
     ### Make sure filesystem is the first thing to be downloaded
     echo "$HOME/.myfs/rpm/filesystem-3.2-25.el7.x86_64.rpm" >/tmp/temprpmfiles.txt
-    ### Wrap around repotrack to download rpm's for package and dependencies
-    ### Save output to temp file so we know what packages just got downloaded
-    repotrack -a x86_64 -p $HOME/.myfs/rpm $PACKAGE >>/tmp/temprpmfiles.txt
-    ### Loop through items in temp file to isolate packages in lines array
-    IFS=$'\r\n' GLOBIGNORE='*' command eval "lines=($(cat /tmp/temprpmfiles.txt | grep -E 'x86_64|noarch' | sed 's/Downloading //' | cut -f1 -d' '))"
-    echo "${lines[@]}"
-    PREVIOUSDIR=$PWD
-    cd $HOME/.myfs
-
-    ### Loop through items in lines array and extraxt filesystem to .myfs
-    for line in "${lines[@]}"; do
+    ### Wrap around yumdownloader to download rpm's for package and dependencies
+    ### NOTE: in a more sophisticated version, we'd save output to file
+    ### so we know what rpms just got downloaded and then only unpack THOSE
+    yumdownloader --resolve --alldeps $package
+    ### Loop through rpms and extract filesystem to .myfs
+    for FILE in $HOME/.myfs/rpm/*; do
         chmod -R u+w .
-        echo ">>>> $line"
-        rpm2cpio "$line" | cpio -id --no-preserve-owner
-        ### Try to make sure nothing is created that we can't edit later
+        echo ">>> $FILE"
+        rpm2cpio "$FILE" | cpio -id --no-preserve-owner
+        # Make sure we don't create anything we can't edit later
         chmod -R u+w .
     done
-    cd $PREVIOUSDIR
+    cd $prev_dir
     ;;
 search)
-    PACKAGE=$1
+    package=$1
     shift # Remove 'search' from the argument list
-    yum search $PACKAGE
+    yum search $package
     ;;
 esac

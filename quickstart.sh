@@ -8,7 +8,7 @@ previous_dir=$PWD
 vundle_download_message="${RED}Vundle plugins can't be installed until vim is${WHI}"
 
 # Require git
-hash git >/dev/null 2>&1 || echo "Git is not installed. Aborting installation."
+command -v git >/dev/null 2>&1 || echo "Git is not installed. Aborting installation."
 
 # Only perform quickstart if myconfig is not already fully installed
 if [[ -d $HOME/.myconfig ]]; then
@@ -44,7 +44,7 @@ fi
 MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
 
 # Test if VIM is installed
-if $(hash vim >/dev/null 2>&1); then
+if $(command -v vim >/dev/null 2>&1); then
     ### Vim is installed, so alias it to our temp .vimrc file
     alias vim="vim -N -u /tmp/myconfig/.vimrc"
 
