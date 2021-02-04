@@ -65,19 +65,20 @@ if $(hash vim >/dev/null 2>&1); then
         ================================================\n\033[37m''';";
         ); bash -c "$cmd" ) &)
         vundle_download_message="${GRE}Vundle plugins are being downloaded "
-        vundle_download_message+=" as a background process; "
-        vundle_download_message+="${RED}DO NOT CLOSE THIS SHELL!${WHI}"
+        vundle_download_message+="as a background process! "
+        vundle_download_message+="${RED}---> DO NOT CLOSE THIS SHELL <---${WHI}"
+        vundle_download_message+="${GRE}Message will be printed to this stdout when complete!${WHI}"
     fi
 
 
     # Check if installed vim has python3 and clipboard support
     if [[ $(vim --version | grep -E '\-python3|\-clipboard') ]]; then
         vim_status=""
-        vim_status+="- ${RED}WARNING!${GRE} Vim is installed BUT does "
-        vim_status+="  not have BOTH python3 AND clipboard support; \n"
+        vim_status+="${RED}WARNING!${GRE} Vim is installed BUT does "
+        vim_status+="not have BOTH python3 AND clipboard support; \n"
         vim_status+="  To install vim with these features, run:\n"
-        vim_status+="${CYA} myconfig install self \n"
-        vim_status+="${CYA} myconfig install vim${WHI}"
+        vim_status+="${CYA}  myconfig install self \n"
+        vim_status+="${CYA}  myconfig install vim${WHI}"
     else
         vim_status="- $(type vim 2>&1)"
     fi
