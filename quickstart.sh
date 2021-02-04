@@ -66,8 +66,8 @@ if $(hash vim >/dev/null 2>&1); then
         ); bash -c "$cmd" ) &)
         vundle_download_message="${GRE}Vundle plugins are being downloaded "
         vundle_download_message+="as a background process!\n${WHI}"
-        vundle_download_message+="${RED}---> DO NOT CLOSE THIS SHELL <---\n${WHI}"
-        vundle_download_message+="${GRE}Message will be printed to this stdout when complete!${WHI}"
+        vundle_download_message+="${RED}         ---> DO NOT CLOSE THIS SHELL <---\n${WHI}"
+        vundle_download_message+="${GRE}  A message will be printed to this stdout when complete!${WHI}"
     fi
 
 
