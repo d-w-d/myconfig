@@ -3,7 +3,7 @@
 # Library to expose myconfig tools to current shell
 
 ### Variables to be cleaned up at end
-local is_verbose=true
+is_verbose=true
 
 ### Inherit $MYCONFIG_ROOT_DIR from parent script, else use default location
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
@@ -51,6 +51,3 @@ esac
     touch $MYCONFIG_ROOT_DIR/misc.sh &&
     echo "#!/usr/bin/env false" >>$MYCONFIG_ROOT_DIR/misc.sh
 source $MYCONFIG_ROOT_DIR/misc.sh
-
-### Cleanup
-#unset is_verbose
