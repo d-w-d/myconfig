@@ -5,6 +5,7 @@
 # Variables, params, etc.
 vim_status=""
 previous_dir=$PWD
+vundle_download_message="${RED}Vundle plugins can't be installed until vim is${WHI}"
 
 # Require git
 hash git >/dev/null 2>&1 || echo "Git is not installed. Aborting installation."
@@ -43,11 +44,12 @@ fi
 MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
 
 # Test if VIM is installed
-if hash vim >/dev/null 2>&1; then
-    # alias vim to use .vimrc in /tmp/myconfig/
+if $(hash vim >/dev/null 2>&1); then
+    ### Vim is installed, so alias it to our temp .vimrc file
     alias vim="vim -N -u /tmp/myconfig/.vimrc"
 
     if [[ $1 == "--verbose" ]];then
+        ### Download vundle plugins in an explicit/blocking fashion
         echo -e "${CYA}Showing vim output explicitly${WHI}"
         _update_or_install_vundle_plugins
     else
@@ -62,6 +64,9 @@ if hash vim >/dev/null 2>&1; then
         VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
         ================================================\n\033[37m''';";
         ); bash -c "$cmd" ) &)
+        vundle_download_message="${GRE}Vundle plugins are being downloaded "
+        vundle_download_message+=" as a background process; "
+        vundle_download_message+="${RED}DO NOT CLOSE THIS SHELL!${WHI}"
     fi
 
 
@@ -69,10 +74,10 @@ if hash vim >/dev/null 2>&1; then
     if [[ $(vim --version | grep -E '\-python3|\-clipboard') ]]; then
         vim_status=""
         vim_status+="- ${RED}WARNING!${GRE} Vim is installed BUT does "
-        vim_status+="not have BOTH python3 AND clipboard support; \n"
+        vim_status+="  not have BOTH python3 AND clipboard support; \n"
         vim_status+="  To install vim with these features, run:\n"
-        vim_status+="${CYA}myconfig install self \n"
-        vim_status+="${CYA}myconfig install vim${WHI}"
+        vim_status+="${CYA} myconfig install self \n"
+        vim_status+="${CYA} myconfig install vim${WHI}"
     else
         vim_status="- $(type vim 2>&1)"
     fi
@@ -88,11 +93,13 @@ MYCONFIG HAS BEEN ${RED}TEMPORARILY${GRE} INSTALLED
 ${GRE}
 - Configuration scripts have been cloned to ${WHI}/tmp/myconfig${GRE}
 
-- $vim_status
-
 - Bash has sourced ${WHI}/tmp/myconfig/entry.sh${GRE}
 
 - Use the CLI \`myconfig\` to perform further installations, etc.
+
+- $vim_status
+
+- $vundle_download_message
 
 """
 

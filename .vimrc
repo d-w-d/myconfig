@@ -129,7 +129,7 @@ vnoremap <Leader>(  c()<Esc>P
 vnoremap <Leader>{  c{}<Esc>P
 
 " Leader+f in visual mode will cause
-vnoremap f :s/\%Vfoo\%V/bar/gc
+vnoremap <Leader>f :s/\%Vfoo\%V/bar/gc
 
 " When you want to replace lots of instances of the last item you searched for
 " then call this
@@ -283,7 +283,6 @@ let g:indent_guides_guide_size = 1
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=cyan ctermbg=lightgrey
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=blue ctermbg=grey
 
-
 "let g:indentLine_setColors = 0
 "let g:indentLine_char = '.'
 "set list
@@ -371,7 +370,7 @@ au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\
 " NOTE: use cw to select _-separated words;
 "           cW to select whole thing
 "==================================================
-set iskeyword-=_
+"set iskeyword-=_
 
 "==================================================
 " Change color when in insert mode
