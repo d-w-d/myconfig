@@ -116,7 +116,7 @@ function _fully_install_myconfig() {
     _replace_dotrc_files
 
     ### Unalias vim from \`alias vim="vim -N -u /tmp/myconfig/.vimrc"\`
-    unalias vim
+    unalias vim 2>/dev/null
 
     ### Final message
     local msg=""

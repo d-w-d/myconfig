@@ -70,7 +70,6 @@ if $(hash vim >/dev/null 2>&1); then
         vundle_download_message+="${GRE}  A message will be printed to this stdout when complete!${WHI}"
     fi
 
-
     # Check if installed vim has python3 and clipboard support
     if [[ $(vim --version | grep -E '\-python3|\-clipboard') ]]; then
         vim_status=""
