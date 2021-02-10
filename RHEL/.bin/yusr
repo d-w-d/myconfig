@@ -51,18 +51,24 @@ install)
 
     ### Logic to download and extract rpm files
     prev_dir=$PWD
+    ### On this approach, don't save previous rpm files
+    [[ ! -d $HOME/.myfs/rpm ]] && mkdir -p $HOME/.myfs/rpm
     cd "$HOME/.myfs/rpm"
-    ### Make sure filesystem is the first thing to be downloaded
-    echo "$HOME/.myfs/rpm/filesystem-3.2-25.el7.x86_64.rpm" >/tmp/temprpmfiles.txt
-    ### Wrap around yumdownloader to download rpm's for package and dependencies
-    ### NOTE: in a more sophisticated version, we'd save output to file
-    ### so we know what rpms just got downloaded and then only unpack THOSE
-    yumdownloader --resolve --alldeps $package
+    ### Make sure filesystem is the first thing to be recorded for extraction!
+    #echo "$HOME/.myfs/rpm/filesystem-3.8-3.el8.x86_64.rpm" >/tmp/temprpmfiles.txt
+    ### Use yumdownloader to download rpms for package and dependencies
+    yumdownloader --resolve --alldeps $package >>/tmp/temprpmfiles.txt
+    ### Loop through entries in /tmp/temprpmfiles.txt
+    IFS=$'\r\n' GLOBIGNORE='*' command eval \
+        lines=$(cat /tmp/temprpmfiles.txt | cut -f2 -d' ' | sed 's/://g')
+    cd $HOME/.myfs
+    rpm2cpio "filesystem-3.8-3.el8.x86_64.rpm" | cpio -id --no-preserve-owner
+
     ### Loop through rpms and extract filesystem to .myfs
-    for FILE in $HOME/.myfs/rpm/*; do
+    for line in "${lines[@]}"; do
         chmod -R u+w .
-        echo ">>> $FILE"
-        rpm2cpio "$FILE" | cpio -id --no-preserve-owner
+        echo ">>> $line"
+        rpm2cpio "$line" | cpio -id --no-preserve-owner
         # Make sure we don't create anything we can't edit later
         chmod -R u+w .
     done

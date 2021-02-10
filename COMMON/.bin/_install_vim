@@ -94,7 +94,7 @@ if [[ $(cat /etc/os-release 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]
     ### to manually install packages through the yusr tool; if so, you might need
     ### to also alter the make-config paths to look for resources within .myfs
     if ! _is_user_sudoer; then
-        yusr install python2_devel
+        yusr install python2-devel
         PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
         #cflags="-I$HOME/.myfs/usr/include/python2.7 -I$HOME/.myfs/usr/include/python3.6m"
         cflags="-I$HOME/.myfs/usr/include/python2.7"
