@@ -22,7 +22,7 @@ alias aljs='cd ~/work/javascript'
 alias allocaltunnel='lt' ### Use e.g. --port 8080
 alias alnpmconfigsetignorescripts="printf '\n\n This alias must be followed by true or false! \n\n';npm config set ignore-scripts"
 alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh"
-
+alias alpasswordgen=$'echo $(($(date '+%s') * $RANDOM))  | sha256sum | base64 | head -c 32 ; echo'
 #source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh &
 
 alias alvsc='code -n ' ### open sth with VSC
