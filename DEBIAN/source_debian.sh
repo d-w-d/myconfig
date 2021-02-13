@@ -9,3 +9,4 @@ MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 source $MYCONFIG_ROOT_DIR/DEBIAN/debian_aliases.sh
 source $MYCONFIG_ROOT_DIR/DEBIAN/debian_functions.sh
 source $MYCONFIG_ROOT_DIR/DEBIAN/debian_env.sh
+source $MYCONFIG_ROOT_DIR/DEBIAN/debian_git.sh
