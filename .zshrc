@@ -83,7 +83,7 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git zsh-autosuggestions zsh-nvm)
 
-source ~/.zsh-nvm/zsh-nvm.plugin.zsh
+#source ~/.zsh-nvm/zsh-nvm.plugin.zsh
 
 source $ZSH/oh-my-zsh.sh
 
