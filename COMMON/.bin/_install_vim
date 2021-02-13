@@ -67,6 +67,9 @@ fi
 PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python2)
 PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python3)
 
+### By default, use default python3 binary
+PYTHON3_BINARY=$(which python3)
+
 ### The following path values are for kept for reference
 # Ubuntu 18 x86:
 #PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
@@ -90,6 +93,9 @@ if [[ $(cat /etc/os-release 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]
     PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
     PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
 
+    # Specify path to python3 binary corresponding to PYTHON3_CONFIG_DIR
+    PYTHON3_BINARY="/usr/bin/python3"
+
     ### If you're on centos8 and don't have sudo permissions, you might need
     ### to manually install packages through the yusr tool; if so, you might need
     ### to also alter the make-config paths to look for resources within .myfs
@@ -104,7 +110,7 @@ if [[ $(cat /etc/os-release 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]
 fi
 
 ### Check that these dirs have a Makefile
-### NOTE:   this is a necessary nut not sufficient condition; 
+### NOTE:   this is a necessary nut not sufficient condition;
 ###         the config dir also needs various lib files
 [[ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ]] &&
     echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
@@ -143,6 +149,7 @@ BEGINCONFIG=true \
     --with-python-config-dir="$PYTHON2_CONFIG_DIR" \
     --enable-python3interp="yes" \
     --with-python3-config-dir="$PYTHON3_CONFIG_DIR" \
+    --with-python-command="$PYTHON3_BINARY" \
     --enable-fail-if-missing \
     --prefix="$HOME/.myfs/usr/local" \
     --with-local-dir="$HOME/.myfs/usr"
