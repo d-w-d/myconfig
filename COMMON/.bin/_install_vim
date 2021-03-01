@@ -68,8 +68,9 @@ echo -e "${CYA}Searching for python-lib-config dirs...${WHI}"
 PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config-*" 2>/dev/null | grep python2)
 PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config-*" 2>/dev/null | grep python3)
 
-### By default, use default python3 binary
+### By default, use default python binaries
 PYTHON3_BINARY=$(which python3)
+PYTHON2_BINARY=$(which python2)
 
 ### The following path values are for kept for reference
 # Ubuntu 18 x86:
@@ -98,13 +99,14 @@ if [[ $(cat /etc/os-release 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]
     PYTHON3_BINARY="/usr/bin/python3"
 
     ### If you're on centos8 and don't have sudo permissions, you might need
-    ### to manually install packages through the yusr tool; if so, you might need
-    ### to also alter the make-config paths to look for resources within .myfs
+    ### to manually install packages through the yusr tool;
+    ### if so, you might need to also alter the make-config paths
+    ### to look for resources within .myfs
     if ! _is_user_sudoer; then
         yusr install python2-devel
         PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
         PYTHON2_CONFIG_DIR="$HOME/.myfs/usr/lib64/python2.7/config"
-        #cflags="-I$HOME/.myfs/usr/include/python2.7 -I$HOME/.myfs/usr/include/python3.6m"
+        PYTHON2_BINARY=$(which python2)
         cflags="-I$HOME/.myfs/usr/include/python2.7"
     fi
 
@@ -139,6 +141,34 @@ make distclean
 
 ### Make sure the python3-config-dir points to the dir with
 ### makefile corresponding to your installation of python3
+
+clear
+echo -e """${GRE}
+================================
+ATTENTION!!!
+================================
+${WHI}
+We're about to try to build vim from source
+with python2, python3 and clipboard capapabilities.
+
+For this to work, we've got to make sure that we've correctly
+identified the locations of the python lib and binary files/dirs.
+The lib dirs will typically look like the following:
+
+#PYTHON2_CONFIG_DIR="/usr/lib/python2.7/config-x86_64-linux-gnu"
+#PYTHON3_CONFIG_DIR="/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu"
+
+${RED}Please take a moment to check that the following lib dirs look sane:${WHI}
+${CYA}
+${PYTHON2_CONFIG_DIR}
+${PYTHON3_CONFIG_DIR}
+${WHI}
+
+... sleeping 5 secs ...
+"""
+sleep 5
+
+### Begin actual build from source
 BEGINCONFIG=true \
     CFLAGS="$cflags" \
     LDFLAGS="-L$HOME/.myfs/usr/local/lib" \
@@ -147,10 +177,11 @@ BEGINCONFIG=true \
     --enable-gui="auto" \
     --enable-gtk2-check \
     --enable-pythoninterp="yes" \
+    --with-python-command="$PYTHON2_BINARY" \
     --with-python-config-dir="$PYTHON2_CONFIG_DIR" \
     --enable-python3interp="yes" \
+    --with-python3-command="$PYTHON3_BINARY" \
     --with-python3-config-dir="$PYTHON3_CONFIG_DIR" \
-    --with-python-command="$PYTHON3_BINARY" \
     --enable-fail-if-missing \
     --prefix="$HOME/.myfs/usr/local" \
     --with-local-dir="$HOME/.myfs/usr"
@@ -160,8 +191,8 @@ make install
 
 cd $previous_dir
 
-### Check if vim is now installed
-if command -v vim >/dev/null 2>&1; then
+### Check if vim is now installed to .myfs
+if [[ $(which vim | grep myfs | wc -l) -ge 1 ]]; then
     ### Now that vim is installed, let's download vundle plugins
     echo -e "${GRE}Vim installed; now re-downloading vundle plugins${WHI}"
     _update_or_install_vundle_plugins
