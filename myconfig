@@ -118,6 +118,9 @@ function _fully_install_myconfig() {
     ### Unalias vim from \`alias vim="vim -N -u /tmp/myconfig/.vimrc"\`
     unalias vim 2>/dev/null
 
+    ### Remove /tmp/myconfig, it will still use this if you forget to re-source
+    rm -rf /tmp/myconfig
+    
     ### Final message
     local msg=""
     msg+="${GRE}Installation complete! ${WHI}"
