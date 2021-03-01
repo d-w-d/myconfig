@@ -64,8 +64,8 @@ fi
 ### a Makefile in it at `/usr/lib/python3.6/`.
 
 ### By default, find python lib dirs automatedly:
-PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python2)
-PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config*" 2>/dev/null | grep python3)
+PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config-*" 2>/dev/null | grep python2)
+PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config-*" 2>/dev/null | grep python3)
 
 ### By default, use default python3 binary
 PYTHON3_BINARY=$(which python3)
