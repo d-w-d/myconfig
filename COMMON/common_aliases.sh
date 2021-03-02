@@ -3,6 +3,9 @@
 ### Inherit $MYCONFIG_ROOT_DIR from parent script
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
 
+### Make sure we are not aliasing vim to /tmp if myconfig is installed
+_is_myconfig_fully_installed && unalias vim 2>/dev/null
+
 ### Modify 'ls' family (this assumes you use a recent GNU ls).
 alias ls='ls -F'            # Sort with color and file-type indicator
 alias lsDirsOnly='ls -d'    # List just dir names (not their content).
