@@ -18,11 +18,11 @@ if ! $(command -v cmake >/dev/null 2>&1); then
 fi
 
 ### If Ubuntu18, then we need to install g++-8
-if _is_ubuntu18 then;
+if _is_ubuntu18; then
     ### Check if g++-8 is installed
-    if ! $(command -v g++-8 >/dev/null 2&>1 ); then
+    if ! $(command -v g++-8 2 >/dev/null &>1); then
         cxx=$(which g++-8)
-    elif _is_sudoer;then
+    elif _is_sudoer; then
         sudo apt install -y g++-8
         cxx=$(which g++-8)
     else
