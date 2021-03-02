@@ -51,14 +51,14 @@ if $(command -v vim >/dev/null 2>&1); then
     if [[ $1 == "--verbose" ]];then
         ### Download vundle plugins in an explicit/blocking fashion
         echo -e "${CYA}Showing vim output explicitly${WHI}"
-        _update_or_install_vundle_plugins
+        _install_vundle_plugins
     else
         # Download vundle plugins as a background process
         # NOTE:   this WILL create/update vim-related utilities in user's $HOME dir,
         #         but will not delete anything
         echo -e "${WHI}Downloading vim-vundle plugins as background process..."
         ((cmd=$(/usr/bin/env true;
-        _update_or_install_vundle_plugins >/dev/null 2>&1;
+        _install_vundle_plugins >/dev/null 2>&1;
         echo -e "echo '''\033[31m
         ================================================
         VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING

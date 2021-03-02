@@ -4,6 +4,9 @@
 # Needed because ycm needs cmake for installation,
 # and this may not be available on your machine.
 
+### Prelims
+cxx=$(which g++)
+
 ### Confirm some prereqs
 [[ ! -d $HOME/.vim/bundle ]] && echo "$HOME/.vim/bundle not found" && exit 1
 command -v python3 >/dev/null 2>&1 || (echo "python3 not found" && exit 1)
@@ -14,12 +17,26 @@ if ! $(command -v cmake >/dev/null 2>&1); then
     python3 -m pip install --user cmake
 fi
 
+### If Ubuntu18, then we need to install g++-8
+if is_ubuntu18 then;
+    ### Check if g++-8 is installed
+    if ! $(command -v g++-8 >/dev/null 2&>1 ); then
+        cxx=$(which g++-8)
+    elif is_sudoer;then
+        sudo apt install -y g++-8
+        cxx=$(which g++-8)
+    else
+        echo -e "You are on Ubuntu18 without g++-8 or sudo permissions"
+        exit 1
+    fi
+fi
+
 ### Rerun ycm-install process manually
 previous_dir=$PWD
 cd $HOME/.vim/bundle/YouCompleteMe
 git pull origin master
 git submodule update --init --recursive
-python3 install.py --all
+CXX=$cxx python3 install.py --all
 
 echo -e "echo '''\033[31m
 ====================================

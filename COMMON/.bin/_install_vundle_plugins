@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Installs all the vundle plugins  from command line
+# Installs/updates all the vundle plugins  from command line
 
 ### Confirm some prereqs
 command -v vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
@@ -27,4 +27,4 @@ else
 fi
 
 ### Double check complete installation of ycm
-_complete_ycm_installation
+_install_ycm

@@ -9,10 +9,6 @@
 previous_dir=$PWD
 cflags="-I$HOME/.myfs/usr/local/include"
 
-_is_user_sudoer() {
-    [[ $(groups | grep sudo | wc -l) == 1 ]] && return 1
-}
-
 ### Begin
 clear && printf '\e[3J'
 echo -e """${CYA}
@@ -195,7 +191,7 @@ cd $previous_dir
 if [[ $(which vim | grep myfs | wc -l) -ge 1 ]]; then
     ### Now that vim is installed, let's download vundle plugins
     echo -e "${GRE}Vim installed; now re-downloading vundle plugins${WHI}"
-    _update_or_install_vundle_plugins
+    _install_vundle_plugins
 else
     echo -e """${RED}
     Vim is not installed. Something must have gone wrong.
