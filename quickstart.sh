@@ -40,6 +40,8 @@ else
     cd myconfig
     touch misc.sh
 fi
+### Need to leave /tmp/myconfig to avoid directory error 
+### in case user deletes it during vundle-install process
 cd $previous_dir
 
 # Expose tools in /tmp/myconfig to this shell
