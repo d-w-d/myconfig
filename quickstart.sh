@@ -3,6 +3,7 @@
 # Library to temporarily install myconfig to /tmp and enable rapid productivity
 
 # Variables, params, etc.
+_is_installing_vundle_plugins=false
 vim_status=""
 previous_dir=$PWD
 vundle_download_message="${RED}Vundle plugins can't be installed until vim is${WHI}"
@@ -57,6 +58,7 @@ if $(command -v vim >/dev/null 2>&1); then
         # NOTE:   this WILL create/update vim-related utilities in user's $HOME dir,
         #         but will not delete anything
         echo -e "${WHI}Downloading vim-vundle plugins as background process..."
+        _is_installing_vundle_plugins=true
         ((cmd=$(/usr/bin/env true;
         _install_vundle_plugins >/dev/null 2>&1;
         echo -e "echo '''\033[31m

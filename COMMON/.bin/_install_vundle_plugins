@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Installs/updates all the vundle plugins  from command line
+# Installs/updates all the vundle plugins from command line
 
 ### Confirm some prereqs
 command -v vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
@@ -20,7 +20,7 @@ fi
 ### Install vundle plugins
 ### NOTE: vim aliases will not work in subprocesses
 echo "Installing vundle plugins..."
-if _is_myconfig_fully_installed ; then
+if _is_myconfig_fully_installed; then
     vim -E -u "$HOME/.myconfig/.vimrc" -N +PluginInstall +qall
 else
     vim -E -u "/tmp/myconfig/.vimrc" -N +PluginInstall +qall
@@ -28,3 +28,17 @@ fi
 
 ### Double check complete installation of ycm
 _install_ycm
+
+### Sometimes we try to install myconfig and delete /tmp/myconfig
+### while vundle plugins are being installed in the background;
+### So we delete /tmp/myconfig AFTER we're done installing
+if _is_myconfig_fully_installed; then
+    unalias vim
+    ### Change dir if you're in the dir to be deleted
+    [[ "$PWD" =~ /tmp/myconfig ]] && cd
+    rm -rf /tmp/myconfig
+fi
+
+### Set global flag to signal that we've finished installing 
+### This is used to check whether we can delete /tmp/myconfig
+_is_installing_vundle_plugins=false
