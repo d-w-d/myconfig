@@ -22,7 +22,7 @@ if _is_ubuntu18; then
     ### Check if g++-8 is installed
     if ! $(command -v g++-8 2 >/dev/null &>1); then
         cxx=$(which g++-8)
-    elif _is_sudoer; then
+    elif _is_user_sudoer; then
         sudo apt install -y g++-8
         cxx=$(which g++-8)
     else
