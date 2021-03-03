@@ -40,6 +40,7 @@ else
     cd myconfig
     touch misc.sh
 fi
+cd $previous_dir
 
 # Expose tools in /tmp/myconfig to this shell
 MYCONFIG_ROOT_DIR=/tmp/myconfig source /tmp/myconfig/entry.sh
@@ -65,7 +66,7 @@ if $(command -v vim >/dev/null 2>&1); then
         ================================================
         VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
         ================================================\n\033[37m''';";
-        ); bash -c "$cmd" ) &)
+        ); bash -c "$cmd" ) &) 
         vundle_download_message="${GRE}Vundle plugins are being downloaded "
         vundle_download_message+="as a background process!\n${WHI}"
         vundle_download_message+="${RED}         ---> DO NOT CLOSE THIS SHELL <---\n${WHI}"
