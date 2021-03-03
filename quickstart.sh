@@ -59,13 +59,13 @@ if $(command -v vim >/dev/null 2>&1); then
         #         but will not delete anything
         echo -e "${WHI}Downloading vim-vundle plugins as background process..."
         _is_installing_vundle_plugins=true
-        ((cmd=$(/usr/bin/env true;
+        (cmd=$(/usr/bin/env true;
         _install_vundle_plugins >/dev/null 2>&1;
         echo -e "echo '''\033[31m
         ================================================
         VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
         ================================================\n\033[37m''';";
-        ); bash -c "$cmd" ) &)
+        ); bash -c "$cmd" ) &
         vundle_download_message="${GRE}Vundle plugins are being downloaded "
         vundle_download_message+="as a background process!\n${WHI}"
         vundle_download_message+="${RED}         ---> DO NOT CLOSE THIS SHELL <---\n${WHI}"
