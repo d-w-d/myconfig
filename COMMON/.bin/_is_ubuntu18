@@ -2,7 +2,7 @@
 #
 # Tests if OS is ubuntu 18
 
-if [[ $(cat /etc/os-release | grep 'Ubuntu 18') -ge 1 ]]; then
+if [[ $(cat /etc/os-release | grep 'Ubuntu 18' | wc -l ) -ge 1 ]]; then
     exit 0
 else
     exit 1
