@@ -20,13 +20,16 @@ fi
 ### If Ubuntu18, then we need to install g++-8
 if _is_ubuntu18; then
     ### Check if g++-8 is installed
-    if ! $(command -v g++-8 2 >/dev/null &>1); then
+    if $(command -v g++-8 >/dev/null 2>&1); then
         cxx=$(which g++-8)
     elif _is_user_sudoer; then
         sudo apt install -y g++-8
         cxx=$(which g++-8)
     else
-        echo -e "You are on Ubuntu18 without g++-8 or sudo permissions"
+        msg=""
+        msg+="${RED}Sorry - you are on Ubuntu18 without g++-8${WHI}"
+        msg+="${RED} or sudo permissions${WHI}"
+        echo -e "$msg"
         exit 1
     fi
 fi
