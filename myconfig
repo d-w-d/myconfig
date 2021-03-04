@@ -73,7 +73,7 @@ function _update_myconfig() {
     cd $previous_dir
 
     # Update vundle plugins
-    _update_or_install_vundle_plugins
+    _install_vundle_plugins
 
     # Finish
     echo -e """${GRE}
