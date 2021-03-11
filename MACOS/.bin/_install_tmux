@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+#########################################
+### TMUX Requires libevent
+#########################################
+
+# DOWNLOAD SOURCES FOR TMUX AND MAKE AND INSTALL
+PREVIOUSDIR=$PWD
+cd /tmp
+curl -LOk https://github.com/tmux/tmux/releases/download/3.1b/tmux-3.1b.tar.gz
+tar -xf tmux-3.1b.tar.gz
+cd tmux-3.1b
+make distclean 
+CFLAGS="-I$HOME/.myfs/usr/local/include" LDFLAGS="-L$HOME/.myfs/usr/local/lib -Wl,-rpath=$HOME/.myfs/usr/local/lib" ./configure --prefix=$HOME/.myfs/usr/local
+make
+make install
+
+# open new shell and check tmux version
+tmux -V
+cd $PREVIOUSDIR

@@ -92,6 +92,7 @@ imap <C-e> <ESC>A
 
 " Fast switching between modes
 imap kj <Esc>
+imap <C-i> <Esc>l
 imap <C-n> <Esc>l
 
 " Faster scrolling with shift
