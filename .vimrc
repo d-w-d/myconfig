@@ -387,3 +387,9 @@ autocmd InsertLeave * colorscheme torte
 
 
 
+
+"==================================================
+" Add short cut :Sw to save with sudo permissions
+" even if you forgot to open vim with sudo
+"==================================================
+command! -nargs=0 Sw w !sudo tee % > /dev/null
