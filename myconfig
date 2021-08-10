@@ -132,7 +132,7 @@ function _status() {
 
     # Test if myconfig is installed
     if _is_myconfig_fully_installed; then
-        msg+="${GRE}✓ myconfig is fully installed\${WHI}"
+        msg+="${GRE}✓ myconfig is fully installed\n${WHI}"
     else
         msg+="${RED}✗ myconfig is NOT fully installed\n${WHI}"
     fi
