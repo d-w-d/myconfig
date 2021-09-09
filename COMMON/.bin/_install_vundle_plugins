@@ -34,7 +34,7 @@ _install_ycm
 ### So we delete /tmp/myconfig AFTER we're done installing
 if _is_myconfig_fully_installed; then
     echo $PWD >> /tmp/temp0.txt
-    unalias vim
+    unalias vim || echo "vim is not aliased"
     ### Change dir if you're in the dir to be deleted
     [[ "$PWD" =~ /tmp/myconfig ]] && cd
     rm -rf /tmp/myconfig
