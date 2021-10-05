@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+
+'''
+    Script to go through all dirs in PWD and remove either all node_modules or .venv dirs
+    in order to save space.
+'''
+
+import subprocess
+
+
+# Choose folder to be deleted:
+choice = input("""
+Choose which to remove:
+1. node_modules
+2. .venv
+""")
+
+if choice == '1':
+    dir_to_be_deleted = 'node_modules'
+else:
+    dir_to_be_deleted = '.venv'
+
+print("You chose: " + dir_to_be_deleted)
+
+# exit()
+
+# Find all node_modules
+print(f"Searching for all dirs named '{dir_to_be_deleted}' nested within this dir")
+p1 = subprocess.Popen(
+    f'find $PWD -name "{dir_to_be_deleted}" -type d -prune',
+    shell=True,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT
+)
+
+# Clean up locations of node_modules
+local_packages_locations = []
+for line in p1.stdout.readlines():
+    local_packages_locations.append(line.decode().strip())
+
+
+# Loop through locations of node_modules and sum up get disk usage
+total_disk_size = 0
+for local_packages_location in local_packages_locations:
+    p2 = subprocess.Popen(
+        str("du -ks " + local_packages_location),
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
+    )
+    parsed_du_reading = p2.stdout.read().decode().strip().split()
+    try:
+        dirsize = int(parsed_du_reading[0])
+        total_disk_size += dirsize
+    except ValueError:
+        print("That was no valid number -- sth needs debugging!")
+
+
+removal_command = "find $PWD -name '"+dir_to_be_deleted+"' -type d -prune -exec rm -rf '{}' +"
+
+print(f"""
+
+    {dir_to_be_deleted} takes up { total_disk_size / 1000 } MBs in disk usage!
+
+    If you want to remove these dirs, then use command:
+
+    {removal_command}
+
+""")
+
