@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Tests if user is sudoer
+# Tests if user is sudoer OR if name === root
 
-if [[ $(groups | grep sudo | wc -l) == 1 ]]; then
+if [[ $(groups | grep sudo | wc -l) == 1 || $(whoami) == 'root' ]]; then
     exit 0
 else
     exit 1
