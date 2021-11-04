@@ -62,7 +62,7 @@ fi
 ### By default, find python lib dirs automatedly:
 echo -e "${CYA}Searching for python-lib-config dirs...${WHI}"
 PYTHON2_CONFIG_DIR=$(find /usr/ -type d -name "config-*" 2>/dev/null | grep python2)
-PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config-*" 2>/dev/null | grep python3)
+PYTHON3_CONFIG_DIR=$(find /usr/ -type d -name "config-3*" 2>/dev/null | grep python3)
 
 ### By default, use default python binaries
 PYTHON3_BINARY=$(which python3)
