@@ -10,7 +10,7 @@ cd /tmp
 curl -LOk https://github.com/tmux/tmux/releases/download/3.1b/tmux-3.1b.tar.gz
 tar -xf tmux-3.1b.tar.gz
 cd tmux-3.1b
-make distclean 
+make distclean
 CFLAGS="-I$HOME/.myfs/usr/local/include" LDFLAGS="-L$HOME/.myfs/usr/local/lib -Wl,-rpath=$HOME/.myfs/usr/local/lib" ./configure --prefix=$HOME/.myfs/usr/local
 make
 make install

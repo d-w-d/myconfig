@@ -7,23 +7,23 @@ command -v vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
 
 ### Clone/update vundle repo
 if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
-    # If Vundle dir does exist then clone it
-    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+  # If Vundle dir does exist then clone it
+  git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
 else
-    # If Vundle dir exists, update it
-    cd $HOME/.vim/bundle/Vundle.vim
-    git fetch origin
-    git checkout master
-    git reset --hard origin/master
+  # If Vundle dir exists, update it
+  cd $HOME/.vim/bundle/Vundle.vim
+  git fetch origin
+  git checkout master
+  git reset --hard origin/master
 fi
 
 ### Install vundle plugins
 ### NOTE: vim aliases will not work in subprocesses
 echo "Installing vundle plugins..."
 if _is_myconfig_fully_installed; then
-    vim -E -u "$HOME/.myconfig/.vimrc" -N +PluginInstall +qall
+  vim -E -u "$HOME/.myconfig/.vimrc" -N +PluginInstall +qall
 else
-    vim -E -u "/tmp/myconfig/.vimrc" -N +PluginInstall +qall
+  vim -E -u "/tmp/myconfig/.vimrc" -N +PluginInstall +qall
 fi
 
 ### Double check complete installation of ycm
@@ -33,13 +33,13 @@ _install_ycm
 ### while vundle plugins are being installed in the background;
 ### So we delete /tmp/myconfig AFTER we're done installing
 if _is_myconfig_fully_installed; then
-    echo $PWD >> /tmp/temp0.txt
-    unalias vim || echo "vim is not aliased"
-    ### Change dir if you're in the dir to be deleted
-    [[ "$PWD" =~ /tmp/myconfig ]] && cd
-    rm -rf /tmp/myconfig
+  echo $PWD >>/tmp/temp0.txt
+  unalias vim 2>/dev/null || echo "vim is not aliased"
+  ### Change dir if you're in the dir to be deleted
+  [[ "$PWD" =~ /tmp/myconfig ]] && cd
+  rm -rf /tmp/myconfig
 fi
 
-### Set global flag to signal that we've finished installing 
+### Set global flag to signal that we've finished installing
 ### This is used to check whether we can delete /tmp/myconfig
 _is_installing_vundle_plugins=false
