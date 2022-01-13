@@ -44,7 +44,8 @@ Plugin 'Chiel92/vim-autoformat'                                     " Autoformat
 Plugin 'kana/vim-submode'
 Plugin 'ekalinin/dockerfile.vim'                                    " Enables :set syntax=Dockerfile
 Plugin 'preservim/nerdcommenter'                                    " used to toggle comments
-Plugin 'fcpg/vim-osc52'
+"Plugin 'fcpg/vim-osc52'
+Plugin 'ojroques/vim-oscyank'
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}     " enables vim status line
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " DO NOT EDIT:
@@ -58,6 +59,7 @@ filetype plugin indent on    " required
 " Post-Plugin Misc settings
 "==================================================
 
+let g:oscyank_max_length = 1000000
 let g:user_emmet_mode='inv'
 let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 "let g:user_emmet_leader_key='<C-Space>'
@@ -193,9 +195,15 @@ vmap <Leader>/ <Leader>c<Space>
 " Enable folding with the spacebar; maps to binding given by symplfold plugin
 nnoremap <Leader>f za
 
+" DEPRECATED way of getting content into clipboard
 " Copy content of working registers to local clipboard
 " This function is provided by Plugin fcpg/vim-osc52
-noremap <Leader>c :call SendViaOSC52(getreg('"*'))<CR>
+"noremap <Leader>c :call SendViaOSC52(getreg('"*'))<CR>
+"
+"New approach to yanking content into clipboard uses this library:
+"https://github.com/ojroques/vim-oscyank
+noremap <Leader>c :OSCYankReg + <CR>
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Alter Cut-Paste Behavior:
@@ -207,7 +215,7 @@ noremap <Leader>c :call SendViaOSC52(getreg('"*'))<CR>
 "   so classic to vim that I wanted to preserve the cut-like bevior of 'd',
 "   but without the overwrite-upon-paste-over behavior.
 "
-"   - Note: if you want to do 'dd' without copying to register, then you need to
+"   - Note: if you want to do 'dd' without copying to register, then you need to select
 "   the lines visually and then use 'x' to delete without copying.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -384,7 +392,6 @@ au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\
 
 autocmd InsertEnter * colorscheme industry | set cursorline | highlight CursorLine guibg=darkgrey ctermbg=darkgrey
 autocmd InsertLeave * colorscheme torte
-
 
 
 
