@@ -25,6 +25,8 @@ alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh"
 alias alpasswordgen=$'echo $(($(date '+%s') * $RANDOM))  | sha256sum | base64 | head -c 32 ; echo'
 #source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh &
 
+alias aldockermongo="clear; printf '\n\n Starting temp mongod server. Connect mongoose with \"mongodb://127.0.0.1\" ... \n\n'; sleep 3;docker run -p "27017:27017" mongo:latest"
+
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
 alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2015\",\"dom\"]}"'
