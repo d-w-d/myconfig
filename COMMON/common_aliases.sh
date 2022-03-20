@@ -12,6 +12,7 @@ alias lt='ls -ltr'          # Sort by date, most recent last.
 ### Useful Aliases for All *NIX Environments
 alias alcatcolored='highlight -O ansi --force'
 alias alclear="clear && printf '\e[3J'"
+alias aldu="du -hsc ./* ./.* 2> /dev/null"
 alias klear="clear && printf '\e[3J'"
 alias kl="clear && printf '\e[3J'"
 alias alhttpserver='http-server'
