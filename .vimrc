@@ -259,7 +259,7 @@ function! EnableDefaultCutPasteRegisterBehavior()
     unmap x
     unmap X
     unmap p
-    unmap P
+    "  unmap P
     unmap y
     unmap yy
     unmap Y

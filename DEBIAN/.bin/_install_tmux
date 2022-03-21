@@ -4,6 +4,19 @@
 ### TMUX Requires libevent
 #########################################
 
+### If sudo user, install all dependencies
+if _is_user_sudoer; then
+  echo -e """
+    You have sudo permissions; let's use them to install dependencies for tmux!
+    """
+  sleep 1
+  sudo apt update -y
+  sudo apt upgrade -y
+  sudo apt install \
+    build-essential \
+    bison
+fi
+
 # DOWNLOAD SOURCES FOR TMUX AND MAKE AND INSTALL
 PREVIOUSDIR=$PWD
 cd /tmp
