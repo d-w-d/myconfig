@@ -13,25 +13,25 @@ command -v python3 >/dev/null 2>&1 || (echo "python3 not found" && exit 1)
 
 ### If cmake doesn't exist, install it with python3
 if ! $(command -v cmake >/dev/null 2>&1); then
-    command -v pip3 >/dev/null 2>&1 || (echo "pip3 not found" && exit 1)
-    python3 -m pip install --user cmake
+  command -v pip3 >/dev/null 2>&1 || (echo "pip3 not found" && exit 1)
+  python3 -m pip install --user cmake
 fi
 
 ### If Ubuntu18, then we need to install g++-8
 if _is_ubuntu18; then
-    ### Check if g++-8 is installed
-    if $(command -v g++-8 >/dev/null 2>&1); then
-        cxx=$(which g++-8)
-    elif _is_user_sudoer; then
-        sudo apt install -y g++-8
-        cxx=$(which g++-8)
-    else
-        msg=""
-        msg+="${RED}Sorry - you are on Ubuntu18 without g++-8${WHI}"
-        msg+="${RED} or sudo permissions${WHI}"
-        echo -e "$msg"
-        exit 1
-    fi
+  ### Check if g++-8 is installed
+  if $(command -v g++-8 >/dev/null 2>&1); then
+    cxx=$(which g++-8)
+  elif _is_user_sudoer; then
+    sudo apt install -y g++-8
+    cxx=$(which g++-8)
+  else
+    msg=""
+    msg+="${RED}Sorry - you are on Ubuntu18 without g++-8${WHI}"
+    msg+="${RED} or sudo permissions${WHI}"
+    echo -e "$msg"
+    exit 1
+  fi
 fi
 
 ### Rerun ycm-install process manually
@@ -39,7 +39,14 @@ previous_dir=$PWD
 cd $HOME/.vim/bundle/YouCompleteMe
 git pull origin master
 git submodule update --init --recursive
-CXX=$cxx python3 install.py --all
+### Only install completers that I use to code
+# CXX=$cxx python3 install.py --all
+CXX=$cxx python3 install.py --clang-completer --ts-completer
+#--cs-completer
+#--go-completer
+#--rust-completer
+#--java-completer
+#--ts-completer
 
 echo -e "echo '''\033[31m
 ====================================

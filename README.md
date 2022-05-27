@@ -22,21 +22,23 @@ This quick/temporary installation leaves you in a bash shell with handy aliases 
 
 ### Full Installation
 
-`myconfig install self` *will* mess with the config files in the user's home dir, and so is supposed to only be run on accounts that are designated for me. Basically, it clones this repo to `$HOME/.myconfig`, and enables you to install modern versions of vim, tmux, zsh, git and ohmyzsh.
+`myconfig install self` _will_ mess with the config files in the user's home dir, and so is supposed to only be run on accounts that are designated for me. Basically, it clones this repo to `$HOME/.myconfig`, and enables you to install modern versions of vim, tmux, zsh, git and ohmyzsh.
 
 ### Phase Three
 
-The function `myconfig_FULL_installation` does *not* perform sophisticated checks/auto-installations of versioned software. For example, it will configure for tmux >v2.1, but you'll have to manually install tmux >v2.1 if it's not available on that machine.
+The function `myconfig_FULL_installation` does _not_ perform sophisticated checks/auto-installations of versioned software. For example, it will configure for tmux >v2.1, but you'll have to manually install tmux >v2.1 if it's not available on that machine.
 
 Phase three is thus for such manual installation of software/configuration depending on what's available on the machine, and how much I expect to use that machine in the future. Phase three is facilitated by helper scripts available in `myconfig` that, for example, install the latest version of tmux, vim and zsh with/without root permissions.
 
 For a machine that I expect to do serious work on, I'll want to make sure that we have up-to-date zsh, tmux, and vim with python3 and clipboard support.
 
-
 ## `.myconfig` vs `.myfs`
 
 The dir `$HOME/.myconfig` has all the libraries/scripts needed to install my tools onto a \*nix system. When `~/.myconfig/entry.sh` is sourced, it will make sure that a user--specific filesystem called `~/.myfs` exists. This is where libraries/executables installed by scripts in `.myconfig` end up.
 
+## Gotchas
+
+- Sometimes you need to run vim with sudo permissions, in which case note that using sudo will cause your environment (e.g. PATH var) to default to the root account; so it will not find `.vimrc`, `.vim` or `vim` as set up by `myconfig` with your user account. The simplest way to fix this is to also install `myconfig` and run `myconfig install vim` on your root account.
 
 ## Conventions
 
@@ -60,14 +62,4 @@ Scripts in the myconfig repo that are supposed to be executed are:
 3. Given the shebang `#!/usr/bin/env bash`
 4. Placed in `.bin` directories within their respective OS dirs
 
-Note: myconfig is designed with the intention that you only ever run executable scripts through the CLI. 
-
-
-
-
-
-
-
-
-
-
+Note: myconfig is designed with the intention that you only ever run executable scripts through the CLI.

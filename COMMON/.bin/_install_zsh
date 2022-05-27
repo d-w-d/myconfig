@@ -5,12 +5,12 @@ previous_dir=$PWD
 ### Install ncurses
 
 if [[ $1 == '--with-ncurses' ]]; then
-    echo "Installing ncurses to .myfs"
-    sleep 2
-    _install_ncurses
+  echo "Installing ncurses to .myfs"
+  sleep 2
+  _install_ncurses
 else
-    echo "Skipping ncurses from source..."
-    sleep 2
+  echo "Skipping ncurses from source..."
+  sleep 2
 fi
 
 ### Install zsh
@@ -27,3 +27,5 @@ make install
 $HOME/.myconfig/COMMON/.bin/_install_ohmyzsh
 
 cd $previous_dir
+
+###

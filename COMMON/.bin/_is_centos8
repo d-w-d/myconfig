@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Tests if OS is centos8
+
+if [[ $(cat /etc/os-release 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -ge 1 ]]; then
+  exit 0
+else
+  exit 1
+fi

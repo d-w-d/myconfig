@@ -44,9 +44,9 @@ Plugin 'Chiel92/vim-autoformat'                                     " Autoformat
 Plugin 'kana/vim-submode'
 Plugin 'ekalinin/dockerfile.vim'                                    " Enables :set syntax=Dockerfile
 Plugin 'preservim/nerdcommenter'                                    " used to toggle comments
-"Plugin 'fcpg/vim-osc52'
-Plugin 'ojroques/vim-oscyank'
+Plugin 'ojroques/vim-oscyank'                                       " enable copying to board remote
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}     " enables vim status line
+Plugin 'maksimr/vim-jsbeautify'                                     " format js-related docs
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " DO NOT EDIT:
 call vundle#end()            " required
@@ -223,7 +223,10 @@ noremap <Leader>c :OSCYankReg + <CR>
 " Note: we are writing to '*' register and then copying to the '+' register.
 " '*' seems to be needed on the Mac, but my understanding is that linux and
 " windows also like to use the '+' register for their system clipboards.
-" I also add a bunch of marks with ma -> `a (mark a -> goto a) syntax
+" Note: I also add a bunch of marks with ma -> `a (mark a -> goto a) syntax
+" Note: read e.g. `noremap yy my"*yy:let @+=@*<CR>` as
+"       `mark y here; use register '*'; yy; copy register * to register +`
+" Note: the register "_ is the "blackhole" register
 function! DisableDefaultCutPasteRegisterBehavior()
     " On this approach 'x' acts like classic 'delete' key
     nnoremap x mx"_x
@@ -393,10 +396,27 @@ au BufRead,BufNewFile *.js,*.ts,*.ts,.py,*.pyw,*.c,*.h match BadWhitespace /\\s\
 autocmd InsertEnter * colorscheme industry | set cursorline | highlight CursorLine guibg=darkgrey ctermbg=darkgrey
 autocmd InsertLeave * colorscheme torte
 
-
-
 "==================================================
 " Add short cut :Sw to save with sudo permissions
 " even if you forgot to open vim with sudo
 "==================================================
 command! -nargs=0 Sw w !sudo tee % > /dev/null
+
+"==================================================
+" Settings for https://github.com/maksimr/vim-jsbeautify
+" to format js-related docs
+"==================================================
+""" Format whole doc
+autocmd FileType javascript noremap <buffer>  <c-f> :call JsBeautify()<cr>
+autocmd FileType typescript noremap <buffer>  <c-f> :call JsBeautify()<cr>
+autocmd FileType json noremap <buffer> <c-f> :call JsonBeautify()<cr>
+autocmd FileType jsx noremap <buffer> <c-f> :call JsxBeautify()<cr>
+autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
+autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
+""" Format selection
+autocmd FileType javascript vnoremap <buffer>  <c-f> :call RangeJsBeautify()<cr>
+autocmd FileType typescript vnoremap <buffer>  <c-f> :call RangeJsBeautify()<cr>
+autocmd FileType json vnoremap <buffer> <c-f> :call RangeJsonBeautify()<cr>
+autocmd FileType jsx vnoremap <buffer> <c-f> :call RangeJsxBeautify()<cr>
+autocmd FileType html vnoremap <buffer> <c-f> :call RangeHtmlBeautify()<cr>
+autocmd FileType css vnoremap <buffer> <c-f> :call RangeCSSBeautify()<cr>

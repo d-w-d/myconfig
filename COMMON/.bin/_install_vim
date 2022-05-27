@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 #
 # Install vim with clipboard and python3 support from source
 # This script was developed within the docker image myubuntu18.04
@@ -26,32 +26,37 @@ sleep 3
 
 ### If sudo user, install all dependencies
 if _is_user_sudoer; then
-    echo -e """
+  echo -e """
     You have sudo permissions; let's use them to install dependencies for vim!
     """
-    sleep 1
-    sudo apt update -y
-    sudo apt upgrade -y
-    sudo apt install build-essential \
-        man \
-        manpages-dev \
-        git \
-        curl \
-        cmake \
-        python \
-        python3 \
-        python-dev \
-        python3-dev \
-        python3-pip \
-        libx11-6 \
-        libx11-dev \
-        libxtst-dev \
-        libxt-dev \
-        libsm-dev \
-        libevent-dev \
-        libncurses5-dev \
-        libncurses5 \
-        libxpm-dev
+  sleep 1
+  sudo apt update -y
+  sudo apt upgrade -y
+  sudo apt install build-essential \
+    man \
+    manpages-dev \
+    git \
+    curl \
+    cmake \
+    python \
+    python3 \
+    python-dev \
+    python3-dev \
+    python3-pip \
+    libx11-6 \
+    libx11-dev \
+    libxtst-dev \
+    libxt-dev \
+    libsm-dev \
+    libevent-dev \
+    libncurses5-dev \
+    libncurses5 \
+    libxpm-dev
+else
+  echo -e """
+    You do not have sudo permissions; let's just hope that this machine has all of the prerequisite libraries!
+    """
+  sleep 1
 fi
 
 ### Need to make sure we have the right python libs for our installations
@@ -87,24 +92,24 @@ PYTHON2_BINARY=$(which python2)
 
 # Centos8
 # Trickier to find automatedly, so set explicitly
-if [[ $(cat /etc/os-release 2>/dev/null | grep 'CentOS Linux 8' | wc -l) -eq 1 ]]; then
+if _is_centos8; then
+  PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
+  PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
+
+  # Specify path to python3 binary corresponding to PYTHON3_CONFIG_DIR
+  PYTHON3_BINARY="/usr/bin/python3"
+
+  ### If you're on centos8 and don't have sudo permissions, you might need
+  ### to manually install packages through the yusr tool;
+  ### if so, you might need to also alter the make-config paths
+  ### to look for resources within .myfs
+  if ! _is_user_sudoer; then
+    yusr install python2-devel
     PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
-    PYTHON3_CONFIG_DIR="/usr/lib64/python3.6/config-3.6m-x86_64-linux-gnu"
-
-    # Specify path to python3 binary corresponding to PYTHON3_CONFIG_DIR
-    PYTHON3_BINARY="/usr/bin/python3"
-
-    ### If you're on centos8 and don't have sudo permissions, you might need
-    ### to manually install packages through the yusr tool;
-    ### if so, you might need to also alter the make-config paths
-    ### to look for resources within .myfs
-    if ! _is_user_sudoer; then
-        yusr install python2-devel
-        PYTHON2_CONFIG_DIR="/usr/lib64/python2.7/config"
-        PYTHON2_CONFIG_DIR="$HOME/.myfs/usr/lib64/python2.7/config"
-        PYTHON2_BINARY=$(which python2)
-        cflags="-I$HOME/.myfs/usr/include/python2.7"
-    fi
+    PYTHON2_CONFIG_DIR="$HOME/.myfs/usr/lib64/python2.7/config"
+    PYTHON2_BINARY=$(which python2)
+    cflags="-I$HOME/.myfs/usr/include/python2.7"
+  fi
 
 fi
 
@@ -112,21 +117,21 @@ fi
 ### NOTE:   this is a necessary nut not sufficient condition;
 ###         the config dir also needs various lib files
 [[ ! -f "$PYTHON2_CONFIG_DIR/Makefile" ]] &&
-    echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
-    exit 1
+  echo "Can't find $PYTHON2_CONFIG_DIR/Makefile ...exiting." &&
+  exit 1
 
 [[ ! -f "$PYTHON3_CONFIG_DIR/Makefile" ]] &&
-    echo "Can't find $PYTHON3_CONFIG_DIR/Makefile ...exiting." &&
-    exit 1
+  echo "Can't find $PYTHON3_CONFIG_DIR/Makefile ...exiting." &&
+  exit 1
 
 ### Vim Requires ncurses
 if [[ $1 == '--with-ncurses' ]]; then
-    echo "Installing ncurses to .myfs"
-    sleep 2
-    _install_ncurses
+  echo "Installing ncurses to .myfs"
+  sleep 2
+  _install_ncurses
 else
-    echo "Skipping ncurses from source..."
-    sleep 2
+  echo "Skipping ncurses from source..."
+  sleep 2
 fi
 
 ### Build vim from source
@@ -166,21 +171,21 @@ sleep 5
 
 ### Begin actual build from source
 BEGINCONFIG=true \
-    CFLAGS="$cflags" \
-    LDFLAGS="-L$HOME/.myfs/usr/local/lib" \
-    LD_LIBRARY_PATH="$HOME/.myfs/usr/local/lib" ./configure \
-    --with-x \
-    --enable-gui="auto" \
-    --enable-gtk2-check \
-    --enable-pythoninterp="yes" \
-    --with-python-command="$PYTHON2_BINARY" \
-    --with-python-config-dir="$PYTHON2_CONFIG_DIR" \
-    --enable-python3interp="yes" \
-    --with-python3-command="$PYTHON3_BINARY" \
-    --with-python3-config-dir="$PYTHON3_CONFIG_DIR" \
-    --enable-fail-if-missing \
-    --prefix="$HOME/.myfs/usr/local" \
-    --with-local-dir="$HOME/.myfs/usr"
+  CFLAGS="$cflags" \
+  LDFLAGS="-L$HOME/.myfs/usr/local/lib" \
+  LD_LIBRARY_PATH="$HOME/.myfs/usr/local/lib" ./configure \
+  --with-x \
+  --enable-gui="auto" \
+  --enable-gtk2-check \
+  --enable-pythoninterp="yes" \
+  --with-python-command="$PYTHON2_BINARY" \
+  --with-python-config-dir="$PYTHON2_CONFIG_DIR" \
+  --enable-python3interp="yes" \
+  --with-python3-command="$PYTHON3_BINARY" \
+  --with-python3-config-dir="$PYTHON3_CONFIG_DIR" \
+  --enable-fail-if-missing \
+  --prefix="$HOME/.myfs/usr/local" \
+  --with-local-dir="$HOME/.myfs/usr"
 
 make
 make install
@@ -189,11 +194,11 @@ cd $previous_dir
 
 ### Check if vim is now installed to .myfs
 if [[ $(which vim | grep myfs | wc -l) -ge 1 ]]; then
-    ### Now that vim is installed, let's download vundle plugins
-    echo -e "${GRE}Vim installed; now re-downloading vundle plugins${WHI}"
-    _install_vundle_plugins
+  ### Now that vim is installed, let's download vundle plugins
+  echo -e "${GRE}Vim installed; now re-downloading vundle plugins${WHI}"
+  _install_vundle_plugins
 else
-    echo -e """${RED}
+  echo -e """${RED}
     Vim is not installed. Something must have gone wrong.
     ${WHI}"""
 fi
