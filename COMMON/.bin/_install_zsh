@@ -2,8 +2,10 @@
 
 previous_dir=$PWD
 
-### Install ncurses
+### If sudo user, install all dependencies
+_install_build_dependencies
 
+### Install ncurses
 if [[ $1 == '--with-ncurses' ]]; then
   echo "Installing ncurses to .myfs"
   sleep 2

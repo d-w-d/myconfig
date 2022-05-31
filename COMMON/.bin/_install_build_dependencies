@@ -1,0 +1,38 @@
+#! /bin/bash
+#
+# If sudo user, install stuff needed for vim, tmux and zsh
+
+### If sudo user, install all dependencies
+if _is_user_sudoer; then
+  echo -e """
+    You have sudo permissions; let's use them to install dependencies for vim!
+    """
+  sleep 1
+  sudo apt update -y
+  sudo apt upgrade -y
+  sudo apt install -y build-essential \
+    man \
+    manpages-dev \
+    git \
+    curl \
+    cmake \
+    python \
+    python3 \
+    python-dev \
+    python3-dev \
+    python3-pip \
+    libx11-6 \
+    libx11-dev \
+    libxtst-dev \
+    libxt-dev \
+    libsm-dev \
+    libevent-dev \
+    libncurses5-dev \
+    libncurses5 \
+    libxpm-dev
+else
+  echo -e """
+    You do not have sudo permissions; let's just hope that this machine has all of the prerequisite libraries!
+    """
+  sleep 1
+fi
