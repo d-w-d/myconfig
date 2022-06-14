@@ -15,6 +15,9 @@ alias alclear="clear && printf '\e[3J'"
 alias aldu="du -hsc ./* ./.* 2> /dev/null"
 alias klear="clear && printf '\e[3J'"
 alias kl="clear && printf '\e[3J'"
+
+alias alangularcompletion="source <(ng completion script)"
+
 alias alhttpserver='http-server'
 alias alimgcat='~/.local/bin/imgcat --height 10' # For imgcat installed with
 # `pip3 install --user imgcat`

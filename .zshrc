@@ -166,3 +166,7 @@ bindkey "^[[1;5B" down-line-or-history  # [CTRL] + Cursor down
 
 
 #echo "Sourced zshrc"
+
+
+# Load Angular CLI autocompletion.
+# source <(ng completion script)
