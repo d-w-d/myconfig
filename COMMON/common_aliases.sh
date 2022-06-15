@@ -24,6 +24,7 @@ alias alimgcat='~/.local/bin/imgcat --height 10' # For imgcat installed with
 alias alipaddress="curl http://ipecho.net/plain; echo"
 alias aljs='cd ~/work/javascript'
 alias allocaltunnel='lt' ### Use e.g. --port 8080
+alias alneighbours="ip neigh | awk '{ print $1 }' | xargs -n1 host"
 alias alnpmconfigsetignorescripts="printf '\n\n This alias must be followed by true or false! \n\n';npm config set ignore-scripts"
 alias alnvm="source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh"
 alias alpasswordgen=$'echo $(($(date '+%s') * $RANDOM))  | sha256sum | base64 | head -c 32 ; echo'
