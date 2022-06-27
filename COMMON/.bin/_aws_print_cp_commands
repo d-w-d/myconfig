@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Simple script to remind syntax for copying to/from S3 bucket
+
+echo -e """${GRE}
+=============================================================================
+${BLU}List Buckets: ${GRE}aws s3 ls
+${BLU}Copy To:      ${GRE}aws s3 cp ${WHI}file ${CYA}s3://bucket/ext${GRE} --recursive --acl public-read
+${BLU}Copy From:    ${GRE}aws s3 cp ${CYA}s3://bucket/ext ${WHI}file${GRE} --recursive --acl public-read
+=============================================================================
+${WHI}
+"""

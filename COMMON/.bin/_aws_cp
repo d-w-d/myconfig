@@ -2,11 +2,190 @@
 #
 # Simple script to remind syntax for copying to/from S3 bucket
 
-echo -e """${GRE}
+#######################################
+# Print usage
+# Globals:
+#   None
+# Arguments:
+#   None
+#######################################
+function _usage() {
+  echo -e """${WHI}
+This is a wrapper around \`aws s3\` to quickly upload files/dirs to an S3 bucket.
+It assumes you have a bucket prepared with a bucket policy allowing public access
+to all objects in the bucket.
+${GRE}
 =============================================================================
-${BLU}List Buckets: ${GRE}aws s3 ls
-${BLU}Copy To:      ${GRE}aws s3 cp ${WHI}file ${CYA}s3://bucket/ext${GRE} --recursive --acl public-read
-${BLU}Copy From:    ${GRE}aws s3 cp ${CYA}s3://bucket/ext ${WHI}file${GRE} --recursive --acl public-read
+${BLU}_aws_cp ls                          ${GRE}List buckets
+${BLU}_aws_cp put FILE/DIR BUCKET[/ext]   ${GRE}Put file/dir into bucket
+${BLU}_aws_cp get FILE/DIR BUCKET[/ext]   ${GRE}Get file/dir from bucket
 =============================================================================
 ${WHI}
 """
+}
+
+#######################################
+# Print available buckets
+# Globals:
+#   None
+# Arguments:
+#   None
+#######################################
+function _ls() {
+  aws s3 ls
+}
+
+#######################################
+# Check that bucket exists for
+# these AWS credentials
+# Globals:
+#   None
+# Arguments:
+#   $1 = bucket to check if exists
+#######################################
+function _does_bucket_exist() {
+  local bucket=$1
+  if [[ ! "$bucket" ]]; then
+    echo -e "${RED}no arg passed to _is_bucket_ext${WHI}"
+    return 1
+  fi
+  aws s3 ls $bucket 1>/dev/null 2>&1
+  return $?
+}
+
+#######################################
+# Print available buckets
+# Globals:
+#   None
+# Arguments:
+#   $1: file/dir to copy to S3
+#   $2 = bucket/ext to copy to
+#######################################
+function _put() {
+  ### Local params
+  local source=$1
+  local target=$2
+
+  ### Check args aren't null
+  if [[ -z $source || -z $target ]]; then
+    echo "_put must have 2 args"
+    return 1
+  fi
+
+  ### Make sure $source is a file or dir
+  if [[ ! -f "$source" ]] && [[ ! -d "$source" ]]; then
+    echo -e """${RED}
+      $source is not a file or a dir!
+    ${WHI}"""
+    return 1
+  fi
+
+  ### Throw error if target ends in '/'
+  if [[ $(echo "$target" | sed "s|/$|xxx|g") != $target ]]; then
+    echo -e """${RED}
+      Do not terminate your target string with a "/" symbol!
+    """
+    return 1
+  fi
+
+  ### Throw error if source has a '/' in it
+  if [[ $(echo "$source" | sed "s|/|xxx|g") != $source ]]; then
+    echo -e """${RED}
+      Your source '$source' cannot have a '/' in it!
+      Only copy a simple file or dir from your PWD!
+    """
+    return 1
+  fi
+
+  ### Decompose $target into bucket and extens(ions) variables
+  local bucket=$(echo "$target" | sed 's@/.*@@')
+  local extens=$(echo "$target" | sed 's@[^/]*@@')
+
+  ### Check bucket exists
+  if ! _does_bucket_exist $bucket; then
+    echo -e "${RED}Bucket/ext '$bucket' does not exist for these credentials${WHI}"
+    return 1
+  fi
+
+  ### If extens is not null...
+  if [[ "$extens" ]]; then
+    ### ...check that the extension is a directory
+    if [[ $(aws s3 ls "${bucket}${extens}" | grep PRE | wc -l) -eq 0 ]]; then
+      echo -e """${RED}
+        ${WHI}\"${extens}\"${RED} is not a folder in the S3 bucket ${WHI}\"${bucket}\"${RED}
+        Use ${WHI}aws s3 ls s3://$bucket${RED} command to find a dir to upload to
+        or put your file into a dir and upload that.
+
+        Note that _aws_cp will not rename an uploaded file, so you can only
+        specify a folder to upload your already named local file/dir!
+      ${WHI}"""
+      return 1
+    fi
+  fi
+
+  ### Default result_code
+  result_code=1
+
+  ### If $source is a file
+  if [[ -f $source ]]; then
+    ### Try uploading
+    cmd="aws s3 cp $source s3://$target/"
+    echo -e "${BLU}Running: ${cmd}${WHI}"
+    exec $cmd
+    result_code=$?
+  fi
+
+  ### If $source is a dir
+  if [[ -d $source ]]; then
+    ### Try uploading
+    cmd="aws s3 cp --recursive $source s3://$target/$source"
+    echo -e "${BLU}Running: ${cmd}${WHI}"
+    exec $cmd
+    result_code=$?
+  fi
+
+  ### Print result
+  if [[ result_code -eq 0 ]]; then
+    local new_route="https://$bucket.s3.amazonaws.com${extens}/${source}"
+    echo -e "${GRE}Success! Try:${CYA} ${new_route} ${WHI}"
+  else
+    echo -e """${RED}
+        Hmmmm... sth went wrong!
+      ${WHI}"""
+  fi
+}
+
+main() {
+  ### Handle no args
+  if [[ $# -eq 0 ]]; then
+    _usage
+    return 1
+  fi
+
+  ### Get 1st arg and shift
+  cmd=$1
+  shift
+
+  ### Branch logic
+  case $cmd in
+  ls)
+    _ls
+    ;;
+  put)
+    ### Get 2nd arg and shift
+    if [[ ! "$1" || ! "$2" ]]; then
+      echo -e "${RED}put requires two args: FILE/DIR BUCKET[/ext]${WHI}"
+      return 1
+    fi
+    _put $1 $2
+    ;;
+  *)
+    echo >&2 "Invalid option: $@"
+    _usage
+    return 1
+    ;;
+  esac
+}
+
+### Execute main with all arguments passed to script
+main "$@"
