@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Simple script to remind syntax for copying to/from S3 bucket
+# Wraps aws s3 commands for fast uploads of files/dir with web optimizations, etc.
 
 #######################################
 # Print usage
@@ -13,14 +13,25 @@ function _usage() {
   echo -e """${WHI}
 This is a wrapper around \`aws s3\` to quickly upload files/dirs to an S3 bucket.
 It assumes you have a bucket prepared with a bucket policy allowing public access
-to all objects in the bucket.
+to all objects in the bucket. It does not set ACL permissions.
+
+All html files are first copied, renamed (e.g. index.html -> index) and both
+are uploaded into order to faciliate SPA routing.
+
+All media files are first gzip-ed before uploading with headers for efficient serving.
 ${GRE}
 =============================================================================
-${BLU}_aws_cp ls                          ${GRE}List buckets
-${BLU}_aws_cp put FILE/DIR BUCKET[/ext]   ${GRE}Put file/dir into bucket
-${BLU}_aws_cp get FILE/DIR BUCKET[/ext]   ${GRE}Get file/dir from bucket
-=============================================================================
-${WHI}
+${BLU}_aws_cp ls   ${WHI}                 ${GRE}List buckets
+-----------
+${BLU}_aws_cp put  ${WHI}FILE BUCKET      ${GRE}Put file into BUCKET (root folder)
+${BLU}_aws_cp put  ${WHI}FILE BUCKET/A    ${GRE}Put file into folder A in BUCKET
+${BLU}_aws_cp put  ${WHI}DIR BUCKET       ${GRE}Put contents of DIR into BUCKET (root folder)
+${BLU}_aws_cp put  ${WHI}DIR BUCKET/A     ${GRE}Put contents of DIR into folder A in BUCKET
+${BLU}_aws_cp put  ${WHI}DIR BUCKET/A/DIR ${GRE}Put DIR into folder A in BUCKET
+-----------
+${BLU}_aws_cp get  ${WHI}BUCKET/A/DIR     ${GRE}Get: to be implemented
+${BLU}_aws_cp sync ${WHI}BUCKET/A/DIR     ${GRE}Get: to be implemented
+=============================================================================${WHI}
 """
 }
 
@@ -54,17 +65,19 @@ function _does_bucket_exist() {
 }
 
 #######################################
-# Print available buckets
+# cp file or dir to folder within bucket
 # Globals:
 #   None
 # Arguments:
-#   $1: file/dir to copy to S3
+#   $1: file or dir to copy to S3
 #   $2 = bucket/ext to copy to
 #######################################
 function _put() {
+
   ### Local params
   local source=$1
   local target=$2
+  local result_code=1
 
   ### Check args aren't null
   if [[ -z $source || -z $target ]]; then
@@ -74,26 +87,19 @@ function _put() {
 
   ### Make sure $source is a file or dir
   if [[ ! -f "$source" ]] && [[ ! -d "$source" ]]; then
-    echo -e """${RED}
-      $source is not a file or a dir!
-    ${WHI}"""
+    echo -e "${RED} $source is not a file or a dir! ${WHI}"
     return 1
   fi
 
   ### Throw error if target ends in '/'
   if [[ $(echo "$target" | sed "s|/$|xxx|g") != $target ]]; then
-    echo -e """${RED}
-      Do not terminate your target string with a "/" symbol!
-    """
+    echo -e "${RED} Do not terminate your target string with a "/" symbol! "
     return 1
   fi
 
   ### Throw error if source has a '/' in it
   if [[ $(echo "$source" | sed "s|/|xxx|g") != $source ]]; then
-    echo -e """${RED}
-      Your source '$source' cannot have a '/' in it!
-      Only copy a simple file or dir from your PWD!
-    """
+    echo -e "${RED} Your source '$source' cannot have a '/' in it! Only copy a simple file or dir from your PWD!"
     return 1
   fi
 
@@ -107,25 +113,6 @@ function _put() {
     return 1
   fi
 
-  ### If extens is not null...
-  if [[ "$extens" ]]; then
-    ### ...check that the extension is a directory
-    if [[ $(aws s3 ls "${bucket}${extens}" | grep PRE | wc -l) -eq 0 ]]; then
-      echo -e """${RED}
-        ${WHI}\"${extens}\"${RED} is not a folder in the S3 bucket ${WHI}\"${bucket}\"${RED}
-        Use ${WHI}aws s3 ls s3://$bucket${RED} command to find a dir to upload to
-        or put your file into a dir and upload that.
-
-        Note that _aws_cp will not rename an uploaded file, so you can only
-        specify a folder to upload your already named local file/dir!
-      ${WHI}"""
-      return 1
-    fi
-  fi
-
-  ### Default result_code
-  result_code=1
-
   ### If $source is a file
   if [[ -f $source ]]; then
     ### Try uploading
@@ -133,26 +120,85 @@ function _put() {
     echo -e "${BLU}Running: ${cmd}${WHI}"
     exec $cmd
     result_code=$?
+    ### Print result
+    if [[ result_code -eq 0 ]]; then
+      local new_route="https://$bucket.s3.amazonaws.com${extens}${source}"
+      echo -e """${GRE}
+      Success! Try: ${CYA}https://$bucket.s3.amazonaws.com${extens}${source}
+      ${WHI}"""
+    else
+      echo -e "${RED} Hmmmm... sth went wrong uploading file ${source}!${WHI}"
+      return 1
+    fi
   fi
 
   ### If $source is a dir
   if [[ -d $source ]]; then
-    ### Try uploading
-    cmd="aws s3 cp --recursive $source s3://$target/$source"
-    echo -e "${BLU}Running: ${cmd}${WHI}"
-    exec $cmd
+    ### Basic recursive upload
+    echo -e "${MAG}>>> STEP 1: Basic-recursive upload:${WHI}"
+    cmd="aws s3 cp --recursive $source s3://${bucket}${extens}"
+    echo -e "${BLU}>>> ${cmd}${WHI}"
+    bash -c "$cmd" 1>/dev/null
     result_code=$?
+    if [[ $result_code -ne 0 ]]; then
+      echo -e "${RED}Initial upload unsuccessful${WHI}"
+      return 1
+    fi
+
+    ### Create copy of each html file without extension and upload
+    echo -e "${MAG}>>> STEP 2: HTML-sans-extension copy:${WHI}"
+    declare -a html_files=($(find $source -type f -name "*.html"))
+    for html_file in "${html_files[@]}"; do
+      local html_file_sans_ext="${html_file%.*}"
+      local relative_path_to_file=${html_file_sans_ext#./}
+      cp $html_file $html_file_sans_ext
+      cmd="aws s3 cp --content-type \"text/html\" $html_file_sans_ext s3://${target}/${relative_path_to_file}"
+      echo -e "${BLU}>>> ${cmd}${WHI}"
+      bash -c "$cmd" 1>/dev/null
+      result_code=$?
+      if [[ $result_code -ne 0 ]]; then
+        echo -e "${RED}HTML-twin upload unsuccessful${WHI}"
+        return 1
+      fi
+      rm $html_file_sans_ext
+    done
+
+    ### Find each image file and pass its path and mime type as args to_zip_and_upload_image_file
+    ### NOTE: you do NOT want to gzip mp4 files!
+    echo -e "${MAG}>>> STEP 3: Zipped-media copy:${WHI}"
+    declare -a media_files=(
+      $(
+        find . -type f |
+          xargs file --mime-type |
+          grep -E "image\/" |
+          tr -s ' ' |
+          sed 's/://g' |
+          cut -d' ' -f1
+      )
+    )
+    for media_file in "${media_files[@]}"; do
+      local mime_type=$(file --mime-type $media_file | cut -d' ' -f2)
+      ### zip file
+      gzip -kf9 $media_file
+      local path_to_zipped_file="$media_file.gz"
+      ### Upload zipped file to S3
+      local relative_path_to_file=${media_file##.}
+      cmd="aws s3 cp --content-type \"${mime_type}\" --content-encoding \"gzip\" ${path_to_zipped_file} s3://${target}${relative_path_to_file}"
+      echo -e "${BLU}>>> ${cmd}${WHI}"
+      bash -c "$cmd" 1>/dev/null
+      result_code=$?
+      if [[ $result_code -ne 0 ]]; then
+        echo -e "${RED}Zipped-file upload unsuccessful${WHI}"
+        return 1
+      fi
+      rm $path_to_zipped_file
+    done
+
+    ### Print final message
+    local new_route="https://$bucket.s3.amazonaws.com${extens}"
+    echo -e "${GRE}Success! Try:${CYA} ${new_route} ${WHI}"
   fi
 
-  ### Print result
-  if [[ result_code -eq 0 ]]; then
-    local new_route="https://$bucket.s3.amazonaws.com${extens}/${source}"
-    echo -e "${GRE}Success! Try:${CYA} ${new_route} ${WHI}"
-  else
-    echo -e """${RED}
-        Hmmmm... sth went wrong!
-      ${WHI}"""
-  fi
 }
 
 main() {
@@ -163,11 +209,14 @@ main() {
   fi
 
   ### Get 1st arg and shift
-  cmd=$1
+  option=$1
   shift
 
   ### Branch logic
-  case $cmd in
+  case $option in
+  help | --help)
+    _usage
+    ;;
   ls)
     _ls
     ;;
@@ -180,7 +229,7 @@ main() {
     _put $1 $2
     ;;
   *)
-    echo >&2 "Invalid option: $@"
+    echo >&2 "Invalid option: \"${option}\""
     _usage
     return 1
     ;;
