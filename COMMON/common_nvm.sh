@@ -1,17 +1,8 @@
 #!/usr/bin/env false
 
-### Make sure functions are sourced
-MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}
-source $MYCONFIG_ROOT_DIR/COMMON/common_functions.sh
+if [[ ! -d ~/.zsh-nvm ]]; then
+  git clone https://github.com/lukechilds/zsh-nvm.git ~/.zsh-nvm
+fi
 
-##################################################
-# Source this file via alias 'alnvm'
-##################################################
-
-[ ! $ZSH_VERSION ] && echo "INITIALIZING NVM"
-export NVM_DIR="$HOME/.nvm"
-
-source "$NVM_DIR"/nvm.sh
-
-# Add node executables globally installed by nvm-enables npm
-export PATH="$PATH:$NVM_BIN"
+# Source zsh plugin even if we are using bash!
+source ~/.zsh-nvm/zsh-nvm.plugin.zsh

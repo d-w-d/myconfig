@@ -34,6 +34,7 @@ alias aldockermongo="clear; printf '\n\n Starting temp mongod server. Connect mo
 
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
+alias alsudovim="sudo -E $(which vim)"
 alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2015\",\"dom\"]}"'
 alias alwork='cd ~/work'
 
