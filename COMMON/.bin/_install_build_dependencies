@@ -43,8 +43,10 @@ fi
 if [[ ! -d ~/.nvm ]]; then
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
   _replace_dotrc_files
-  # Make sure a version of node is installed
-  if ! [ -x "$(command -v node)" ]; then
-    nvm install 18
-  fi
+fi
+
+# Make sure a version of node is installed
+if ! [ -x "$(command -v node)" ]; then
+  source ~/.myconfig/COMMON/common_nvm.sh
+  nvm install 18
 fi
