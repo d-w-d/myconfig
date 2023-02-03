@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-### Replace .rc config files
-sleep 3
-echo -e """${RED}
+if _is_myconfig_fully_installed; then
+
+  ### Replace .rc config files
+  sleep 3
+  echo -e """${RED}
     ========
     WARNING!
     ========
@@ -17,22 +19,24 @@ echo -e """${RED}
 
     ${WHI}"""
 
-### Move old config files to myconfig/redundant
-[[ ! -d $HOME/.myconfig/redundant ]] && mkdir $HOME/.myconfig/redundant
-[[ -f $HOME/.bashrc ]] &&
+  ### Move old config files to myconfig/redundant
+  [[ ! -d $HOME/.myconfig/redundant ]] && mkdir $HOME/.myconfig/redundant
+  [[ -f $HOME/.bashrc ]] &&
     mv $HOME/.bashrc $HOME/.myconfig/redundant/.bashrc-original
-[[ -f $HOME/.p10k.zsh ]] &&
+  [[ -f $HOME/.p10k.zsh ]] &&
     mv $HOME/.p10k.zsh $HOME/.myconfig/redundant/.p10k.zsh-original
-[[ -f $HOME/.tmux.conf ]] &&
+  [[ -f $HOME/.tmux.conf ]] &&
     mv $HOME/.tmux.conf $HOME/.myconfig/redundant/.tmux.conf-original
-[[ -f $HOME/.vimrc ]] &&
+  [[ -f $HOME/.vimrc ]] &&
     mv $HOME/.vimrc $HOME/.myconfig/redundant/.vimrc-original
-[[ -f $HOME/.zshrc ]] &&
+  [[ -f $HOME/.zshrc ]] &&
     mv $HOME/.zshrc $HOME/.myconfig/redundant/.zshrc-original
 
-### Create symlinks from myconfig to ~
-ln -s $HOME/.myconfig/.bashrc $HOME/.bashrc
-ln -s $HOME/.myconfig/.p10k.zsh $HOME/.p10k.zsh
-ln -s $HOME/.myconfig/.tmux.conf $HOME/.tmux.conf
-ln -s $HOME/.myconfig/.vimrc $HOME/.vimrc
-ln -s $HOME/.myconfig/.zshrc $HOME/.zshrc
+  ### Create symlinks from myconfig to ~
+  ln -s $HOME/.myconfig/.bashrc $HOME/.bashrc
+  ln -s $HOME/.myconfig/.p10k.zsh $HOME/.p10k.zsh
+  ln -s $HOME/.myconfig/.tmux.conf $HOME/.tmux.conf
+  ln -s $HOME/.myconfig/.vimrc $HOME/.vimrc
+  ln -s $HOME/.myconfig/.zshrc $HOME/.zshrc
+
+fi

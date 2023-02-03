@@ -2,13 +2,6 @@
 
 if [ ! -x "$(command -v git)" ] && [ ! -x "$(command -v curl)" ] && _is_user_sudoer; then
   sudo apt install -y git curl
-else
-  sleep 10
-  echo -e """${RED}
-    WARNING! Missing git and/or curl so can't install nvm!
-    This might mess up your vim installation and/or operation
-    since it depends on npm for typescript etc.
-  ${WHI}"""
 fi
 
 if [ -x "$(command -v git)" ] && [ -x "$(command -v curl)" ]; then
