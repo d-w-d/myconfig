@@ -4,9 +4,9 @@
 
 ### If sudo user, install all dependencies
 if _is_user_sudoer; then
-  echo -e """
+  echo -e """${GRE}
     You have sudo permissions; let's use them to install dependencies for vim!
-    """
+    ${WHI}"""
   sleep 1
   sudo apt update -y
   sudo apt upgrade -y
@@ -37,16 +37,4 @@ else
     You do not have sudo permissions; let's just hope that this machine has all of the prerequisite libraries!
     """
   sleep 1
-fi
-
-# You'll also need to have npm installed for e.g. typescript in vim
-if [[ ! -d ~/.nvm ]]; then
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-  _replace_dotrc_files
-fi
-
-# Make sure a version of node is installed
-if ! [ -x "$(command -v node)" ]; then
-  source ~/.myconfig/COMMON/common_nvm.sh
-  nvm install 18
 fi
