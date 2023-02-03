@@ -29,7 +29,8 @@ if _is_user_sudoer; then
     libevent-dev \
     libncurses5-dev \
     libncurses5 \
-    libxpm-dev
+    libxpm-dev \
+    bison
 
 else
 
