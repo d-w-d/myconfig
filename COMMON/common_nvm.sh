@@ -10,9 +10,6 @@ if [ -x "$(command -v git)" ] && [ -x "$(command -v curl)" ]; then
   if [[ ! -d ~/.nvm ]]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
     _replace_dotrc_files
-  else
-    cd ~/.nvm
-    git pull
   fi
 
   # Enables nvm
