@@ -30,9 +30,21 @@ if _is_user_sudoer; then
     libncurses5-dev \
     libncurses5 \
     libxpm-dev
+
 else
+
   echo -e """
     You do not have sudo permissions; let's just hope that this machine has all of the prerequisite libraries!
     """
   sleep 1
+fi
+
+# You'll also need to have npm installed for e.g. typescript in vim
+if [[ ! -d ~/.nvm ]]; then
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+  _replace_dotrc_files
+  # Make sure a version of node is installed
+  if ! [ -x "$(command -v node)" ]; then
+    nvm install 18
+  fi
 fi
