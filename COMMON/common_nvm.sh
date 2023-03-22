@@ -18,7 +18,7 @@ if [ -x "$(command -v git)" ] && [ -x "$(command -v curl)" ]; then
 
   # Make sure a version of node is installed
   if ! [ -x "$(command -v node)" ]; then
-    nvm install 18
+    nvm install 18 2>/dev/null 1>&2
   fi
 
 fi
