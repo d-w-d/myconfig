@@ -35,7 +35,7 @@ alias aldockermongo="clear; printf '\n\n Starting temp mongod server. Connect mo
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
 alias alsudovim="sudo -E $(which vim)"
-alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2015\",\"dom\"]}"'
+alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2021\",\"dom\"]}"'
 alias alwork='cd ~/work'
 
 ### open vim easily with sudo
@@ -47,5 +47,4 @@ alias gitlog="printf '\n\nAlias: git log --oneline\n\n' && git log --oneline"
 alias gitl="printf '\n\nAlias: git log --oneline\n\n' && git log --oneline"
 alias gits="printf '\n\nAlias: git status\n\n' && git status"
 alias gitb="printf '\n\nAlias: git branch\n\n' && git branch"
-alias gitbs="printf '\n\nAlias: git branch && git status\n\n' && git branch && printf '\n' && git status"
-alias gitc="printf '\n\nAlias: git checkout\n\n' && git checkout"
+alias gitdateofcommit="printf '\n\nAlias: git show -s --format=%ci <commit>\n\n' && git show -s --format=%ci "
