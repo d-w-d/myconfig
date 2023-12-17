@@ -169,4 +169,4 @@ bindkey "^[[1;5B" down-line-or-history  # [CTRL] + Cursor down
 # Load Angular CLI autocompletion.
 # source <(ng completion script)
 
-source /Users/dwd/.docker/init-zsh.sh || true # Added by Docker Desktop
+#source /Users/dwd/.docker/init-zsh.sh || true # Added by Docker Desktop

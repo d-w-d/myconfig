@@ -13,18 +13,20 @@ colorscheme torte
 "let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
 let g:ycm_global_ycm_extra_conf = '~/.myconfig/.ycm_extra_conf.py'
 
+
 "==================================================
-" Begin Vundle Setup
+" BEGIN VUNDLE SETUP
 "==================================================
+"
 " Initiate plugins first in order to call functions,
 " variables, etc. later
 " See: https://github.com/VundleVim/Vundle.vim for setup instructions
 "
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " DO NOT EDIT:
-set nocompatible                    " required
-filetype off                        " required
-set rtp+=~/.vim/bundle/Vundle.vim   " set the runtime path to include Vundle and initialize
+set nocompatible                    " REQUIRED
+filetype off                        " REQUIRED
+set rtp+=~/.vim/bundle/Vundle.vim   " SET THE RUNTIME PATH TO INCLUDE VUNDLE AND INITIALIZE
 call vundle#begin()
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " EDIT:
@@ -52,11 +54,11 @@ Plugin 'maksimr/vim-jsbeautify'                                     " format js-
 call vundle#end()            " required
 filetype plugin indent on    " required
 "==================================================
-" End Vundle setup
+" END VUNDLE SETUP
 "==================================================
 
 "==================================================
-" Post-Plugin Misc settings
+" POST-PLUGIN MISC SETTINGS
 "==================================================
 
 let g:oscyank_max_length = 1000000
@@ -67,52 +69,52 @@ let g:ctrlp_show_hidden = 1         " Have ctrlP find hidden files
 
 "==================================================
 "==================================================
-" Shortcuts
+" SHORTCUTS
 "==================================================
 "==================================================
 
 "==================================================
-" Non-Leader Shortcuts
+" NON-LEADER SHORTCUTS
 "================================================
 
-" Find and select next occurance of yanked content
+" FIND AND SELECT NEXT OCCURANCE OF YANKED CONTENT
 noremap ff <ESC>:let @/=@*<CR><ESC>wgn
 noremap FF <ESC>:let @/=@*<CR><ESC>bbgN
 
-" Shortcut to autoformat the doc
+" SHORTCUT TO AUTOFORMAT THE DOC
 noremap <C-f> :Autoformat<CR>
 
-" Make Y behave similarly to C and D
+" MAKE Y BEHAVE SIMILARLY TO C AND D
 noremap Y y$
 
-" Overwrite: "CTRL-A    2    add N to number at/after cursor"
+" OVERWRITE: "CTRL-A    2    ADD N TO NUMBER AT/AFTER CURSOR"
 "map <C-a> ^
 imap <C-a> <ESC>I
-" Overwrite: "CTRL-E         scroll N lines upwards (N lines Extra)"
+" OVERWRITE: "CTRL-E         SCROLL N LINES UPWARDS (N LINES EXTRA)"
 "map <C-e> g_
 imap <C-e> <ESC>A
 
-" Fast switching between modes
+" FAST SWITCHING BETWEEN MODES
 imap kj <Esc>
 imap <C-i> <Esc>l
 imap <C-n> <Esc>l
 
-" Faster scrolling with shift
+" FASTER SCROLLING WITH SHIFT
 noremap <S-j> 3jzz
 noremap <S-k> 3kzz
 noremap <S-h> b
 noremap <S-l> w
 vnoremap <S-l> e
 
-" Enables up/down on single-wrapped lines whilst preserving standard jumpto
-" See: https://stackoverflow.com/a/21000307/8620332
+" ENABLES UP/DOWN ON SINGLE-WRAPPED LINES WHILST PRESERVING STANDARD JUMPTO
+" SEE: HTTPS://STACKOVERFLOW.COM/A/21000307/8620332
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 
-" Select all file
+" SELECT ALL FILE
 nmap VV ggVG
 
-" Move around in command and insert mode with CTRL-hjkl
+" MOVE AROUND IN COMMAND AND INSERT MODE WITH CTRL-HJKL
 inoremap <C-h> <ESC>i
 inoremap <C-j> <ESC>ja
 inoremap <C-k> <ESC>ka
@@ -123,85 +125,84 @@ cnoremap <C-k> <ESC>ka
 cnoremap <C-l> <ESC>la
 
 "==================================================
-" Leader Shortcuts
+" LEADER SHORTCUTS
 "==================================================
 
-" Enable easy surrounding of selected text with brackets
+" ENABLE EASY SURROUNDING OF SELECTED TEXT WITH BRACKETS
 vnoremap <Leader>[  c[]<Esc>P
 vnoremap <Leader>(  c()<Esc>P
 vnoremap <Leader>{  c{}<Esc>P
 
-" Leader+f in visual mode will cause
+" LEADER+F IN VISUAL MODE WILL CAUSE
 vnoremap <Leader>f :s/\%Vfoo\%V/bar/gc
 
-" When you want to replace lots of instances of the last item you searched for
-" then call this
+" WHEN YOU WANT TO REPLACE LOTS OF INSTANCES OF THE LAST ITEM YOU SEARCHED FOR
+" THEN CALL THIS
 noremap <Leader>sub :%s//new-string/gc
 
 
-" Jump to beginning/end of line
+" JUMP TO BEGINNING/END OF LINE
 noremap <Leader>b ^
 vnoremap <Leader>e $h
 nnoremap <Leader>e $
 
-" Toggle file-tree display; crudely set menu to width 20
-" This might well lead to crap results if we have multiple splits
+" TOGGLE FILE-TREE DISPLAY; CRUDELY SET MENU TO WIDTH 20
+" THIS MIGHT WELL LEAD TO CRAP RESULTS IF WE HAVE MULTIPLE SPLITS
 map <Leader>n :NERDTreeToggle <bar> vertical resize 20<CR>
 
-" More-Width-in-present-window shortcut
+" MORE-WIDTH-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>mw :vertical resize +2<cr>
-" Much-More-Width-in-present-window shortcut
+" MUCH-MORE-WIDTH-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>mmw :vertical resize +10<cr>
-" Less-Width-in-present-window shortcut
+" LESS-WIDTH-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>lw :vertical resize -2<cr>
-" Much-Less-Width-in-present-window shortcut
+" MUCH-LESS-WIDTH-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>mlw :vertical resize -10<cr>
-" More-Height-in-present-window shortcut
+" MORE-HEIGHT-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>mh :resize +2<cr>
-" Much-More-Height-in-present-window shortcut
+" MUCH-MORE-HEIGHT-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>mmh :resize +10<cr>
-" Less-Height-in-present-window shortcut
+" LESS-HEIGHT-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>lh :resize -2<cr>
-" Much-Less-Height-in-present-window shortcut
+" MUCH-LESS-HEIGHT-IN-PRESENT-WINDOW SHORTCUT
 nmap <Leader>mlh :resize -10<cr>
-" Fancy paste text onto line below/above
+" FANCY PASTE TEXT ONTO LINE BELOW/ABOVE
 nnoremap <leader>p m`o<ESC>p``
 nnoremap <leader>P m`O<ESC>p``
 
-" Emmet shortcut
-"noremap <C-Space> <C-y>,
+" EMMET SHORTCUT
+" NOREMAP <C-SPACE> <C-Y>,
 map <NUL> <C-y>,
 imap <NUL> <C-y>,
 "map <Leader>e <C-y>,
 "noremap <Leader>g viw
 
-" Toggle relative numbering
+" TOGGLE RELATIVE NUMBERING
 nmap <Leader>nu :set rnu! <cr>
-" Toggle absolute numbering
+" TOGGLE ABSOLUTE NUMBERING
 nmap <Leader>rnu :set nu! <cr>
 
-" Replacement for J = Join
+" REPLACEMENT FOR J = JOIN
 vmap <Leader>j :join!<CR>
 
-" Make color scheme light
+" MAKE COLOR SCHEME LIGHT
 nmap <Leader>l :colorscheme morning<CR>
-" Make color scheme light
+" MAKE COLOR SCHEME LIGHT
 nmap <Leader>d :colorscheme desert<CR>
 
-" Toggle line commenting; see: https://github.com/preservim/nerdcommenter
+" TOGGLE LINE COMMENTING; SEE: HTTPS://GITHUB.COM/PRESERVIM/NERDCOMMENTER
 nmap <Leader>/ <Leader>c<Space>
 vmap <Leader>/ <Leader>c<Space>
 
-" Enable folding with the spacebar; maps to binding given by symplfold plugin
+" ENABLE FOLDING WITH THE SPACEBAR; MAPS TO BINDING GIVEN BY SYMPLFOLD PLUGIN
 nnoremap <Leader>f za
 
-" DEPRECATED way of getting content into clipboard
-" Copy content of working registers to local clipboard
-" This function is provided by Plugin fcpg/vim-osc52
-"noremap <Leader>c :call SendViaOSC52(getreg('"*'))<CR>
 "
-"New approach to yanking content into clipboard uses this library:
-"https://github.com/ojroques/vim-oscyank
+" WORKING APPROACH TO YANKING CONTENT INTO CLIPBOARD USES THIS LIBRARY:
+" https://github.com/ojroques/vim-oscyank
+" NOTE: Sep 2023: a breaking change was introduced;
+"       I had to go to ~/.vim/bundle/vim-oscyank and run:
+"       `sudo git checkout v1.0.0`  to get it to work again!
 noremap <Leader>c :OSCYankReg + <CR>
 
 
