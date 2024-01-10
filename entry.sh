@@ -3,7 +3,7 @@
 # Library to expose myconfig tools to current shell
 
 ### Variables to be cleaned up at end
-is_verbose=false
+is_verbose=true
 
 ### Inherit $MYCONFIG_ROOT_DIR from parent script, else use default location
 MYCONFIG_ROOT_DIR=${MYCONFIG_ROOT_DIR:-"$HOME/.myconfig"}

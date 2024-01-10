@@ -16,9 +16,10 @@ cd $HOME
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 sleep 3
 
-cd $HOME
-git clone https://github.com/lukechilds/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
-sleep 3
+### Dont install via zsh -- what if you want to use it from a bash shell?!
+# cd $HOME
+# git clone https://github.com/lukechilds/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
+# sleep 3
 
 ### install powerlevel10k
 cd $HOME

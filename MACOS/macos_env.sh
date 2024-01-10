@@ -25,13 +25,7 @@ export PATH="$PATH:/usr/local/opt/binutils/bin"
 # Install openjdk versions via homebrew:
 # Latest:    brew install openjdk
 # Versioned: brew install openjdk@11
-# These will then be located at e.g.:
-# /usr/local/Cellar/openjdk@11/11.0.12/libexec/openjdk.jdk/Contents/Home
-# ... and you'll need to set the following variables accordingly
-export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
-export JAVA_11_HOME="/usr/local/Cellar/openjdk@11/11.0.12/libexec/openjdk.jdk/Contents/Home"
-export JAVA_18_HOME="/usr/local/Cellar/openjdk/18.0.1/libexec/openjdk.jdk/Contents/Home"
-export JAVA_HOME=$JAVA_18_HOME
+export JAVA_HOME="/opt/homebrew/Cellar/openjdk/21.0.1/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$PATH"
 
 ### PHP Attempt

@@ -16,9 +16,4 @@ if [ -x "$(command -v git)" ] && [ -x "$(command -v curl)" ]; then
   export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-  # Make sure a version of node is installed
-  if ! [ -x "$(command -v node)" ]; then
-    nvm install 18 2>/dev/null 1>&2
-  fi
-
 fi

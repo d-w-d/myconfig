@@ -27,7 +27,9 @@ function _install_usage() {
   msg+="${CYA}self        ${WHI}Permanently install myconfig to ~/.myconfig${WHI}\n"
   msg+="${CYA}vim         ${WHI}Install vim 8.2 from source${WHI}\n"
   msg+="${CYA}tmux        ${WHI}Install tmux 3.1b from source${WHI}\n"
-  msg+="${CYA}zsh         ${WHI}Install zsh 5.7.1 from source${WHI}\n"
+  msg+="${CYA}zsh         ${WHI}Install zsh 5.9+ from source${WHI}\n"
+  msg+="${CYA}ohmyzsh     ${WHI}Install ohmyzsh from source${WHI}\n"
+  msg+="${CYA}p10k        ${WHI}Install p10k from source${WHI}\n"
   msg+="${CYA}all         ${WHI}Install zsh, npm, vim & tmux${WHI}\n"
   echo -e "$msg"
 }
@@ -243,6 +245,17 @@ main() {
         "zsh")
           if _is_myconfig_fully_installed; then
             _install_zsh
+          else
+            local msg=""
+            msg+="${RED}You must fully install myconfig ${WHI}"
+            msg+="${RED}before installing zsh${WHI}"
+            echo -e "$msg"
+          fi
+          break
+          ;;
+        "ohmyzsh")
+          if _is_myconfig_fully_installed; then
+            _install_ohmyzsh
           else
             local msg=""
             msg+="${RED}You must fully install myconfig ${WHI}"
