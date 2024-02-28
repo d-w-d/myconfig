@@ -209,7 +209,7 @@ main() {
         "all")
           if _is_myconfig_fully_installed; then
             _install_zsh
-            nvm install 18
+            nvm install 20
             _install_vim
             _install_tmux
           else

@@ -38,9 +38,6 @@ alias alsudovim="sudo -E $(which vim)"
 alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2021\",\"dom\"]}"'
 alias alwork='cd ~/work'
 
-### open vim easily with sudo
-alias suvim="sudo -E $HOME/.myfs/usr/local/bin/vim"
-
 ### Git Shortcuts
 alias gac="git add . && git commit -a -m " ### Just add message
 alias gitlog="printf '\n\nAlias: git log --oneline\n\n' && git log --oneline"
@@ -48,3 +45,4 @@ alias gitl="printf '\n\nAlias: git log --oneline\n\n' && git log --oneline"
 alias gits="printf '\n\nAlias: git status\n\n' && git status"
 alias gitb="printf '\n\nAlias: git branch\n\n' && git branch"
 alias gitdateofcommit="printf '\n\nAlias: git show -s --format=%ci <commit>\n\n' && git show -s --format=%ci "
+alias gitcredentials="printf '\n\nAlias: git config --global user.name \"[name]\" and git config --global user.email \"[email address]\""

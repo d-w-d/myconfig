@@ -14,3 +14,5 @@ source $MYCONFIG_ROOT_DIR/COMMON/common_nvm.sh
 source $MYCONFIG_ROOT_DIR/COMMON/common_setup_scripts.sh
 source $MYCONFIG_ROOT_DIR/COMMON/common_shell_prompt.sh
 source $MYCONFIG_ROOT_DIR/COMMON/common_unaliases.sh
+source $MYCONFIG_ROOT_DIR/COMMON/common_usage_vim.sh
+source $MYCONFIG_ROOT_DIR/COMMON/common_usage_git.sh

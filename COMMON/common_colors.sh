@@ -1,6 +1,12 @@
 #!/usr/bin/env false
+#
+# Handy color definitions for terminal output
 
-### BLA, RED, GRE, YEL, BLU, MAG, CYA, WHI
+### Resets both font and background
+export RES="\033[0m"
+export RESET="\033[0m"
+
+### Sets FONT color for terminal output
 export BLA="\033[30m"
 export RED="\033[31m"
 export GRE="\033[32m"
@@ -9,3 +15,69 @@ export BLU="\033[34m"
 export MAG="\033[35m"
 export CYA="\033[36m"
 export WHI="\033[37m"
+export PIN="\033[38;5;213m"
+export GOL="\033[38;5;220m"
+
+export FBLA="\033[30m"
+export FRED="\033[31m"
+export FGRE="\033[32m"
+export FYEL="\033[33m"
+export FBLU="\033[34m"
+export FMAG="\033[35m"
+export FCYA="\033[36m"
+export FWHI="\033[37m"
+export FPIN="\033[38;5;213m"
+export FGOL="\033[38;5;220m"
+
+export BLACK="\033[30m"
+export RED="\033[31m"
+export GREEN="\033[32m"
+export YELLOW="\033[33m"
+export BLUE="\033[34m"
+export MAGENTA="\033[35m"
+export CYAN="\033[36m"
+export WHITE="\033[37m"
+export PINK="\033[38;5;213m"
+export GOLD="\033[38;5;220m"
+
+export FBLACK="\033[30m"
+export FRED="\033[31m"
+export FGREEN="\033[32m"
+export FYELLOW="\033[33m"
+export FBLUE="\033[34m"
+export FMAGENTA="\033[35m"
+export FCYAN="\033[36m"
+export FWHITE="\033[37m"
+export FPINK="\033[38;5;213m"
+export FGOLD="\033[38;5;220m"
+
+### Sets BACKGROUND color for terminal output
+export BBLA="\u001b[40m"
+export BRED="\u001b[41m"
+export BGRE="\u001b[42m"
+export BYEL="\u001b[43m"
+export BBLU="\u001b[44m"
+export BMAG="\u001b[45m"
+export BCYA="\u001b[46m"
+export BWHI="\u001b[47m"
+export BPIN="\u001b[48;5;213m"
+export BGOL="\u001b[48;5;220m"
+
+export BBLACK="\u001b[40m"
+export BRED="\u001b[41m"
+export BGREEN="\u001b[42m"
+export BYELLOW="\u001b[43m"
+export BBLUE="\u001b[44m"
+export BMAGENTA="\u001b[45m"
+export BCYAN="\u001b[46m"
+export BWHITE="\u001b[47m"
+export BPINK="\u001b[48;5;213m"
+export BGOLD="\u001b[48;5;220m"
+
+### Sets nice FONT_BACKGROUND combos
+export GOLD_BLUE="${FGOL}${BBLU}"
+export WHITE_BLACK="${FWHI}${BBLA}"
+export BLACK_WHITE="${FBLA}${BWHI}"
+export RED_CYAN="${FRED}${BCYA}"
+export GREEN_MAGENTA="${FGRE}${BMAG}"
+export RED_ORA="${FYEL}${BPUR}"

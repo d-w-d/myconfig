@@ -44,3 +44,9 @@ export CPPFLAGS="-I/usr/local/opt/icu4c/include"
 
 # For pkg-config to find icu4c you may need to set:
 export PKG_CONFIG_PATH="/usr/local/opt/icu4c/lib/pkgconfig"
+
+### Add coreutils from homebrew
+# export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+
+### Add mysql stuff from homebrew mysql-client
+# export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"

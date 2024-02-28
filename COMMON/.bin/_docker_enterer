@@ -7,7 +7,7 @@
 ### Params
 # Get dir this script is in (from https://stackoverflow.com/a/246128/8620332)
 THIS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-VERSION=0.5.0
+VERSION=0.5.2
 
 #######################################
 # Crude helper printout
@@ -19,7 +19,8 @@ function help() {
   echo -e """
     Usage:
     _docker_enterer           -   Search/enter running docker containers
-    _docker_enterer --update  -   Update script from github gist
+    _docker_enterer --sudo    -   Search/enter with sudo docker
+    _docker_enterer --update  -   Update script from github gist    
     _docker_enterer --version -   Show version
     _docker_enterer --help    -   Show usage
   """
@@ -54,28 +55,30 @@ function update() {
 #######################################
 # Search for running docker containers and enter if found
 # Arguments:
-#   None
+#   - if the word 'sudo' is supplied, then run docker with sudo
 #######################################
 function main() {
 
+  SUDO=$1
+
   ### Test if there are any running docker containers by counting output lines
-  number_of_running_containers=$(docker container ls | wc -l)
+  number_of_running_containers=$($SUDO docker container ls | wc -l)
   if [[ $number_of_running_containers -eq 1 ]]; then
     echo -e "${RED}No running docker containers found${WHI}"
     exit 1
   fi
 
   ### Extract all running-container names and ids into bash arrays
-  containerIds=($(docker container ls | sed -n '2,$p' | tr -s " " | cut -f1 -d' '))
-  containerNames=($(docker container ls | rev | sed -n '2,$p' | tr -s " " | cut -f1 -d' ' | rev))
-  imageNames=($(docker container ls | sed -n '2,$p' | tr -s " " | cut -f2 -d' '))
+  containerIds=($($SUDO docker container ls | sed -n '2,$p' | tr -s " " | cut -f1 -d' '))
+  containerNames=($($SUDO docker container ls | rev | sed -n '2,$p' | tr -s " " | cut -f1 -d' ' | rev))
+  imageNames=($($SUDO docker container ls | sed -n '2,$p' | tr -s " " | cut -f2 -d' '))
 
   ### If there's only one container, just jump straight into it
   if [[ $number_of_running_containers -eq 2 ]]; then
 
     echo -e "${GRE}1 container found named ${containerNames[0]}; starting in 3s ...${WHI}"
     sleep 3
-    docker exec -it "${containerIds[0]}" sh
+    $SUDO docker exec -it "${containerIds[0]}" sh
 
   else
 
@@ -96,7 +99,7 @@ function main() {
     ### Enter chosen container
     echo -e "${GRE}Entering container ${containerNames[$choice]}${WHI}"
     sleep 1
-    docker exec -it "${containerIds[$choice]}" sh
+    $SUDO docker exec -it "${containerIds[$choice]}" sh
 
   fi
 
@@ -105,8 +108,10 @@ function main() {
 ### Main script switch
 if [[ -z $1 ]]; then
   main
+elif [[ $1 == "--sudo" ]]; then
+  main sudo
 elif [[ $1 == "--update" ]]; then
-  update
+  update  
 elif [[ $1 == "--version" ]]; then
   echo "$VERSION"
 else
