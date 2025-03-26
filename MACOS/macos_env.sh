@@ -28,9 +28,6 @@ export PATH="$PATH:/usr/local/opt/binutils/bin"
 export JAVA_HOME="/opt/homebrew/Cellar/openjdk/21.0.1/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$PATH"
 
-### PHP Attempt
-export PATH=$PATH:$HOME/.composer/vendor/bin
-
 ### PYTHON
 
 ### HOMEBREW-GDL RECOMMENDED

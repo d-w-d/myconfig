@@ -18,6 +18,10 @@ alias kl="clear && printf '\e[3J'"
 
 alias alangularcompletion="source <(ng completion script)"
 
+alias aldockerstopcontainers=$'docker stop $(docker ps -aq)'
+alias aldockerrmcontainers=$'docker rm $(docker ps -aq)'
+alias aldockerkillcontainers=$'docker kill $(docker ps -aq)'
+
 alias alhttpserver='http-server'
 alias alimgcat='~/.local/bin/imgcat --height 10' # For imgcat installed with
 # `pip3 install --user imgcat`
@@ -35,7 +39,7 @@ alias aldockermongo="clear; printf '\n\n Starting temp mongod server. Connect mo
 alias alvsc='code -n ' ### open sth with VSC
 alias alsource="source ~/.bashrc"
 alias alsudovim="sudo -E $(which vim)"
-alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2021\",\"dom\"]}"'
+alias altsnodecommonjs='ts-node --compiler-options "{\"module\": \"CommonJS\",\"lib\":[\"es2020\",\"dom\"],\"resolveJsonModule\":true}"'
 alias alwork='cd ~/work'
 
 ### Git Shortcuts
