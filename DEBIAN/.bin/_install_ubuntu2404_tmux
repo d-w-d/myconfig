@@ -6,7 +6,7 @@
 
 # Install dependencies
 sudo apt update
-sudo apt install -y build-essential automake pkg-config libevent-dev libncurses-dev
+sudo apt install -y build-essential automake pkg-config libevent-dev libncurses-dev bison
 
 # DOWNLOAD SOURCES FOR LATEST TMUX AND BUILD
 PREVIOUSDIR=$PWD
