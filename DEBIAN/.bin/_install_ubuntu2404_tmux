@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# I used to build my own tmux, but now I just use the package manager.
+
+sudo apt install tmux

@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# I used to build my own zsh, but now I just use the package manager.
+
+sudo apt install zsh
