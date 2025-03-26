@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+#########################################
+### Install Nerd Fonts for p10k
+#########################################
+
+# Install font dependencies
+sudo apt update
+sudo apt install -y curl unzip fontconfig
+
+# Create font directory
+mkdir -p ~/.local/share/fonts
+
+# Download and install Meslo Nerd Font (recommended for p10k)
+echo "Downloading MesloLGS NF fonts (recommended for Powerlevel10k)..."
+cd ~/.local/share/fonts
+curl -fLo "MesloLGS NF Regular.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
+curl -fLo "MesloLGS NF Bold.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
+curl -fLo "MesloLGS NF Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
+curl -fLo "MesloLGS NF Bold Italic.ttf" https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+
+# Update font cache
+echo "Updating font cache..."
+fc-cache -fv
+
+echo "========================================================"
+echo "Nerd Fonts installed successfully!"
+echo "========================================================"
+echo ""
+echo "IMPORTANT: For proper display of p10k in Docker containers:"
+echo ""
+echo "1. Your HOST terminal must use these fonts too. Install "
+echo "   MesloLGS NF on your host system and configure your"
+echo "   terminal emulator to use it."
+echo ""
+echo "2. For VSCode: Add to settings.json:"
+echo "   \"terminal.integrated.fontFamily\": \"MesloLGS NF\""
+echo ""
+echo "3. For iTerm2: Preferences → Profiles → Text → Font → MesloLGS NF"
+echo ""
+echo "4. Restart your tmux session with: tmux source ~/.tmux.conf"
+echo "========================================================"
