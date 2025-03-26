@@ -129,6 +129,11 @@ main() {
   local start_dir
   start_dir=$(pwd)
 
+  # Create and use a build directory in /tmp
+  local build_dir="/tmp/vim_build"
+  mkdir -p "$build_dir"
+  cd "$build_dir" || exit 1
+  
   install_dependencies
   download_vim_source
   configure_vim
