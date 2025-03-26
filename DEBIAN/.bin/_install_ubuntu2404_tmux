@@ -1,5 +1,31 @@
-#!/bin/bash
-#
-# I used to build my own tmux, but now I just use the package manager.
+#!/usr/bin/env bash
 
-sudo apt install tmux
+#########################################
+### Install latest TMUX
+#########################################
+
+# Install dependencies
+sudo apt update
+sudo apt install -y build-essential automake pkg-config libevent-dev libncurses-dev
+
+# DOWNLOAD SOURCES FOR LATEST TMUX AND BUILD
+PREVIOUSDIR=$PWD
+cd /tmp
+
+# Clone the latest tmux from GitHub
+git clone https://github.com/tmux/tmux.git
+cd tmux
+
+# Generate configuration files
+sh autogen.sh
+
+# Configure with full feature support
+./configure
+
+# Build and install
+make
+sudo make install
+
+# Check tmux version
+tmux -V
+cd "$PREVIOUSDIR"
