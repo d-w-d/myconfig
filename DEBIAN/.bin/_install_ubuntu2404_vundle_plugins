@@ -25,6 +25,3 @@ if _is_myconfig_fully_installed; then
 else
   vim -E -u "/tmp/myconfig/.vimrc" -N +PluginInstall +qall
 fi
-
-### Double check complete installation of ycm
-_install_ubuntu2404_ycmd

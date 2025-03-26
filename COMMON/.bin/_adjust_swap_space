@@ -1,0 +1,284 @@
+#!/bin/bash
+#
+# _adjust_swap_space - Utility to adjust swap space by integer amounts of GB
+#
+# This script follows the Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# Usage: _adjust_swap_space [OPTIONS]
+#
+# Options:
+#   -h, --help            Display this help message and exit
+#   -c, --create SIZE     Create or increase swap space by SIZE GB
+#   -r, --remove SIZE     Decrease swap space by SIZE GB
+#   -d, --delete-all      Delete all temporary swap space
+#   -s, --status          Show current swap space status
+#
+
+set -e # Exit immediately if a command exits with a non-zero status
+set -u # Treat unset variables as an error when substituting
+
+# Default values
+SWAP_DIR="/tmp"
+SWAP_PREFIX="tmp_swap_"
+COMMAND=""
+SIZE=0
+
+# Function to display help message
+display_help() {
+  echo "Usage: $(basename "$0") [OPTIONS]"
+  echo ""
+  echo "Options:"
+  echo "  -h, --help            Display this help message and exit"
+  echo "  -c, --create SIZE     Create or increase swap space by SIZE GB"
+  echo "  -r, --remove SIZE     Decrease swap space by SIZE GB"
+  echo "  -d, --delete-all      Delete all temporary swap space"
+  echo "  -s, --status          Show current swap space status"
+  echo ""
+  echo "Examples:"
+  echo "  $(basename "$0") --create 2     # Create 2GB of additional swap space"
+  echo "  $(basename "$0") --remove 1     # Remove 1GB of swap space"
+  echo "  $(basename "$0") --delete-all   # Delete all temporary swap files"
+  echo "  $(basename "$0") --status       # Show current swap status"
+  exit 0
+}
+
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Function to check required commands
+check_prerequisites() {
+  local missing_commands=()
+  
+  if ! command_exists fallocate; then
+    missing_commands+=("fallocate")
+  fi
+  
+  if ! command_exists mkswap; then
+    missing_commands+=("mkswap")
+  fi
+  
+  if ! command_exists swapon; then
+    missing_commands+=("swapon")
+  fi
+  
+  if ! command_exists swapoff; then
+    missing_commands+=("swapoff")
+  fi
+  
+  if [ ${#missing_commands[@]} -gt 0 ]; then
+    echo "Error: The following required commands are missing:"
+    for cmd in "${missing_commands[@]}"; do
+      echo "  - $cmd"
+    done
+    echo "Please install them before using this script."
+    exit 1
+  fi
+}
+
+# Function to parse arguments
+parse_arguments() {
+  if [ $# -eq 0 ]; then
+    display_help
+  fi
+  
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -h|--help)
+        display_help
+        ;;
+      -c|--create)
+        COMMAND="create"
+        if [[ "$2" =~ ^[0-9]+$ ]]; then
+          SIZE="$2"
+          shift
+        else
+          echo "Error: --create requires a valid integer for SIZE in GB"
+          exit 1
+        fi
+        ;;
+      -r|--remove)
+        COMMAND="remove"
+        if [[ "$2" =~ ^[0-9]+$ ]]; then
+          SIZE="$2"
+          shift
+        else
+          echo "Error: --remove requires a valid integer for SIZE in GB"
+          exit 1
+        fi
+        ;;
+      -d|--delete-all)
+        COMMAND="delete-all"
+        ;;
+      -s|--status)
+        COMMAND="status"
+        ;;
+      *)
+        echo "Unknown option: $1"
+        echo "Use --help to see available options."
+        exit 1
+        ;;
+    esac
+    shift
+  done
+  
+  if [ -z "$COMMAND" ]; then
+    echo "Error: No command specified"
+    display_help
+  fi
+}
+
+# Function to get current swap status
+show_swap_status() {
+  echo "Current Swap Status:"
+  echo "------------------"
+  
+  # Show system swap information
+  echo "System Swap:"
+  free -h | grep -i swap
+  
+  # Show detailed swap information
+  echo ""
+  echo "Swap Details:"
+  swapon --show
+  
+  # Show temporary swap files
+  echo ""
+  echo "Temporary Swap Files:"
+  ls -lh "${SWAP_DIR}/${SWAP_PREFIX}"* 2>/dev/null || echo "No temporary swap files found in ${SWAP_DIR}"
+}
+
+# Function to create new swap space
+create_swap() {
+  if [ "$SIZE" -le 0 ]; then
+    echo "Error: SIZE must be a positive integer"
+    exit 1
+  fi
+  
+  local swap_file="${SWAP_DIR}/${SWAP_PREFIX}${SIZE}GB_$(date +%s)"
+  
+  echo "Creating ${SIZE}GB swap file at ${swap_file}..."
+  sudo fallocate -l "${SIZE}G" "$swap_file"
+  sudo chmod 600 "$swap_file"
+  
+  echo "Setting up swap space..."
+  sudo mkswap "$swap_file"
+  
+  echo "Activating swap space..."
+  sudo swapon "$swap_file"
+  
+  echo "Swap space increased by ${SIZE}GB."
+  show_swap_status
+}
+
+# Function to remove swap space
+remove_swap() {
+  if [ "$SIZE" -le 0 ]; then
+    echo "Error: SIZE must be a positive integer"
+    exit 1
+  fi
+  
+  # Find temporary swap files
+  local temp_swap_files=($(find "$SWAP_DIR" -name "${SWAP_PREFIX}*" 2>/dev/null || echo ""))
+  
+  if [ ${#temp_swap_files[@]} -eq 0 ]; then
+    echo "No temporary swap files found to remove."
+    return
+  fi
+  
+  # Calculate total GB to remove
+  local gb_left_to_remove=$SIZE
+  local files_to_remove=()
+  
+  for swap_file in "${temp_swap_files[@]}"; do
+    if [ "$gb_left_to_remove" -le 0 ]; then
+      break
+    fi
+    
+    # Get file size in GB (rounded)
+    local file_size_kb=$(du -k "$swap_file" | cut -f1)
+    local file_size_gb=$((file_size_kb / 1024 / 1024))
+    
+    if [ "$file_size_gb" -eq 0 ]; then
+      file_size_gb=1  # Minimum 1GB for small files
+    fi
+    
+    if [ "$file_size_gb" -le "$gb_left_to_remove" ]; then
+      files_to_remove+=("$swap_file")
+      gb_left_to_remove=$((gb_left_to_remove - file_size_gb))
+    fi
+  done
+  
+  if [ ${#files_to_remove[@]} -eq 0 ]; then
+    echo "No suitable swap files found to remove ${SIZE}GB."
+    return
+  fi
+  
+  # Remove selected swap files
+  for swap_file in "${files_to_remove[@]}"; do
+    echo "Deactivating swap file: $swap_file"
+    sudo swapoff "$swap_file"
+    echo "Removing swap file: $swap_file"
+    sudo rm -f "$swap_file"
+  done
+  
+  echo "Swap space decreased by approximately $((SIZE - gb_left_to_remove))GB."
+  
+  if [ "$gb_left_to_remove" -gt 0 ]; then
+    echo "Note: Could only remove $((SIZE - gb_left_to_remove))GB out of requested ${SIZE}GB."
+  fi
+  
+  show_swap_status
+}
+
+# Function to delete all temporary swap space
+delete_all_swap() {
+  # Find all temporary swap files
+  local temp_swap_files=($(find "$SWAP_DIR" -name "${SWAP_PREFIX}*" 2>/dev/null || echo ""))
+  
+  if [ ${#temp_swap_files[@]} -eq 0 ]; then
+    echo "No temporary swap files found."
+    return
+  fi
+  
+  # Deactivate and remove all temporary swap files
+  for swap_file in "${temp_swap_files[@]}"; do
+    echo "Deactivating swap file: $swap_file"
+    sudo swapoff "$swap_file" || true
+    echo "Removing swap file: $swap_file"
+    sudo rm -f "$swap_file"
+  done
+  
+  echo "All temporary swap files have been removed."
+  show_swap_status
+}
+
+# Main function
+main() {
+  # Check prerequisites
+  check_prerequisites
+  
+  # Parse arguments
+  parse_arguments "$@"
+  
+  # Execute requested command
+  case "$COMMAND" in
+    create)
+      create_swap
+      ;;
+    remove)
+      remove_swap
+      ;;
+    delete-all)
+      delete_all_swap
+      ;;
+    status)
+      show_swap_status
+      ;;
+  esac
+}
+
+# Run main function with all arguments
+main "$@"

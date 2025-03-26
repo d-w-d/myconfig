@@ -1,11 +1,8 @@
 #!/bin/bash
 #
-# _install_ycmd_ubuntu24.04 - Simple script to install YouCompleteMe on Ubuntu 24.04
+# _install_ubuntu2404_ycmd - Simple script to install YouCompleteMe on Ubuntu 24.04
 #
-# This script follows the Google Shell Style Guide:
-# https://google.github.io/styleguide/shellguide.html
-#
-# Usage: ./_install_ycmd_ubuntu24.04 [OPTIONS]
+# Usage: ./_install_ubuntu2404_ycmd [OPTIONS]
 #
 # Options:
 #   --help              Display this help message and exit
@@ -15,6 +12,7 @@
 #   --rust              Install Rust completer
 #   --js                Install JavaScript/TypeScript completer
 #   --java              Install Java completer
+#   --verbose           Show detailed output during compilation
 #
 
 set -e # Exit immediately if a command exits with a non-zero status
@@ -32,9 +30,9 @@ display_help() {
   echo "  --rust              Install Rust completer"
   echo "  --js                Install JavaScript/TypeScript completer"
   echo "  --java              Install Java completer"
+  echo "  --verbose           Show detailed output during compilation"
   echo ""
   echo "By default, all language completers will be installed."
-  echo "You can run the script without options to use the default setting."
   exit 0
 }
 
@@ -45,6 +43,7 @@ GO_COMPLETER=false
 RUST_COMPLETER=false
 JS_COMPLETER=false
 JAVA_COMPLETER=false
+VERBOSE_MODE=false
 
 # Parse command line arguments
 for arg in "$@"; do
@@ -84,6 +83,10 @@ for arg in "$@"; do
   --java)
     ALL_COMPLETERS=false
     JAVA_COMPLETER=true
+    shift
+    ;;
+  --verbose)
+    VERBOSE_MODE=true
     shift
     ;;
   *)
@@ -199,6 +202,11 @@ install_ycm() {
     fi
   fi
 
+  # Add verbose flag if requested
+  if [ "$VERBOSE_MODE" = true ]; then
+    INSTALL_CMD="$INSTALL_CMD --verbose"
+  fi
+
   echo "Compiling YouCompleteMe with: $INSTALL_CMD"
 
   # Execute the installation command
@@ -223,7 +231,11 @@ verify_installation() {
   if [ -z "$YCM_CORE_SO" ]; then
     echo "Warning: YouCompleteMe compilation may have failed. ycm_core library not found."
     echo "You may need to compile manually by running:"
-    echo "cd ~/.vim/bundle/YouCompleteMe && python3 ./install.py [completer options]"
+    if [ "$VERBOSE_MODE" = true ]; then
+      echo "cd ~/.vim/bundle/YouCompleteMe && python3 ./install.py --verbose [completer options]"
+    else
+      echo "cd ~/.vim/bundle/YouCompleteMe && python3 ./install.py [completer options]"
+    fi
     return 1
   fi
 
@@ -247,83 +259,12 @@ print_instructions() {
   echo "let g:ycm_autoclose_preview_window_after_completion = 1"
   echo "let g:ycm_autoclose_preview_window_after_insertion = 1"
   echo ""
-  echo "IMPORTANT: If you previously had 'Plugin \"Valloric/YouCompleteMe\"' in your .vimrc,"
-  echo "you need to remove it and replace it with 'Plugin \"ycm-core/YouCompleteMe\"' to avoid"
-  echo "name collision errors."
-  echo ""
   echo "For more information, visit: https://github.com/ycm-core/YouCompleteMe"
   echo "========================================================"
 }
 
-# Function to check for repository collision in vimrc
-check_repository_collision() {
-  local vimrc="$HOME/.vimrc"
-  
-  if [ -f "$vimrc" ] && grep -q "Valloric/YouCompleteMe" "$vimrc"; then
-    echo "========================================================"
-    echo "WARNING: Repository collision detected!"
-    echo "========================================================"
-    echo "Your .vimrc contains references to the old repository 'Valloric/YouCompleteMe'."
-    echo "YouCompleteMe has moved to 'ycm-core/YouCompleteMe'."
-    echo ""
-    echo "You need to update your .vimrc to replace:"
-    echo "  Plugin 'Valloric/YouCompleteMe'"
-    echo "with:"
-    echo "  Plugin 'ycm-core/YouCompleteMe'"
-    echo ""
-    echo "Otherwise, you will encounter name collision errors when starting Vim."
-    echo "========================================================"
-    
-    read -rp "Do you want to continue with the installation anyway? (y/n): " continue_install
-    
-    if [[ "$continue_install" != "y" && "$continue_install" != "Y" ]]; then
-      echo "Installation canceled."
-      exit 0
-    fi
-  fi
-}
-
-# Function to confirm language selection
-confirm_language_selection() {
-  echo "========================================================"
-  echo "YouCompleteMe Installation Script for Ubuntu 24.04"
-  echo "========================================================"
-
-  # Print selected completer options
-  echo "Selected completers:"
-  if [ "$ALL_COMPLETERS" = true ]; then
-    echo "  - All completers"
-  else
-    if [ "$CLANG_COMPLETER" = true ]; then echo "  - C-family completer"; fi
-    if [ "$GO_COMPLETER" = true ]; then echo "  - Go completer"; fi
-    if [ "$RUST_COMPLETER" = true ]; then echo "  - Rust completer"; fi
-    if [ "$JS_COMPLETER" = true ]; then echo "  - JavaScript/TypeScript completer"; fi
-    if [ "$JAVA_COMPLETER" = true ]; then echo "  - Java completer"; fi
-
-    if [ "$CLANG_COMPLETER" = false ] && [ "$GO_COMPLETER" = false ] &&
-      [ "$RUST_COMPLETER" = false ] && [ "$JS_COMPLETER" = false ] &&
-      [ "$JAVA_COMPLETER" = false ]; then
-      echo "  - Basic completers only (Python)"
-    fi
-  fi
-  
-  echo ""
-  read -rp "Do you want to proceed with the selected language completers? (y/n): " confirm
-  
-  if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    echo "Installation canceled. Rerun with different options or use --help for more information."
-    exit 0
-  fi
-}
-
 # Main function
 main() {
-  # First confirm language selection
-  confirm_language_selection
-  
-  # Check for repository collision
-  check_repository_collision
-
   # Install dependencies
   install_dependencies
 
