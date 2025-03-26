@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# Installs/updates all the vundle plugins from command line
+
+### Confirm some prereqs
+command -v vim >/dev/null 2>&1 || (echo "vim not found" && return 1)
+
+### Clone/update vundle repo
+if [[ ! -d $HOME/.vim/bundle/Vundle.vim ]]; then
+  # If Vundle dir does exist then clone it
+  git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+else
+  # If Vundle dir exists, update it
+  cd $HOME/.vim/bundle/Vundle.vim
+  git fetch origin
+  git checkout master
+  git reset --hard origin/master
+fi
+
+### Install vundle plugins
+### NOTE: vim aliases will not work in subprocesses
+echo "Installing vundle plugins..."
+if _is_myconfig_fully_installed; then
+  vim -E -u "$HOME/.myconfig/.vimrc" -N +PluginInstall +qall
+else
+  vim -E -u "/tmp/myconfig/.vimrc" -N +PluginInstall +qall
+fi
+
+### Double check complete installation of ycm
+_install_ubuntu2404_ycmd

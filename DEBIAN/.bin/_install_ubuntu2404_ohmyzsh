@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# This script install ohmyzsh and specific plugins
+
+previous_dir=$PWD
+
+### install ohmyzsh
+### Note: you need to add '--unattended' to prevent it starting new zsh sub-shell
+### right away and preventing execution of the rest of this script
+cd $HOME
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh) --unattended"
+sleep 3
+
+### Add autosuggestions git repo
+cd $HOME
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+sleep 3
+
+### Dont install via zsh -- what if you want to use it from a bash shell?!
+# cd $HOME
+# git clone https://github.com/lukechilds/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
+# sleep 3
+
+### install powerlevel10k
+cd $HOME
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+sleep 3
+
+### Fix the fact that installing these will mess with your committed .rc files
+_replace_dotrc_files
+
+cd $previous_dir

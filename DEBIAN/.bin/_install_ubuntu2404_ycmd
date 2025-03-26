@@ -1,0 +1,341 @@
+#!/bin/bash
+#
+# _install_ycmd_ubuntu24.04 - Simple script to install YouCompleteMe on Ubuntu 24.04
+#
+# This script follows the Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# Usage: ./_install_ycmd_ubuntu24.04 [OPTIONS]
+#
+# Options:
+#   --help              Display this help message and exit
+#   --all               Install all language completers (default)
+#   --clang             Install C-family language completer
+#   --go                Install Go completer
+#   --rust              Install Rust completer
+#   --js                Install JavaScript/TypeScript completer
+#   --java              Install Java completer
+#
+
+set -e # Exit immediately if a command exits with a non-zero status
+set -u # Treat unset variables as an error when substituting
+
+# Function to display help message
+display_help() {
+  echo "Usage: $(basename "$0") [OPTIONS]"
+  echo ""
+  echo "Options:"
+  echo "  --help              Display this help message and exit"
+  echo "  --all               Install all language completers (default)"
+  echo "  --clang             Install C-family language completer"
+  echo "  --go                Install Go completer"
+  echo "  --rust              Install Rust completer"
+  echo "  --js                Install JavaScript/TypeScript completer"
+  echo "  --java              Install Java completer"
+  echo ""
+  echo "By default, all language completers will be installed."
+  echo "You can run the script without options to use the default setting."
+  exit 0
+}
+
+# Default values
+ALL_COMPLETERS=true
+CLANG_COMPLETER=false
+GO_COMPLETER=false
+RUST_COMPLETER=false
+JS_COMPLETER=false
+JAVA_COMPLETER=false
+
+# Parse command line arguments
+for arg in "$@"; do
+  case $arg in
+  --help)
+    display_help
+    ;;
+  --all)
+    ALL_COMPLETERS=true
+    CLANG_COMPLETER=false
+    GO_COMPLETER=false
+    RUST_COMPLETER=false
+    JS_COMPLETER=false
+    JAVA_COMPLETER=false
+    shift
+    ;;
+  --clang)
+    ALL_COMPLETERS=false
+    CLANG_COMPLETER=true
+    shift
+    ;;
+  --go)
+    ALL_COMPLETERS=false
+    GO_COMPLETER=true
+    shift
+    ;;
+  --rust)
+    ALL_COMPLETERS=false
+    RUST_COMPLETER=true
+    shift
+    ;;
+  --js)
+    ALL_COMPLETERS=false
+    JS_COMPLETER=true
+    shift
+    ;;
+  --java)
+    ALL_COMPLETERS=false
+    JAVA_COMPLETER=true
+    shift
+    ;;
+  *)
+    # Unknown option
+    echo "Unknown option: $arg"
+    echo "Use --help to see available options."
+    exit 1
+    ;;
+  esac
+done
+
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Function to install dependencies
+install_dependencies() {
+  echo "Installing necessary dependencies..."
+
+  # Update package lists
+  sudo apt update
+
+  # Install build essentials and Python dev
+  sudo apt install -y build-essential cmake python3-dev
+
+  # Install git if not already installed
+  if ! command_exists git; then
+    sudo apt install -y git
+  fi
+
+  # Install language-specific dependencies based on selected completers
+  if [ "$ALL_COMPLETERS" = true ] || [ "$CLANG_COMPLETER" = true ]; then
+    echo "Installing C-family completer dependencies..."
+    sudo apt install -y clang libclang-dev
+  fi
+
+  if [ "$ALL_COMPLETERS" = true ] || [ "$GO_COMPLETER" = true ]; then
+    echo "Installing Go completer dependencies..."
+    sudo apt install -y golang
+  fi
+
+  if [ "$ALL_COMPLETERS" = true ] || [ "$RUST_COMPLETER" = true ]; then
+    echo "Installing Rust completer dependencies..."
+    if ! command_exists rustc; then
+      echo "Installing Rust..."
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      # Source the cargo environment
+      # shellcheck disable=SC1090
+      source "$HOME/.cargo/env"
+    fi
+  fi
+
+  if [ "$ALL_COMPLETERS" = true ] || [ "$JS_COMPLETER" = true ]; then
+    echo "Installing JavaScript completer dependencies..."
+    sudo apt install -y nodejs npm
+  fi
+
+  if [ "$ALL_COMPLETERS" = true ] || [ "$JAVA_COMPLETER" = true ]; then
+    echo "Installing Java completer dependencies..."
+    sudo apt install -y default-jdk
+  fi
+
+  echo "Dependencies installed successfully."
+}
+
+# Function to install YouCompleteMe
+install_ycm() {
+  echo "Installing YouCompleteMe..."
+
+  # Create bundle directory if it doesn't exist
+  mkdir -p "$HOME/.vim/bundle"
+
+  # Check if installation directory already exists
+  if [ -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
+    echo "Existing YouCompleteMe installation found, updating..."
+    cd "$HOME/.vim/bundle/YouCompleteMe" || exit 1
+    git pull
+  else
+    # Clone YouCompleteMe
+    cd "$HOME/.vim/bundle" || exit 1
+    git clone https://github.com/ycm-core/YouCompleteMe.git
+    cd YouCompleteMe || exit 1
+  fi
+
+  # Initialize submodules
+  git submodule update --init --recursive
+
+  # Build installation command based on selected completers
+  INSTALL_CMD="./install.py"
+
+  if [ "$ALL_COMPLETERS" = true ]; then
+    INSTALL_CMD="$INSTALL_CMD --all"
+  else
+    if [ "$CLANG_COMPLETER" = true ]; then
+      INSTALL_CMD="$INSTALL_CMD --clangd-completer"
+    fi
+
+    if [ "$GO_COMPLETER" = true ]; then
+      INSTALL_CMD="$INSTALL_CMD --go-completer"
+    fi
+
+    if [ "$RUST_COMPLETER" = true ]; then
+      INSTALL_CMD="$INSTALL_CMD --rust-completer"
+    fi
+
+    if [ "$JS_COMPLETER" = true ]; then
+      INSTALL_CMD="$INSTALL_CMD --ts-completer"
+    fi
+
+    if [ "$JAVA_COMPLETER" = true ]; then
+      INSTALL_CMD="$INSTALL_CMD --java-completer"
+    fi
+  fi
+
+  echo "Compiling YouCompleteMe with: $INSTALL_CMD"
+
+  # Execute the installation command
+  python3 $INSTALL_CMD
+
+  echo "YouCompleteMe plugin installed successfully."
+}
+
+# Function to verify installation
+verify_installation() {
+  echo "Verifying YouCompleteMe installation..."
+
+  # Check if YouCompleteMe directory exists
+  if [ ! -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
+    echo "Error: YouCompleteMe installation failed. Directory not found."
+    return 1
+  fi
+
+  # Find compiled YCM core library
+  YCM_CORE_SO=$(find "$HOME/.vim/bundle/YouCompleteMe/third_party/ycmd" -name "ycm_core*.so" | head -1)
+
+  if [ -z "$YCM_CORE_SO" ]; then
+    echo "Warning: YouCompleteMe compilation may have failed. ycm_core library not found."
+    echo "You may need to compile manually by running:"
+    echo "cd ~/.vim/bundle/YouCompleteMe && python3 ./install.py [completer options]"
+    return 1
+  fi
+
+  echo "YouCompleteMe installation verified successfully."
+}
+
+# Function to print final instructions
+print_instructions() {
+  echo "========================================================"
+  echo "YouCompleteMe has been installed successfully!"
+  echo "========================================================"
+  echo ""
+  echo "IMPORTANT: Your .vimrc has NOT been modified."
+  echo ""
+  echo "To activate YouCompleteMe, add the following to your .vimrc:"
+  echo ""
+  echo "\"\" YouCompleteMe configuration"
+  echo "Plugin 'ycm-core/YouCompleteMe'"
+  echo "let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'"
+  echo "let g:ycm_confirm_extra_conf = 0"
+  echo "let g:ycm_autoclose_preview_window_after_completion = 1"
+  echo "let g:ycm_autoclose_preview_window_after_insertion = 1"
+  echo ""
+  echo "IMPORTANT: If you previously had 'Plugin \"Valloric/YouCompleteMe\"' in your .vimrc,"
+  echo "you need to remove it and replace it with 'Plugin \"ycm-core/YouCompleteMe\"' to avoid"
+  echo "name collision errors."
+  echo ""
+  echo "For more information, visit: https://github.com/ycm-core/YouCompleteMe"
+  echo "========================================================"
+}
+
+# Function to check for repository collision in vimrc
+check_repository_collision() {
+  local vimrc="$HOME/.vimrc"
+  
+  if [ -f "$vimrc" ] && grep -q "Valloric/YouCompleteMe" "$vimrc"; then
+    echo "========================================================"
+    echo "WARNING: Repository collision detected!"
+    echo "========================================================"
+    echo "Your .vimrc contains references to the old repository 'Valloric/YouCompleteMe'."
+    echo "YouCompleteMe has moved to 'ycm-core/YouCompleteMe'."
+    echo ""
+    echo "You need to update your .vimrc to replace:"
+    echo "  Plugin 'Valloric/YouCompleteMe'"
+    echo "with:"
+    echo "  Plugin 'ycm-core/YouCompleteMe'"
+    echo ""
+    echo "Otherwise, you will encounter name collision errors when starting Vim."
+    echo "========================================================"
+    
+    read -rp "Do you want to continue with the installation anyway? (y/n): " continue_install
+    
+    if [[ "$continue_install" != "y" && "$continue_install" != "Y" ]]; then
+      echo "Installation canceled."
+      exit 0
+    fi
+  fi
+}
+
+# Function to confirm language selection
+confirm_language_selection() {
+  echo "========================================================"
+  echo "YouCompleteMe Installation Script for Ubuntu 24.04"
+  echo "========================================================"
+
+  # Print selected completer options
+  echo "Selected completers:"
+  if [ "$ALL_COMPLETERS" = true ]; then
+    echo "  - All completers"
+  else
+    if [ "$CLANG_COMPLETER" = true ]; then echo "  - C-family completer"; fi
+    if [ "$GO_COMPLETER" = true ]; then echo "  - Go completer"; fi
+    if [ "$RUST_COMPLETER" = true ]; then echo "  - Rust completer"; fi
+    if [ "$JS_COMPLETER" = true ]; then echo "  - JavaScript/TypeScript completer"; fi
+    if [ "$JAVA_COMPLETER" = true ]; then echo "  - Java completer"; fi
+
+    if [ "$CLANG_COMPLETER" = false ] && [ "$GO_COMPLETER" = false ] &&
+      [ "$RUST_COMPLETER" = false ] && [ "$JS_COMPLETER" = false ] &&
+      [ "$JAVA_COMPLETER" = false ]; then
+      echo "  - Basic completers only (Python)"
+    fi
+  fi
+  
+  echo ""
+  read -rp "Do you want to proceed with the selected language completers? (y/n): " confirm
+  
+  if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    echo "Installation canceled. Rerun with different options or use --help for more information."
+    exit 0
+  fi
+}
+
+# Main function
+main() {
+  # First confirm language selection
+  confirm_language_selection
+  
+  # Check for repository collision
+  check_repository_collision
+
+  # Install dependencies
+  install_dependencies
+
+  # Install YouCompleteMe
+  install_ycm
+
+  # Verify installation
+  verify_installation
+
+  # Print final instructions
+  print_instructions
+}
+
+# Run the main function
+main

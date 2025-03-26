@@ -1,0 +1,148 @@
+#!/bin/bash
+#
+# build_vim.sh - Script to build Vim with X11, clipboard, and Python3 support
+#
+# This script follows the Google Shell Style Guide:
+# https://google.github.io/styleguide/shellguide.html
+#
+# Usage: ./build_vim.sh
+# Note: This script requires sudo access for installing dependencies and Vim
+
+set -e # Exit immediately if a command exits with a non-zero status
+set -u # Treat unset variables as an error when substituting
+
+# Print script banner
+echo "========================================================"
+echo "Building Vim with X11, Clipboard, and Python3 support"
+echo "========================================================"
+
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Function to install dependencies
+install_dependencies() {
+  echo "Installing necessary dependencies..."
+  sudo apt update
+
+  # Install build tools and required libraries
+  # - make, gcc: Basic build tools
+  # - libncurses5-dev: Required for terminal UI
+  # - libx11-dev, libxtst-dev, libxt-dev, libsm-dev, libxpm-dev: X11 support
+  # - python3-dev: Python3 integration
+  # - libcanberra-dev: Sound support
+  # - libperl-dev: Perl integration
+  sudo apt install -y make gcc libncurses5-dev libx11-dev libxtst-dev \
+    libxt-dev libsm-dev libxpm-dev python3-dev libcanberra-dev libperl-dev
+
+  echo "Dependencies installed successfully."
+}
+
+# Function to download Vim source code
+download_vim_source() {
+  echo "Downloading Vim source code..."
+
+  # Check if git is installed
+  if ! command_exists git; then
+    echo "Git is not installed. Installing git..."
+    sudo apt install -y git
+  fi
+
+  # Clone the Vim repository
+  if [ -d "vim" ]; then
+    echo "Vim directory already exists. Updating..."
+    cd vim || exit 1
+    git pull
+  else
+    git clone https://github.com/vim/vim.git
+    cd vim || exit 1
+  fi
+
+  echo "Vim source code downloaded successfully."
+}
+
+# Function to configure Vim
+configure_vim() {
+  echo "Configuring Vim with requested features..."
+
+  # Get Python3 config directory
+  local python3_config_dir
+  python3_config_dir=$(python3-config --configdir)
+
+  # Configure Vim with:
+  # --with-features=huge: Enable all features
+  # --enable-gui=auto: Automatically detect available GUI
+  # --enable-python3interp=yes: Enable Python3 interpreter
+  # --with-python3-config-dir: Set Python3 config directory
+  # --enable-xim: Enable X Input Method
+  # --enable-fontset: Enable fontset support
+  # --enable-terminal: Enable terminal support
+  # --enable-multibyte: Enable multibyte character support
+  # --enable-cscope: Enable cscope interface
+  # --with-x: Enable X11 support (includes clipboard and xterm_clipboard)
+  ./configure --with-features=huge \
+    --enable-gui=auto \
+    --enable-python3interp=yes \
+    --with-python3-config-dir="${python3_config_dir}" \
+    --enable-xim \
+    --enable-fontset \
+    --enable-terminal \
+    --enable-multibyte \
+    --enable-cscope \
+    --with-x
+
+  echo "Vim configured successfully."
+}
+
+# Function to build and install Vim
+build_install_vim() {
+  echo "Building Vim..."
+  make -j "$(nproc)" # Use all available CPU cores for faster compilation
+
+  echo "Installing Vim..."
+  sudo make install
+
+  echo "Vim built and installed successfully."
+}
+
+# Function to verify Vim features
+verify_vim_features() {
+  echo "Verifying Vim features..."
+
+  # Check if vim is installed and executable
+  if ! command_exists vim; then
+    echo "Error: Vim installation failed. Please check the logs."
+    return 1
+  fi
+
+  # Check for required features
+  echo "Checking for X11, Clipboard, Xterm_Clipboard, and Python3 support:"
+  vim --version | grep -E 'python3|clipboard|xterm_clipboard|X11'
+
+  echo "Feature verification complete."
+}
+
+# Main script execution
+main() {
+  # Store starting directory
+  local start_dir
+  start_dir=$(pwd)
+
+  install_dependencies
+  download_vim_source
+  configure_vim
+  build_install_vim
+
+  # Return to starting directory
+  cd "${start_dir}" || exit 1
+
+  verify_vim_features
+
+  echo "========================================================"
+  echo "Vim build completed successfully!"
+  echo "========================================================"
+}
+
+# Execute main function
+main
