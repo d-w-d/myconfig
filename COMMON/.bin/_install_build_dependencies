@@ -5,7 +5,7 @@
 ### If sudo user, install all dependencies
 if _is_user_sudoer; then
   echo -e """${GRE}
-    You have sudo permissions; let's use them to install dependencies for vim!
+    You have sudo permissions; let's use them to install build dependencies for vim, tmux, etc.!
     ${WHI}"""
   sleep 1
   sudo apt update -y

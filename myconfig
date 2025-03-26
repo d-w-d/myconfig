@@ -29,7 +29,7 @@ function _install_usage() {
   msg+="${CYA}tmux        ${WHI}Install tmux 3.1b from source${WHI}\n"
   msg+="${CYA}zsh         ${WHI}Install zsh 5.9+ from source${WHI}\n"
   msg+="${CYA}ohmyzsh     ${WHI}Install ohmyzsh from source${WHI}\n"
-  msg+="${CYA}p10k        ${WHI}Install p10k from source${WHI}\n"
+  # msg+="${CYA}p10k        ${WHI}Install p10k from source${WHI}\n"
   msg+="${CYA}all         ${WHI}Install zsh, npm, vim & tmux${WHI}\n"
   echo -e "$msg"
 }
