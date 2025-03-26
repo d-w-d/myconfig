@@ -36,7 +36,7 @@ Plugin 'vim-scripts/indentpython.vim'
 Plugin 'christoomey/vim-tmux-navigator'     " Move between vim windows and tmux panes with ctrl-j, etc.
 "Plugin 'Yggdroot/indentLine'
 "Plugin 'nathanaelkane/vim-indent-guides'
-Plugin 'Valloric/YouCompleteMe'                                     " autocomplete
+Plugin 'ycm-core/YouCompleteMe'                                     " autocomplete
 "Plugin 'neoclide/coc.nvim', {'branch': 'release'}
 Plugin 'mattn/emmet-vim'                                            " emmet webdev snippets
 Plugin 'mattn/webapi-vim'                                           " emmet webdev snippets
