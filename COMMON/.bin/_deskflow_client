@@ -1,0 +1,72 @@
+#!/bin/bash
+## Copyright 2025 xAI
+## SPDX-License-Identifier: MIT
+##
+## Author: DWD using Grok 3 (xAI assistant)
+## Created: March 25, 2025
+##
+## Description:
+##   This script launches the Deskflow client (deskflow-client) within a Flatpak
+##   sandbox to connect an Ubuntu machine (client) to a remote Deskflow server
+##   running on a Mac at IP address 192.168.1.13. Deskflow enables sharing a
+##   single keyboard and mouse across multiple computers over a network.
+##
+## Purpose:
+##   The script ensures the Ubuntu client can be controlled from the Mac server
+##   without requiring a local keyboard or mouse, even when no user is logged in.
+##   It is designed to be executed automatically by GDM (GNOME Display Manager)
+##   at the login screen to maintain connectivity after logout.
+##
+## Usage:
+##   - Automatic: Integrated into /etc/gdm3/Init/Default to run at GDM startup.
+##     No manual invocation required; use 'sudo systemctl restart gdm' to apply.
+##   - Manual: Run '/usr/local/bin/deskflow-client.sh' from a terminal to test
+##     the connection. Kill with 'flatpak kill org.deskflow.deskflow' or Ctrl+C
+##     if testing interactively.
+##
+## Prerequisites:
+##   - Deskflow must be installed via Flatpak (org.deskflow.deskflow).
+##   - The Mac server at 192.168.1.13 must be running Deskflow in server mode.
+##   - Network connectivity between the Ubuntu client and Mac server is required.
+##
+## Notes:
+##   - The '--no-daemon' flag keeps deskflow-client in the foreground, suitable
+##     for GDM integration when backgrounded with '&'.
+##   - The '--enable-crypto' flag ensures encrypted communication with the server.
+##   - If multiple instances run, use 'flatpak ps' and 'flatpak kill' to manage.
+
+# Path to the Flatpak Deskflow client binary (within sandbox).
+deskflow_client="/app/bin/deskflow-client"
+
+# IP address of the Mac running the Deskflow server.
+# Check if DESKFLOW_SERVER_IP environment variable is set.
+if [[ -z "${DESKFLOW_SERVER_IP}" ]]; then
+  echo "Error: Environment variable DESKFLOW_SERVER_IP is not set." >&2
+  echo "Please set it to the IP address of the Deskflow server." >&2
+  exit 1
+fi
+server_ip="${DESKFLOW_SERVER_IP}"
+
+# Log file for debugging (moved to /tmp for gdm access).
+log_file="/tmp/deskflow-client.log"
+
+# Set display environment for GDM’s X11 session.
+export DISPLAY=":0"
+# Set Xauthority to GDM’s auth file.
+gdm_uid=$(id -u gdm)
+export XAUTHORITY=$(ls /var/run/gdm3/auth-for-gdm-* 2>/dev/null || echo "/run/user/${gdm_uid}/.mutter-Xwaylandauth.*")
+
+# Log start attempt with environment details.
+echo "$(date): Starting deskflow-client.sh (DISPLAY=${DISPLAY}, XAUTHORITY=${XAUTHORITY})" >>"${log_file}"
+
+# Check if deskflow-client is already running.
+if pgrep -f "${deskflow_client}" >/dev/null; then
+  echo "$(date): deskflow-client already running, exiting" >>"${log_file}"
+  exit 0
+fi
+
+# Launch the Deskflow client to connect to the server.
+echo "$(date): Launching deskflow-client to ${server_ip}" >>"${log_file}"
+flatpak run --command="${deskflow_client}" org.deskflow.deskflow \
+  --no-daemon --enable-crypto "${server_ip}" 2>>"${log_file}"
+echo "$(date): Launched with PID $!" >>"${log_file}"
