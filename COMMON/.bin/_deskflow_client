@@ -50,8 +50,25 @@ server_ip="${DESKFLOW_SERVER_IP}"
 # Log file for debugging (moved to /tmp for gdm access).
 log_file="/tmp/deskflow-client.log"
 
-# Set display environment for GDM’s X11 session.
-export DISPLAY=":0"
+# Determine the correct DISPLAY value by calling _find_display script.
+# Note: In X11, a DISPLAY is a string that represents which X
+# server to connect to (e.g. :0, :1, etc.). GDM does not set this
+# environment variable, so when we run deskflow-client, it will
+# default to DISPLAY=:0.0. This is a problem because GDM may actually
+# run on DISPLAY=:1.0 (or higher), and we need to connect to GDM's
+# X server in order to share the keyboard and mouse. The script
+# _find_display is designed to output the correct DISPLAY value by checking
+# available X11 sockets.
+display_output=$($(dirname "$0")/_find_display)
+find_display_status=$?
+
+if [[ ${find_display_status} -ne 0 ]]; then
+  echo "$(date): _find_display failed to determine DISPLAY. Exiting." >> "${log_file}"
+  # The error message from _find_display already went to stderr.
+  exit 1
+fi
+export DISPLAY="${display_output}"
+
 # Set Xauthority to GDM’s auth file.
 gdm_uid=$(id -u gdm)
 export XAUTHORITY=$(ls /var/run/gdm3/auth-for-gdm-* 2>/dev/null || echo "/run/user/${gdm_uid}/.mutter-Xwaylandauth.*")

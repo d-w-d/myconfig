@@ -11,5 +11,6 @@ if sockets=$(ls -1 /tmp/.X11-unix/X* 2>/dev/null); then
   echo ":${display_num}"
 else
   # Default if no socket found
-  echo ":0"
+  echo "Error: No X11 sockets found in /tmp/.X11-unix/" >&2
+  exit 1
 fi
