@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# _find_display - A utility script that outputs the recommended value for DISPLAY
+# environment variable by checking available X11 sockets. Use this to set `export DISPLAY=`
+# in `misc.sh`.
+
+# Look for available X11 sockets
+if sockets=$(ls -1 /tmp/.X11-unix/X* 2>/dev/null); then
+  # Extract the first available display number from socket name
+  display_num=$(basename "$(echo "${sockets}" | head -1)" | sed 's/^X//')
+  echo ":${display_num}"
+else
+  # Default if no socket found
+  echo ":0"
+fi
