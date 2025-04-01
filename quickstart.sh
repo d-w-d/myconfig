@@ -40,7 +40,7 @@ else
     cd myconfig
     touch misc.sh
 fi
-### Need to leave /tmp/myconfig to avoid directory error 
+### Need to leave /tmp/myconfig to avoid directory error
 ### in case user deletes it during vundle-install process
 cd $previous_dir
 
@@ -68,7 +68,7 @@ if $(command -v vim >/dev/null 2>&1); then
         ================================================
         VUNDLE PLUGINS HAVE FINISHED INSTALLING/UPDATING
         ================================================\n\033[37m''';";
-        ); bash -c "$cmd" ) &) 
+        ); bash -c "$cmd" ) &)
         vundle_download_message="${GRE}Vundle plugins are being downloaded "
         vundle_download_message+="as a background process!\n${WHI}"
         vundle_download_message+="${RED}         ---> DO NOT CLOSE THIS SHELL <---\n${WHI}"
