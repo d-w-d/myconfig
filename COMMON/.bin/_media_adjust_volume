@@ -1,0 +1,158 @@
+#!/bin/bash
+#
+# Script Name: _media_adjust_volume
+# Purpose: Adjusts the audio volume of a media file (video or audio)
+#          by a specified multiplier, saving to a new file.
+# Usage: _media_adjust_volume -i <input_file> -v <multiplier>
+# Example: _media_adjust_volume -i input.mp4 -v 1.5  # Increase volume by 50%
+# Example: _media_adjust_volume -i audio.wav -v 0.8  # Decrease volume to 80%
+# Dependencies: ffmpeg
+# Style: Google Shell Style Guide compliant
+
+# Exit immediately if a command exits with a non-zero status.
+set -o errexit
+# Treat unset variables as an error when substituting.
+set -o nounset
+# Prevent errors in a pipeline from being masked.
+set -o pipefail
+
+# --- Globals ---
+readonly SCRIPT_NAME="${0##*/}"
+readonly VOLUME_SUFFIX="-vol_adj" # Suffix for the output file
+# --- End Globals ---
+
+# Function for standardized error messages and exit.
+# Arguments:
+#   Error message string.
+err_exit() {
+  echo "[${SCRIPT_NAME} ERROR] ${1}" >&2
+  exit 1
+}
+
+# Function to display usage information and exit.
+usage() {
+  echo "Usage: ${SCRIPT_NAME} -i <input_file> -v <volume_multiplier>" >&2
+  echo "  Adjusts the audio volume of a media file." >&2
+  echo "  Arguments:" >&2
+  echo "    -i <input_file>:       Path to the input media file (video or audio)." >&2
+  echo "    -v <volume_multiplier>: Audio volume multiplier. " >&2
+  echo "                          > 1 increases volume (e.g., 1.5 = +50%)." >&2
+  echo "                          < 1 decreases volume (e.g., 0.8 = 80%)." >&2
+  echo "                          Must be a positive number." >&2
+  echo "    -h:                    Display this help message." >&2
+  echo "  Output:" >&2
+  echo "    A new file is created in the same directory as the input," >&2
+  echo "    with the suffix '${VOLUME_SUFFIX}' added before the extension." >&2
+  echo "    (e.g., input.mp4 -> input${VOLUME_SUFFIX}.mp4)" >&2
+  echo "  Examples:" >&2
+  echo "    ${SCRIPT_NAME} -i my_video.mov -v 2.0  # Double volume" >&2
+  echo "    ${SCRIPT_NAME} -i podcast.mp3 -v 0.5 # Halve volume" >&2
+  exit 1
+}
+
+# --- Main Function ---
+main() {
+  local input_file=""
+  local volume_multiplier=""
+
+  # 1. Parse Command Line Options
+  # Leading colon enables silent error handling for getopts
+  while getopts ":i:v:h" opt; do
+    case "${opt}" in
+    i) input_file="${OPTARG}" ;;
+    v) volume_multiplier="${OPTARG}" ;;
+    h) usage ;;
+    \?) err_exit "Invalid option: -${OPTARG}" ;;
+    :) err_exit "Option -${OPTARG} requires an argument." ;;
+    *) usage ;; # Should not happen with correct option string
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  # Check for non-option arguments (should be none)
+  if [[ "$#" -ne 0 ]]; then
+    echo "[${SCRIPT_NAME} ERROR] Unexpected arguments: $@" >&2
+    usage
+  fi
+
+  # 2. Validate Mandatory Arguments
+  if [[ -z "${input_file}" ]]; then
+    echo "[${SCRIPT_NAME} ERROR] Input file path (-i) is required." >&2
+    usage
+  fi
+  if [[ -z "${volume_multiplier}" ]]; then
+    echo "[${SCRIPT_NAME} ERROR] Volume multiplier (-v) is required." >&2
+    usage
+  fi
+
+  # 3. Validate Input File and Multiplier
+  if [[ ! -f "${input_file}" ]]; then
+    err_exit "Input file not found: '${input_file}'"
+  fi
+  # Check if multiplier is a positive number (integer or decimal)
+  # Using basic regex and bc for check > 0
+  if ! [[ "${volume_multiplier}" =~ ^[0-9]+(\.[0-9]+)?$ && $(echo "${volume_multiplier} > 0" | bc -l) -eq 1 ]]; then
+    err_exit "Invalid volume multiplier '${volume_multiplier}'. Must be a positive number (e.g., 1.5, 0.8, 2)."
+  fi
+
+  # 4. Check Dependencies
+  if ! command -v ffmpeg &>/dev/null; then
+    err_exit "'ffmpeg' command not found. Please install it."
+  fi
+  if ! command -v bc &>/dev/null; then
+    # Should ideally not be needed if regex is sufficient, but good practice
+    err_exit "'bc' command not found (needed for validation). Please install it."
+  fi
+
+  # 5. Generate Output Filename
+  local input_dir
+  local input_basename
+  local input_ext
+  input_dir="$(dirname "${input_file}")"
+  input_basename="$(basename "${input_file}")"
+  # Handle filenames without extensions
+  if [[ "${input_basename}" == *.* ]]; then
+    input_ext=".${input_basename##*.}"
+    input_filename_noext="${input_basename%.*}"
+  else
+    input_ext=""
+    input_filename_noext="${input_basename}"
+  fi
+  local output_file="${input_dir}/${input_filename_noext}${VOLUME_SUFFIX}${input_ext}"
+
+  # 6. Check if Output File Exists
+  if [[ -e "${output_file}" ]]; then
+    err_exit "Output file already exists: '${output_file}'. Please remove it or choose different inputs."
+  fi
+
+  # 7. Execute FFmpeg Command
+  echo "[${SCRIPT_NAME} INFO] Adjusting volume for '${input_file}'..." >&2
+  echo "[${SCRIPT_NAME} INFO] Multiplier: ${volume_multiplier}" >&2
+  echo "[${SCRIPT_NAME} INFO] Output file will be: '${output_file}'" >&2
+
+  # -filter:a "volume=MULTIPLIER": Adjusts audio volume.
+  # -c:v copy: Copies video stream without re-encoding (fast, preserves quality). Ignored if no video.
+  # -map 0: Selects all streams from the first input (preserves multiple audio/subtitle streams).
+  # -y is NOT used to prevent accidental overwrites (checked above).
+  if ! ffmpeg -i "${input_file}" \
+    -map 0 \
+    -filter:a "volume=${volume_multiplier}" \
+    -c:v copy \
+    "${output_file}"; then
+    # Attempt cleanup if ffmpeg fails partway through creating the file
+    rm -f "${output_file}" 2>/dev/null || true
+    err_exit "FFmpeg command failed. Check ffmpeg output above for details."
+  fi
+
+  # 8. Final Report
+  echo "[${SCRIPT_NAME} SUCCESS] Volume adjusted successfully." >&2
+  echo "[${SCRIPT_NAME} INFO] Output file created: ${output_file}" >&2
+
+}
+
+# --- Script Entry Point ---
+# Execute the main function, passing all script arguments to it.
+main "$@"
+
+# Explicitly exit with 0 status if main completes without error.
+exit 0

@@ -1,0 +1,246 @@
+#!/bin/bash
+#
+# Script Name: _media_convert_and_resize
+# Purpose: Concatenates multiple media files (video or audio), converts them
+#          to a specified output format (inferred from output filename),
+#          and resizes the output to a target file size.
+#          Uses two-pass encoding for video, single-pass for audio-only.
+# Usage: _media_convert_and_resize -o <output_file> -s <size_gb> <input_file1> [input_file2 ...]
+# Example (Video): _convert_and_resize_media -o movie.mp4 -s 2.5 input1.mov input2.avi
+# Example (Audio): _convert_and_resize_media -o compilation.mp3 -s 0.5 song1.wav song2.flac
+# Dependencies: ffmpeg, ffprobe, bc
+# Style: Google Shell Style Guide compliant
+
+# Exit immediately if a command exits with a non-zero status.
+set -o errexit
+# Treat unset variables as an error when substituting.
+set -o nounset
+# Prevent errors in a pipeline from being masked.
+set -o pipefail
+
+# --- Globals ---
+# Store the script's base name for use in messages.
+readonly SCRIPT_NAME="${0##*/}"
+# Temporary file to hold the list of input files for ffmpeg concat demuxer.
+readonly TMP_FILE_LIST="./_tmp_file_list.txt"
+# Temporary ffmpeg pass log files prefix.
+readonly FFMPEG_PASS_LOG="_ffmpeg2pass"
+# Default audio bitrate used *if video is present* (kbps).
+readonly DEFAULT_AUDIO_BITRATE_KBPS="192"
+# --- End Globals ---
+
+# Function for standardized error messages and exit.
+# Arguments:
+#   Error message string.
+err_exit() {
+  echo "[${SCRIPT_NAME} ERROR] ${1}" >&2
+  # Clean up before exiting on error, if trap hasn't already run.
+  cleanup >&2
+  exit 1
+}
+
+# Function to display usage information and exit.
+usage() {
+  echo "Usage: ${SCRIPT_NAME} -o <output_file> -s <size_gb> <input_file1> [input_file2 ...]" >&2
+  echo "  Concatenates and converts media files to a target size." >&2
+  echo "  Arguments:" >&2
+  echo "    -o <output_file>: Path to the output media file (e.g., movie.mp4, song.ogg)." >&2
+  echo "                       The extension determines the output format." >&2
+  echo "    -s <size_gb>:     Target output file size in Gigabytes (GB) (e.g., 1.5, 2, 0.5)." >&2
+  echo "    <input_file...>:  One or more input media files." >&2
+  echo "  Examples:" >&2
+  echo "    ${SCRIPT_NAME} -o final_cut.mp4 -s 1.5 intro.mov part1.avi credits.mkv" >&2
+  echo "    ${SCRIPT_NAME} -o podcast_episode.mp3 -s 0.1 segment1.wav segment2.mp3" >&2
+  exit 1
+}
+
+# Function to clean up temporary files.
+cleanup() {
+  # This function might be called multiple times (trap, err_exit), so check existence.
+  if [[ -e "${TMP_FILE_LIST}" || -n $(find . -maxdepth 1 -name "${FFMPEG_PASS_LOG}*.log*" -print -quit) ]]; then
+    echo "[${SCRIPT_NAME} INFO] Cleaning up temporary files..." >&2
+    # Use find to remove files matching the pattern, suppressing errors if they don't exist.
+    find . -maxdepth 1 -name "${TMP_FILE_LIST}" -delete 2>/dev/null || true
+    find . -maxdepth 1 -name "${FFMPEG_PASS_LOG}*.log*" -delete 2>/dev/null || true
+  fi
+}
+
+# --- Main Function ---
+main() {
+  # Set trap to ensure cleanup runs on script exit (normal or error).
+  trap cleanup EXIT SIGINT SIGTERM
+
+  local output_file=""
+  local target_size_gb=""
+
+  # 1. Parse Command Line Options
+  # Note: Using ':' after s indicates it requires an argument.
+  while getopts ":o:s:h" opt; do
+    case "${opt}" in
+    o) output_file="${OPTARG}" ;;
+    s) target_size_gb="${OPTARG}" ;;
+    h) usage ;;
+    \?) err_exit "Invalid option: -${OPTARG}" ;;
+    :) err_exit "Option -${OPTARG} requires an argument." ;;
+    *) usage ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  # 2. Validate Mandatory Arguments
+  if [[ -z "${output_file}" ]]; then
+    echo "[${SCRIPT_NAME} ERROR] Output file path (-o) is required." >&2
+    usage
+  fi
+  if [[ -z "${target_size_gb}" ]]; then
+    echo "[${SCRIPT_NAME} ERROR] Target output size in GB (-s) is required." >&2
+    usage
+  fi
+  # Regex allows integer or decimal numbers.
+  if ! [[ "${target_size_gb}" =~ ^[0-9]+(\.[0-9]+)?$ && $(echo "${target_size_gb} > 0" | bc -l) -eq 1 ]]; then
+    err_exit "Invalid target size '${target_size_gb}'. Must be a positive number (e.g., 1.5, 2, 0.5)."
+  fi
+  if [[ "$#" -lt 1 ]]; then
+    echo "[${SCRIPT_NAME} ERROR] At least one input file must be specified." >&2
+    usage
+  fi
+
+  # 3. Check Dependencies
+  if ! command -v ffmpeg &>/dev/null; then
+    err_exit "'ffmpeg' command not found. Please install it."
+  fi
+  if ! command -v ffprobe &>/dev/null; then
+    err_exit "'ffprobe' command not found. Please install it (usually part of ffmpeg package)."
+  fi
+  if ! command -v bc &>/dev/null; then
+    err_exit "'bc' command not found. Please install it (required for calculations)."
+  fi
+
+  # 4. Scan Inputs, Create File List, Get Duration & Detect Video
+  echo "[${SCRIPT_NAME} INFO] Scanning input files and creating list: ${TMP_FILE_LIST}" >&2
+  # Ensure the temp file starts empty.
+  >"${TMP_FILE_LIST}"
+  local total_duration_sec="0.0"
+  local input_file
+  local is_video_present=false # Flag to track if any input has video
+
+  for input_file in "$@"; do
+    if [[ ! -f "${input_file}" ]]; then
+      err_exit "Input file not found: '${input_file}'"
+    fi
+    # Add file to list for ffmpeg concat demuxer. Handle single quotes safely.
+    printf "file '%s'\\n" "${input_file//\\'/\\\\\\'/}" >>"${TMP_FILE_LIST}"
+
+    # Get duration.
+    local duration
+    duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${input_file}") ||
+      err_exit "Failed to get duration for '${input_file}'."
+    if ! [[ "${duration}" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+      err_exit "Invalid duration '${duration}' from ffprobe for '${input_file}'."
+    fi
+    total_duration_sec=$(echo "${total_duration_sec} + ${duration}" | bc -l)
+    echo "[${SCRIPT_NAME} DEBUG] Added '${input_file}', duration: ${duration}s, cumulative: ${total_duration_sec}s" >&2
+
+    # Check for video stream if not already found.
+    if ! ${is_video_present}; then
+      if ffprobe -v error -select_streams v:0 -show_entries stream=codec_type -of default=noprint_wrappers=1:nokey=1 "${input_file}" 2>/dev/null | grep -q .; then
+        echo "[${SCRIPT_NAME} DEBUG] Video stream detected in '${input_file}'." >&2
+        is_video_present=true
+      fi
+    fi
+  done
+
+  if [[ $(echo "${total_duration_sec} <= 0" | bc -l) -eq 1 ]]; then
+    err_exit "Total calculated duration (${total_duration_sec}s) is not positive. Cannot proceed."
+  fi
+  echo "[${SCRIPT_NAME} INFO] Total duration: ${total_duration_sec} seconds." >&2
+  if ${is_video_present}; then
+    echo "[${SCRIPT_NAME} INFO] Video stream detected. Will perform two-pass video/audio encode." >&2
+  else
+    echo "[${SCRIPT_NAME} INFO] No video streams detected. Will perform single-pass audio-only encode." >&2
+  fi
+
+  # 5. Calculate Target Bitrates
+  echo "[${SCRIPT_NAME} INFO] Calculating target bitrates for size ${target_size_gb} GB..." >&2
+  local target_size_bytes
+  local total_bitrate_bps
+  local video_bitrate_bps="0"
+  local audio_bitrate_bps="0"
+
+  # bc scale=10 for precision; GB -> Bytes
+  target_size_bytes=$(echo "scale=10; ${target_size_gb} * 1024 * 1024 * 1024" | bc -l)
+  # Calculate total bitrate: (Size in Bits) / Duration
+  total_bitrate_bps=$(echo "scale=0; (${target_size_bytes} * 8) / ${total_duration_sec}" | bc -l)
+
+  if ${is_video_present}; then
+    # Video + Audio Calculation
+    audio_bitrate_bps=$((DEFAULT_AUDIO_BITRATE_KBPS * 1000))
+    video_bitrate_bps=$(echo "scale=0; ${total_bitrate_bps} - ${audio_bitrate_bps}" | bc -l)
+
+    # Sanity check video bitrate
+    if [[ $(echo "${video_bitrate_bps} <= 0" | bc -l) -eq 1 ]]; then
+      err_exit "Calculated video bitrate (${video_bitrate_bps} bps) is too low or negative. Target size may be too small for the duration with ${DEFAULT_AUDIO_BITRATE_KBPS}k audio. Increase target size (-s) or check inputs."
+    fi
+    echo "[${SCRIPT_NAME} INFO] Target total bitrate: ${total_bitrate_bps} bps" >&2
+    echo "[${SCRIPT_NAME} INFO] Target video bitrate: ${video_bitrate_bps} bps (using libx264)" >&2
+    echo "[${SCRIPT_NAME} INFO] Target audio bitrate: ${audio_bitrate_bps} bps (using aac, fixed)" >&2
+  else
+    # Audio-Only Calculation
+    audio_bitrate_bps=${total_bitrate_bps}
+    if [[ $(echo "${audio_bitrate_bps} <= 0" | bc -l) -eq 1 ]]; then
+      err_exit "Calculated audio bitrate (${audio_bitrate_bps} bps) is not positive. Target size may be too small for the duration. Increase target size (-s) or check inputs."
+    fi
+    echo "[${SCRIPT_NAME} INFO] Target audio bitrate: ${audio_bitrate_bps} bps (using aac)" >&2
+  fi
+
+  # 6. Execute Encoding
+  if ${is_video_present}; then
+    # --- Two-Pass Video/Audio Encoding ---
+    echo "[${SCRIPT_NAME} INFO] Starting FFmpeg Pass 1 (Video Analysis)..." >&2
+    # Use -y to overwrite existing pass log files without prompting.
+    if
+      ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" \\
+      -c:v libx264 -b:v "${video_bitrate_bps}" -pass 1 -passlogfile "${FFMPEG_PASS_LOG}" \\
+      -an -f null /dev/null
+    then
+      err_exit "FFmpeg Pass 1 failed. Check ffmpeg output for details."
+    fi
+    echo "[${SCRIPT_NAME} INFO] FFmpeg Pass 1 completed." >&2
+
+    echo "[${SCRIPT_NAME} INFO] Starting FFmpeg Pass 2 (Video/Audio Encode)..." >&2
+    if
+      ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" \\
+      -c:v libx264 -b:v "${video_bitrate_bps}" -pass 2 -passlogfile "${FFMPEG_PASS_LOG}" \\
+      -c:a aac -b:a "${audio_bitrate_bps}" \\
+      "${output_file}"
+    then
+      err_exit "FFmpeg Pass 2 failed. Check ffmpeg output for details."
+    fi
+    echo "[${SCRIPT_NAME} INFO] FFmpeg Pass 2 completed." >&2
+  else
+    # --- Single-Pass Audio-Only Encoding ---
+    echo "[${SCRIPT_NAME} INFO] Starting FFmpeg Single Pass (Audio Encode)..." >&2
+    if
+      ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" \\
+      -c:a aac -b:a "${audio_bitrate_bps}" \\
+      -vn \\
+      "${output_file}"
+    then
+      err_exit "FFmpeg audio encoding failed. Check ffmpeg output for details."
+    fi
+    echo "[${SCRIPT_NAME} INFO] FFmpeg audio encoding completed." >&2
+  fi
+
+  # 7. Final Report
+  echo "[${SCRIPT_NAME} SUCCESS] Output file created successfully: ${output_file}" >&2
+
+  # Explicit cleanup call here before final exit (trap also handles abnormal exits)
+  cleanup >&2
+}
+
+# --- Script Entry Point ---
+# Execute the main function, passing all script arguments to it.
+main "$@"
+
+# Explicitly exit with 0 status if main completes without error.
+exit 0

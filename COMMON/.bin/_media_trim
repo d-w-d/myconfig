@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 3 ]; then
+  echo "Usage: $0 <start_time_seconds> <stop_time_seconds> <input_file_path>"
+  exit 1
+fi
+
+# Assign arguments to variables
+start_time=$1
+stop_time=$2
+input_file=$3
+
+# Extract file extension from input file
+extension="${input_file##*.}"
+
+# Create output filename with same extension
+output_file="out.$extension"
+
+# Check if ffmpeg is installed
+if ! command -v ffmpeg &>/dev/null; then
+  echo "Error: ffmpeg is not installed. Please install it with: sudo apt install ffmpeg"
+  exit 1
+fi
+
+# Calculate duration
+duration=$((stop_time - start_time))
+
+# Perform the trim operation using ffmpeg
+echo "Trimming $input_file from $start_time seconds to $stop_time seconds..."
+ffmpeg -ss $start_time -i "$input_file" -t $duration -c copy "$output_file"
+
+# Check if operation was successful
+if [ $? -eq 0 ]; then
+  echo "Trim completed successfully!"
+  echo "Output file: $output_file"
+else
+  echo "Error occurred during trimming."
+  exit 1
+fi
