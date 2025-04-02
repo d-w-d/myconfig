@@ -63,7 +63,7 @@ display_output=$($(dirname "$0")/_find_display)
 find_display_status=$?
 
 if [[ ${find_display_status} -ne 0 ]]; then
-  echo "$(date): _find_display failed to determine DISPLAY. Exiting." >> "${log_file}"
+  echo "$(date): _find_display failed to determine DISPLAY. Exiting." >>"${log_file}"
   # The error message from _find_display already went to stderr.
   exit 1
 fi
@@ -84,7 +84,7 @@ fi
 
 # Launch the Deskflow client to connect to the server.
 echo "$(date): Launching deskflow-client to ${server_ip}" >>"${log_file}"
-echo "Executing: flatpak run --command=\"${deskflow_client}\" org.deskflow.deskflow --no-daemon --enable-crypto \"${server_ip}\""
-flatpak run --command="${deskflow_client}" org.deskflow.deskflow \
+echo "Executing: DISPLAY=\"${display_output}\" flatpak run --command=\"${deskflow_client}\" org.deskflow.deskflow --no-daemon --enable-crypto \"${server_ip}\""
+DISPLAY="${display_output}" flatpak run --command="${deskflow_client}" org.deskflow.deskflow \
   --no-daemon --enable-crypto "${server_ip}" 2>>"${log_file}"
 echo "$(date): Launched with PID $!" >>"${log_file}"
