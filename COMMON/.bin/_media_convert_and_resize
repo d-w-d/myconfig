@@ -198,34 +198,20 @@ main() {
     # --- Two-Pass Video/Audio Encoding ---
     echo "[${SCRIPT_NAME} INFO] Starting FFmpeg Pass 1 (Video Analysis)..." >&2
     # Use -y to overwrite existing pass log files without prompting.
-    if
-      ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" \\
-      -c:v libx264 -b:v "${video_bitrate_bps}" -pass 1 -passlogfile "${FFMPEG_PASS_LOG}" \\
-      -an -f null /dev/null
-    then
+    if ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" -c:v libx264 -b:v "${video_bitrate_bps}" -pass 1 -passlogfile "${FFMPEG_PASS_LOG}" -an -f null /dev/null; then
       err_exit "FFmpeg Pass 1 failed. Check ffmpeg output for details."
     fi
     echo "[${SCRIPT_NAME} INFO] FFmpeg Pass 1 completed." >&2
 
     echo "[${SCRIPT_NAME} INFO] Starting FFmpeg Pass 2 (Video/Audio Encode)..." >&2
-    if
-      ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" \\
-      -c:v libx264 -b:v "${video_bitrate_bps}" -pass 2 -passlogfile "${FFMPEG_PASS_LOG}" \\
-      -c:a aac -b:a "${audio_bitrate_bps}" \\
-      "${output_file}"
-    then
+    if ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" -c:v libx264 -b:v "${video_bitrate_bps}" -pass 2 -passlogfile "${FFMPEG_PASS_LOG}" -c:a aac -b:a "${audio_bitrate_bps}" "${output_file}"; then
       err_exit "FFmpeg Pass 2 failed. Check ffmpeg output for details."
     fi
     echo "[${SCRIPT_NAME} INFO] FFmpeg Pass 2 completed." >&2
   else
     # --- Single-Pass Audio-Only Encoding ---
     echo "[${SCRIPT_NAME} INFO] Starting FFmpeg Single Pass (Audio Encode)..." >&2
-    if
-      ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" \\
-      -c:a aac -b:a "${audio_bitrate_bps}" \\
-      -vn \\
-      "${output_file}"
-    then
+    if ! ffmpeg -y -f concat -safe 0 -i "${TMP_FILE_LIST}" -c:a aac -b:a "${audio_bitrate_bps}" -vn "${output_file}"; then
       err_exit "FFmpeg audio encoding failed. Check ffmpeg output for details."
     fi
     echo "[${SCRIPT_NAME} INFO] FFmpeg audio encoding completed." >&2
