@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# Script Name: _deskflow_client (Simplified)
-# Purpose: Launches the Deskflow client Flatpak application, dynamically
-#          determining the target DISPLAY using the _find_display script.
+# Script Name: _deskflow_client (Simplified, Foreground)
+# Purpose: Launches the Deskflow client Flatpak application in the foreground,
+#          dynamically determining the target DISPLAY using the _find_display script.
 # Usage:
 #   - Ensure DESKFLOW_SERVER_IP environment variable is set.
 #   - If targeting the login screen (DISPLAY :0), ensure _xauth_for_login_screen
 #     has been run successfully in the current SSH session first.
-#   - Run this script to start the client. Run again after graphical login
-#     (targeting DISPLAY :1 or similar) if needed.
+#   - Run this script to start the client. It will occupy the terminal until stopped (Ctrl+C).
+#   - Run again after graphical login (targeting DISPLAY :1 or similar) if needed.
 # Dependencies:
 #   - _find_display script (expected in same directory or PATH).
 #   - DESKFLOW_SERVER_IP environment variable.
@@ -29,14 +29,13 @@ readonly SCRIPT_DIR="$(dirname "$0")"
 
 # --- Configuration ---
 # Path to the utility script that finds the target DISPLAY value.
-readonly FIND_DISPLAY_SCRIPT="${SCRIPT_DIR}/_find_display"
+readonly FIND_DISPLAY_SCRIPT="${SCRIPT_DIR}/_deskflow_find_display"
 # Path to the Deskflow client binary inside the Flatpak sandbox.
 readonly DESKFLOW_CLIENT_CMD="/app/bin/deskflow-client"
 # Flatpak application ID.
 readonly FLATPAK_APP_ID="org.deskflow.deskflow"
-# Log file location. Using /tmp allows writing even if run by different users.
-# Consider user-specific logs if running manually as 'dwd'.
-readonly LOG_FILE="/tmp/deskflow-client.log"
+# Log file location for *script's* messages (client output goes to terminal).
+readonly LOG_FILE="/tmp/deskflow-client-script.log" # Renamed slightly
 # --- End Configuration ---
 
 # Function for standardized error messages and exit.
@@ -52,7 +51,7 @@ err_exit() {
   exit 1
 }
 
-# Logs informational messages to the log file.
+# Logs informational messages *only* to the log file.
 # Arguments:
 #   Info message string.
 log_info() {
@@ -63,10 +62,10 @@ log_info() {
 
 # Main execution logic.
 main() {
+  # Log script start to file. No output to terminal unless error.
   log_info "--- Starting ${SCRIPT_NAME} ---"
 
   # 1. Check for required environment variable.
-  # Use :- default value syntax to avoid nounset error if DESKFLOW_SERVER_IP is unset.
   if [[ -z "${DESKFLOW_SERVER_IP:-}" ]]; then
     err_exit "Required environment variable DESKFLOW_SERVER_IP is not set or empty."
   fi
@@ -79,46 +78,51 @@ main() {
   fi
   log_info "Running ${FIND_DISPLAY_SCRIPT} to determine target DISPLAY..."
   local target_display
-  # Capture output; errexit/pipefail handle errors from the script.
   target_display=$("${FIND_DISPLAY_SCRIPT}")
   log_info "Determined target DISPLAY=${target_display}"
 
   # 3. Check if Deskflow client might already be running (simple check).
-  # This pgrep pattern tries to be specific but might need tuning.
   if pgrep -f "${FLATPAK_APP_ID}.*${DESKFLOW_CLIENT_CMD}.*${server_ip}" >/dev/null; then
-    log_info "A process matching the Deskflow client connecting to ${server_ip} appears to be running. Exiting."
-    # Exit successfully assuming the running instance is intended.
+    # Log to file and also print a message to terminal since script is exiting cleanly.
+    local msg="A process matching the Deskflow client connecting to ${server_ip} appears to be running. Exiting."
+    log_info "${msg}"
+    echo "[${SCRIPT_NAME} INFO] ${msg}" >&2
     exit 0
   fi
 
-  # 4. Prepare and launch the Deskflow client using Flatpak in the background.
-  log_info "Launching Deskflow client on DISPLAY=${target_display} connecting to ${server_ip}"
+  # 4. Prepare and launch the Deskflow client using Flatpak in the FOREGROUND.
+  log_info "Launching Deskflow client in foreground on DISPLAY=${target_display} connecting to ${server_ip}"
+  # Inform user on terminal where output will now appear.
+  echo "[${SCRIPT_NAME} INFO] Launching Deskflow client in foreground."
+  echo "[${SCRIPT_NAME} INFO] Client output will appear below. Press Ctrl+C here to stop it."
+  echo "[${SCRIPT_NAME} INFO] (Script's own logs are in ${LOG_FILE})"
 
   # Use an array for the command and arguments for robustness.
   local flatpak_cmd_args=(
     run
     "--command=${DESKFLOW_CLIENT_CMD}"
     "${FLATPAK_APP_ID}"
-    --no-daemon
+    --no-daemon # Good for foreground execution
     --enable-crypto
     "${server_ip}"
   )
 
   # Execute the command with the determined DISPLAY environment variable.
-  # Run in background (&) and redirect both stdout & stderr to the log file.
-  DISPLAY="${target_display}" flatpak "${flatpak_cmd_args[@]}" >>"${LOG_FILE}" 2>&1 &
+  # Output (stdout/stderr) from flatpak/deskflow goes directly to the terminal.
+  DISPLAY="${target_display}" flatpak "${flatpak_cmd_args[@]}"
 
-  # Capture PID of the background process.
-  local client_pid=$!
-  # Disown the process so it doesn't get killed if the parent shell (e.g., SSH) exits.
-  disown "${client_pid}"
+  # --- Script execution pauses here until the flatpak command finishes ---
 
-  log_info "Deskflow client launched in background (PID: ${client_pid}). Output/errors logged to ${LOG_FILE}"
+  # Capture exit status after flatpak command finishes.
+  local exit_status=$?
+  log_info "Deskflow client process exited with status ${exit_status}."
+  echo "[${SCRIPT_NAME} INFO] Deskflow client exited (Status: ${exit_status})." >&2
   log_info "--- ${SCRIPT_NAME} finished ---"
 }
 
 # Execute the main function, passing script arguments (if any).
 main "$@"
 
-# Exit explicitly with success status.
+# Exit explicitly with the status of the flatpak command if needed, or just 0.
+# Exiting 0 here means the script itself finished, regardless of client status.
 exit 0

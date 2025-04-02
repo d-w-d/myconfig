@@ -1,0 +1,143 @@
+#!/bin/bash
+#
+# Script Name: _deskflow_login_authX11
+# Purpose: Sets up X11 authorization for controlling the login screen (DISPLAY=:0)
+#          via SSH before a user is graphically logged in. Dynamically finds and
+#          validates the X server's authority file path.
+# Usage: Run this script in an SSH session before attempting to launch
+#        GUI applications (like DeskFlow) targeting DISPLAY=:0 on the login screen.
+# Style: Google Shell Style Guide compliant
+
+# Exit immediately if a command exits with a non-zero status.
+set -o errexit
+# Treat unset variables as an error when substituting.
+set -o nounset
+# Prevent errors in a pipeline from being masked. The return value of a pipeline
+# is the status of the last command to exit with a non-zero status,
+# or zero if no command exited with a non-zero status.
+set -o pipefail
+
+# Store the script's base name for use in messages.
+readonly SCRIPT_NAME="${0##*/}"
+
+# Function for standardized error messages and exit.
+# Arguments:
+#   Error message string.
+err_exit() {
+  # Prefix message with script name and ERROR tag. Output to stderr.
+  echo "[${SCRIPT_NAME} ERROR] ${1}" >&2
+  exit 1
+}
+
+# Function to find and validate the Xorg authority file path for the login screen.
+# Assumes the relevant Xorg process is associated with tty1 or vt1.
+# Outputs:
+#   Prints the validated path to the authority file to stdout.
+# Exits:
+#   If the Xorg process, auth argument, or auth file cannot be found or validated.
+find_xorg_auth_path() {
+  local xorg_cmdline
+  local auth_path
+  # Heuristic pattern to find the Xorg process for the primary display console.
+  local search_pattern='[X]org.*(vt1|tty1)'
+
+  # Redirect INFO messages to stderr
+  echo "[INFO] Searching for login screen Xorg process using pattern: ${search_pattern}" >&2
+  # Use subshell and '|| true' to prevent errexit if grep finds nothing.
+  xorg_cmdline=$(ps aux | grep -E "${search_pattern}" || true)
+
+  if [[ -z "${xorg_cmdline}" ]]; then
+    err_exit "Could not find running Xorg process for login screen (pattern: '${search_pattern}'). Is the login screen active?"
+  fi
+
+  # Ensure only one matching line is found for reliability.
+  local line_count
+  line_count=$(echo "${xorg_cmdline}" | wc -l)
+  if [[ "${line_count}" -ne 1 ]]; then
+    err_exit "Found ${line_count} Xorg processes matching pattern '${search_pattern}'. Require exactly one. Manual inspection needed."
+  fi
+  # Redirect INFO message to stderr
+  echo "[INFO] Found Xorg command line snippet (path extraction follows)." >&2
+
+  # Extract the path specified after the '-auth' argument using awk.
+  auth_path=$(echo "${xorg_cmdline}" | awk \
+    '{for(i=1; i<=NF; i++) if ($i=="-auth") {print $(i+1); exit}}')
+
+  if [[ -z "${auth_path}" ]]; then
+    err_exit "Could not extract '-auth <path>' argument from Xorg command line."
+  fi
+  # Redirect INFO message to stderr
+  echo "[INFO] Extracted potential auth path: ${auth_path}" >&2
+
+  # Validate that the extracted path points to a regular file accessible to root.
+  # Redirect INFO message to stderr
+  echo "[INFO] Validating extracted path is a regular file accessible to root..." >&2
+  # Use 'sudo test -f' for the check. Suppress command output (stdout/stderr).
+  set +o errexit # Temporarily disable errexit to check the command's status.
+  sudo test -f "${auth_path}" >/dev/null 2>&1
+  local test_status=$?
+  set -o errexit # Re-enable errexit.
+
+  if [[ ${test_status} -ne 0 ]]; then
+    # If 'sudo test -f' failed, provide details including 'sudo ls -ld' output.
+    local ls_output
+    # Use subshell and '|| true' to capture output even if ls fails.
+    ls_output=$( (sudo ls -ld "${auth_path}") 2>&1 || true)
+    err_exit "Validation failed. Path '${auth_path}' is not a regular file or is inaccessible to root (sudo test -f exit code: ${test_status}). Details: [${ls_output}]"
+  fi
+  # Redirect INFO message to stderr
+  echo "[INFO] Path validation successful." >&2
+
+  # Output ONLY the path to stdout for capture by the calling code.
+  echo "${auth_path}"
+}
+
+# Main execution logic.
+main() {
+  # Redirect INFO messages to stderr
+  echo "--- Setting up X11 authorization for DISPLAY=:0 ---" >&2
+
+  # 1. Set DISPLAY environment variable for the current session.
+  export DISPLAY=:0
+  # Redirect INFO message to stderr
+  echo "[INFO] Set DISPLAY=${DISPLAY}" >&2
+
+  # 2. Find and validate the Display Manager's authority file path.
+  local dm_auth_file
+  # Capture only the final path output from the function.
+  dm_auth_file=$(find_xorg_auth_path)
+  # Redirect INFO message to stderr
+  echo "[INFO] Using validated Display Manager auth file: ${dm_auth_file}" >&2
+
+  # 3. Ensure the target user's .Xauthority file exists for merging.
+  local xauth_user_file="${HOME}/.Xauthority"
+  # Redirect INFO message to stderr
+  echo "[INFO] Ensuring user auth file exists: ${xauth_user_file}" >&2
+  # Temporarily disable errexit for 'touch' to check its status directly.
+  set +o errexit
+  touch "${xauth_user_file}"
+  local touch_status=$?
+  set -o errexit # Re-enable errexit.
+
+  if [[ ${touch_status} -ne 0 ]]; then
+    err_exit "Failed to create or touch user auth file '${xauth_user_file}'. Check permissions in ${HOME}."
+  fi
+
+  # 4. Merge the authorization cookie from the DM file into the user file.
+  # Redirect INFO message to stderr
+  echo "[INFO] Attempting to merge authorization cookie (requires sudo)..." >&2
+  # 'set -o pipefail' ensures failure is detected in either command.
+  # Errors from sudo/xauth commands will go to stderr automatically.
+  sudo xauth -f "${dm_auth_file}" extract - "${DISPLAY}" | xauth merge -
+
+  # Redirect SUCCESS/INFO messages to stderr
+  echo "[SUCCESS] Authorization cookie merged successfully." >&2
+  echo "[INFO] You should now be able to run GUI applications on ${DISPLAY}." >&2
+  echo "--- Authorization setup complete ---" >&2
+}
+
+# Execute the main function, passing along any script arguments (though none are used).
+main "$@"
+
+# Exit explicitly with success status.
+exit 0
