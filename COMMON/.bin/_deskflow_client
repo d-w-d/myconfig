@@ -84,6 +84,7 @@ fi
 
 # Launch the Deskflow client to connect to the server.
 echo "$(date): Launching deskflow-client to ${server_ip}" >>"${log_file}"
+echo "Executing: flatpak run --command=\"${deskflow_client}\" org.deskflow.deskflow --no-daemon --enable-crypto \"${server_ip}\""
 flatpak run --command="${deskflow_client}" org.deskflow.deskflow \
   --no-daemon --enable-crypto "${server_ip}" 2>>"${log_file}"
 echo "$(date): Launched with PID $!" >>"${log_file}"
