@@ -1,90 +1,124 @@
 #!/bin/bash
-## Copyright 2025 xAI
-## SPDX-License-Identifier: MIT
-##
-## Author: DWD using Grok 3 (xAI assistant)
-## Created: March 25, 2025
-##
-## Description:
-##   This script launches the Deskflow client (deskflow-client) within a Flatpak
-##   sandbox to connect an Ubuntu machine (client) to a remote Deskflow server
-##   running on a Mac at IP address 192.168.1.13. Deskflow enables sharing a
-##   single keyboard and mouse across multiple computers over a network.
-##
-## Purpose:
-##   The script ensures the Ubuntu client can be controlled from the Mac server
-##   without requiring a local keyboard or mouse, even when no user is logged in.
-##   It is designed to be executed automatically by GDM (GNOME Display Manager)
-##   at the login screen to maintain connectivity after logout.
-##
-## Usage:
-##   - Automatic: Integrated into /etc/gdm3/Init/Default to run at GDM startup.
-##     No manual invocation required; use 'sudo systemctl restart gdm' to apply.
-##   - Manual: Run '/usr/local/bin/deskflow-client.sh' from a terminal to test
-##     the connection. Kill with 'flatpak kill org.deskflow.deskflow' or Ctrl+C
-##     if testing interactively.
-##
-## Prerequisites:
-##   - Deskflow must be installed via Flatpak (org.deskflow.deskflow).
-##   - The Mac server at 192.168.1.13 must be running Deskflow in server mode.
-##   - Network connectivity between the Ubuntu client and Mac server is required.
-##
-## Notes:
-##   - The '--no-daemon' flag keeps deskflow-client in the foreground, suitable
-##     for GDM integration when backgrounded with '&'.
-##   - The '--enable-crypto' flag ensures encrypted communication with the server.
-##   - If multiple instances run, use 'flatpak ps' and 'flatpak kill' to manage.
+#
+# Script Name: _deskflow_client (Simplified)
+# Purpose: Launches the Deskflow client Flatpak application, dynamically
+#          determining the target DISPLAY using the _find_display script.
+# Usage:
+#   - Ensure DESKFLOW_SERVER_IP environment variable is set.
+#   - If targeting the login screen (DISPLAY :0), ensure _xauth_for_login_screen
+#     has been run successfully in the current SSH session first.
+#   - Run this script to start the client. Run again after graphical login
+#     (targeting DISPLAY :1 or similar) if needed.
+# Dependencies:
+#   - _find_display script (expected in same directory or PATH).
+#   - DESKFLOW_SERVER_IP environment variable.
+#   - org.deskflow.deskflow Flatpak installed.
+# Style: Google Shell Style Guide compliant
 
-# Path to the Flatpak Deskflow client binary (within sandbox).
-deskflow_client="/app/bin/deskflow-client"
+# Exit immediately if a command exits with a non-zero status.
+set -o errexit
+# Treat unset variables as an error when substituting.
+set -o nounset
+# Prevent errors in a pipeline from being masked.
+set -o pipefail
 
-# IP address of the Mac running the Deskflow server.
-# Check if DESKFLOW_SERVER_IP environment variable is set.
-if [[ -z "${DESKFLOW_SERVER_IP}" ]]; then
-  echo "Error: Environment variable DESKFLOW_SERVER_IP is not set." >&2
-  echo "Please set it to the IP address of the Deskflow server." >&2
+# Store the script's base name for use in messages.
+readonly SCRIPT_NAME="${0##*/}"
+# Get the directory where the script itself resides to find helpers.
+readonly SCRIPT_DIR="$(dirname "$0")"
+
+# --- Configuration ---
+# Path to the utility script that finds the target DISPLAY value.
+readonly FIND_DISPLAY_SCRIPT="${SCRIPT_DIR}/_find_display"
+# Path to the Deskflow client binary inside the Flatpak sandbox.
+readonly DESKFLOW_CLIENT_CMD="/app/bin/deskflow-client"
+# Flatpak application ID.
+readonly FLATPAK_APP_ID="org.deskflow.deskflow"
+# Log file location. Using /tmp allows writing even if run by different users.
+# Consider user-specific logs if running manually as 'dwd'.
+readonly LOG_FILE="/tmp/deskflow-client.log"
+# --- End Configuration ---
+
+# Function for standardized error messages and exit.
+# Arguments:
+#   Error message string.
+err_exit() {
+  local timestamp
+  timestamp=$(date +'%Y-%m-%dT%H:%M:%S%z') # ISO 8601 Format
+  # Log error to file first.
+  echo "${timestamp}: [${SCRIPT_NAME} ERROR] ${1}" >>"${LOG_FILE}"
+  # Also print error to stderr for immediate feedback.
+  echo "[${SCRIPT_NAME} ERROR] ${1}" >&2
   exit 1
-fi
-server_ip="${DESKFLOW_SERVER_IP}"
+}
 
-# Log file for debugging (moved to /tmp for gdm access).
-log_file="/tmp/deskflow-client.log"
+# Logs informational messages to the log file.
+# Arguments:
+#   Info message string.
+log_info() {
+  local timestamp
+  timestamp=$(date +'%Y-%m-%dT%H:%M:%S%z')
+  echo "${timestamp}: [${SCRIPT_NAME} INFO] ${1}" >>"${LOG_FILE}"
+}
 
-# Determine the correct DISPLAY value by calling _find_display script.
-# Note: In X11, a DISPLAY is a string that represents which X
-# server to connect to (e.g. :0, :1, etc.). GDM does not set this
-# environment variable, so when we run deskflow-client, it will
-# default to DISPLAY=:0.0. This is a problem because GDM may actually
-# run on DISPLAY=:1.0 (or higher), and we need to connect to GDM's
-# X server in order to share the keyboard and mouse. The script
-# _find_display is designed to output the correct DISPLAY value by checking
-# available X11 sockets.
-display_output=$($(dirname "$0")/_find_display)
-find_display_status=$?
+# Main execution logic.
+main() {
+  log_info "--- Starting ${SCRIPT_NAME} ---"
 
-if [[ ${find_display_status} -ne 0 ]]; then
-  echo "$(date): _find_display failed to determine DISPLAY. Exiting." >>"${log_file}"
-  # The error message from _find_display already went to stderr.
-  exit 1
-fi
-export DISPLAY="${display_output}"
+  # 1. Check for required environment variable.
+  # Use :- default value syntax to avoid nounset error if DESKFLOW_SERVER_IP is unset.
+  if [[ -z "${DESKFLOW_SERVER_IP:-}" ]]; then
+    err_exit "Required environment variable DESKFLOW_SERVER_IP is not set or empty."
+  fi
+  local server_ip="${DESKFLOW_SERVER_IP}"
+  log_info "Target Deskflow server IP: ${server_ip}"
 
-# Set Xauthority to GDM’s auth file.
-gdm_uid=$(id -u gdm)
-export XAUTHORITY=$(ls /var/run/gdm3/auth-for-gdm-* 2>/dev/null || echo "/run/user/${gdm_uid}/.mutter-Xwaylandauth.*")
+  # 2. Determine the target DISPLAY using the helper script.
+  if [[ ! -x "${FIND_DISPLAY_SCRIPT}" ]]; then
+    err_exit "Helper script not found or not executable: ${FIND_DISPLAY_SCRIPT}"
+  fi
+  log_info "Running ${FIND_DISPLAY_SCRIPT} to determine target DISPLAY..."
+  local target_display
+  # Capture output; errexit/pipefail handle errors from the script.
+  target_display=$("${FIND_DISPLAY_SCRIPT}")
+  log_info "Determined target DISPLAY=${target_display}"
 
-# Log start attempt with environment details.
-echo "$(date): Starting deskflow-client.sh (DISPLAY=${DISPLAY}, XAUTHORITY=${XAUTHORITY})" >>"${log_file}"
+  # 3. Check if Deskflow client might already be running (simple check).
+  # This pgrep pattern tries to be specific but might need tuning.
+  if pgrep -f "${FLATPAK_APP_ID}.*${DESKFLOW_CLIENT_CMD}.*${server_ip}" >/dev/null; then
+    log_info "A process matching the Deskflow client connecting to ${server_ip} appears to be running. Exiting."
+    # Exit successfully assuming the running instance is intended.
+    exit 0
+  fi
 
-# Check if deskflow-client is already running.
-if pgrep -f "${deskflow_client}" >/dev/null; then
-  echo "$(date): deskflow-client already running, exiting" >>"${log_file}"
-  exit 0
-fi
+  # 4. Prepare and launch the Deskflow client using Flatpak in the background.
+  log_info "Launching Deskflow client on DISPLAY=${target_display} connecting to ${server_ip}"
 
-# Launch the Deskflow client to connect to the server.
-echo "$(date): Launching deskflow-client to ${server_ip}" >>"${log_file}"
-echo "Executing: DISPLAY=\"${display_output}\" flatpak run --command=\"${deskflow_client}\" org.deskflow.deskflow --no-daemon --enable-crypto \"${server_ip}\""
-DISPLAY="${display_output}" flatpak run --command="${deskflow_client}" org.deskflow.deskflow \
-  --no-daemon --enable-crypto "${server_ip}" 2>>"${log_file}"
-echo "$(date): Launched with PID $!" >>"${log_file}"
+  # Use an array for the command and arguments for robustness.
+  local flatpak_cmd_args=(
+    run
+    "--command=${DESKFLOW_CLIENT_CMD}"
+    "${FLATPAK_APP_ID}"
+    --no-daemon
+    --enable-crypto
+    "${server_ip}"
+  )
+
+  # Execute the command with the determined DISPLAY environment variable.
+  # Run in background (&) and redirect both stdout & stderr to the log file.
+  DISPLAY="${target_display}" flatpak "${flatpak_cmd_args[@]}" >>"${LOG_FILE}" 2>&1 &
+
+  # Capture PID of the background process.
+  local client_pid=$!
+  # Disown the process so it doesn't get killed if the parent shell (e.g., SSH) exits.
+  disown "${client_pid}"
+
+  log_info "Deskflow client launched in background (PID: ${client_pid}). Output/errors logged to ${LOG_FILE}"
+  log_info "--- ${SCRIPT_NAME} finished ---"
+}
+
+# Execute the main function, passing script arguments (if any).
+main "$@"
+
+# Exit explicitly with success status.
+exit 0
