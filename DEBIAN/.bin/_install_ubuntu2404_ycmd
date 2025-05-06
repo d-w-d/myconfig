@@ -6,7 +6,7 @@
 #
 # Options:
 #   --help              Display this help message and exit
-#   --all               Install all language completers (default)
+#   --all               Install all language completers
 #   --clang             Install C-family language completer
 #   --go                Install Go completer
 #   --rust              Install Rust completer
@@ -24,7 +24,7 @@ display_help() {
   echo ""
   echo "Options:"
   echo "  --help              Display this help message and exit"
-  echo "  --all               Install all language completers (default)"
+  echo "  --all               Install all language completers"
   echo "  --clang             Install C-family language completer"
   echo "  --go                Install Go completer"
   echo "  --rust              Install Rust completer"
@@ -32,12 +32,12 @@ display_help() {
   echo "  --java              Install Java completer"
   echo "  --verbose           Show detailed output during compilation"
   echo ""
-  echo "By default, all language completers will be installed."
+  echo "You must specify at least one completer option (e.g., --clang, --js) or --all."
   exit 0
 }
 
 # Default values
-ALL_COMPLETERS=true
+ALL_COMPLETERS=false
 CLANG_COMPLETER=false
 GO_COMPLETER=false
 RUST_COMPLETER=false
@@ -97,6 +97,19 @@ for arg in "$@"; do
     ;;
   esac
 done
+
+# Check if any completer option was specified
+if [ "$ALL_COMPLETERS" = false ] && \
+   [ "$CLANG_COMPLETER" = false ] && \
+   [ "$GO_COMPLETER" = false ] && \
+   [ "$RUST_COMPLETER" = false ] && \
+   [ "$JS_COMPLETER" = false ] && \
+   [ "$JAVA_COMPLETER" = false ]; then
+  echo "Error: You must specify which completers to install."
+  echo "Use --all or one or more of --clang, --go, --rust, --js, --java."
+  echo ""
+  display_help # This function also exits
+fi
 
 # Function to check if a command exists
 command_exists() {

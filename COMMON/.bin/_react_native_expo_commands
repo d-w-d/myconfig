@@ -1,0 +1,72 @@
+#!/bin/bash
+#
+# Useful commands for working with Expo and React Native
+# -----------------------------------------------------------
+
+# Print header
+print_header() {
+  echo -e "\n\033[1;36m$1\033[0m"
+  echo -e "-----------------------------------------------"
+}
+
+# Print command with description
+print_cmd() {
+  echo -e "\033[1;33m$1\033[0m"
+  echo -e "\033[0;90m$2\033[0m\n"
+}
+
+# Main sections of commands
+print_header "EXPO PROJECT CREATION"
+print_cmd "npx create-expo-app MyApp" "Create a new Expo project with default template"
+print_cmd "npx create-expo-app MyApp --template blank" "Create with blank template"
+print_cmd "npx create-expo-app MyApp --template blank-typescript" "Create with TypeScript template"
+print_cmd "npx create-expo-app MyApp --template tabs" "Create with tabs navigation template"
+
+print_header "DEVELOPMENT"
+print_cmd "npx expo start" "Start the development server"
+print_cmd "npx expo start --clear" "Start with cleared cache"
+print_cmd "npx expo start --web" "Start and open in web browser"
+print_cmd "npx expo start --ios" "Start and open in iOS simulator"
+print_cmd "npx expo start --android" "Start and open in Android emulator"
+print_cmd "npx expo start --tunnel" "Start with tunnel connection"
+print_cmd "npx expo start --offline" "Start in offline mode"
+
+print_header "DEVICE RUNNING"
+print_cmd "npx expo run:ios" "Build and run on iOS simulator"
+print_cmd "npx expo run:ios --device" "Build and run on connected iOS device"
+print_cmd "npx expo run:android" "Build and run on Android emulator"
+print_cmd "npx expo run:android --device" "Build and run on connected Android device"
+
+print_header "DEPENDENCIES & PACKAGES"
+print_cmd "npx expo install [package-name]" "Install Expo-compatible version of a package"
+print_cmd "npx expo install expo-camera expo-location" "Install multiple Expo packages"
+print_cmd "npx expo doctor" "Check for package compatibility issues"
+
+print_header "BUILDING & PUBLISHING"
+print_cmd "npx expo build:ios" "Build iOS binary (requires paid Apple Developer account)"
+print_cmd "npx expo build:android" "Build Android binary"
+print_cmd "npx expo build:web" "Build for web deployment"
+print_cmd "npx expo publish" "Publish to Expo's servers for over-the-air updates"
+print_cmd "npx expo export" "Export app as static bundle"
+
+print_header "EAS (EXPO APPLICATION SERVICES)"
+print_cmd "npx eas build:configure" "Configure EAS Build for your project"
+print_cmd "npx eas build --platform ios" "Build iOS app with EAS"
+print_cmd "npx eas build --platform android" "Build Android app with EAS"
+print_cmd "npx eas build --platform all" "Build for both platforms with EAS"
+print_cmd "npx eas update" "Create and publish an update"
+print_cmd "npx eas submit" "Submit app to stores"
+
+print_header "UPGRADING"
+print_cmd "npx expo upgrade" "Upgrade Expo SDK version"
+print_cmd "npx expo-cli upgrade" "Upgrade Expo CLI itself"
+
+print_header "ENVIRONMENT & TROUBLESHOOTING"
+print_cmd "npx expo diagnostics" "Get environment info for debugging"
+print_cmd "npx expo-env-info" "Show Expo environment info"
+print_cmd "npx react-native info" "Show React Native environment info"
+print_cmd "npx react-native log-ios" "Show iOS device logs"
+print_cmd "npx react-native log-android" "Show Android device logs"
+print_cmd "watchman watch-del-all" "Clear Watchman cache"
+print_cmd "rm -rf node_modules && npm install" "Reinstall node modules"
+print_cmd "rm -rf ~/.expo" "Clear Expo cache directory"
