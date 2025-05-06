@@ -290,7 +290,8 @@ _status_swap_action() {
     log "  Configured in '${FSTAB_PATH}': No"
   fi
 
-  log "\nOverall System Swap Status:"
+  echo # This will print a blank line
+  log "Overall System Swap Status:" # Log message without the \n
   if command -v swapon >/dev/null && sudo swapon --show --noheadings | grep -q '.'; then
     sudo swapon --show
   else
