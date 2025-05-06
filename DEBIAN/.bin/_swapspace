@@ -1,0 +1,342 @@
+#!/bin/bash
+#
+# Manages the /swapspace swap file on a Linux system.
+#
+# This script allows for creation, deletion, modification, and status checking
+# of a single, fixed swap file located at /swapspace.
+# It also manages the corresponding entry in /etc/fstab.
+
+set -euo pipefail
+
+# --- Constants ---
+readonly SWAP_FILE_PATH="/swapspace"
+readonly FSTAB_PATH="/etc/fstab"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# --- Logging & Utility Functions ---
+
+# err prints an error message to stderr.
+# Globals:
+#   SCRIPT_NAME
+err() {
+  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] ERROR: ${SCRIPT_NAME}: $*" >&2
+}
+
+# log prints an informational message to stdout.
+# Globals:
+#   SCRIPT_NAME
+log() {
+  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] INFO: ${SCRIPT_NAME}: $*" >&1
+}
+
+# _check_root ensures the script is run with root privileges.
+# Exits if not root.
+_check_root() {
+  if [[ "$(id -u)" -ne 0 ]]; then
+    err "This operation requires root privileges. Please run with sudo."
+    exit 1
+  fi
+}
+
+# usage displays the help message for the script.
+# Globals:
+#   SCRIPT_NAME
+#   SWAP_FILE_PATH
+usage() {
+  cat <<EOF
+Usage: sudo ${SCRIPT_NAME} <command> [options]
+
+Manages the '${SWAP_FILE_PATH}' swap file on a Linux system.
+
+Commands:
+  create --size <SIZE>  Create and activate the swap file.
+                        SIZE examples: 512M, 2G, 1024K.
+  delete                Deactivate and delete the swap file.
+  modify --size <SIZE>  Recreate the swap file with a new size.
+                        This involves deleting the old one first.
+  status                Show status of '${SWAP_FILE_PATH}' and system swap.
+  help                  Display this help message.
+
+Examples:
+  sudo ${SCRIPT_NAME} create --size 2G
+  sudo ${SCRIPT_NAME} status
+  sudo ${SCRIPT_NAME} delete
+EOF
+}
+
+# _is_swap_active checks if the specified path is an active swap device.
+# Arguments:
+#   $1: Path to the potential swap file/device.
+# Returns:
+#   0 if active, 1 otherwise.
+_is_swap_active() {
+  local path_to_check="$1"
+  # swapon --show exits with 0 and prints output if there's any swap.
+  # We need to check if our specific path is in the output.
+  if swapon --show=NAME --noheadings | grep -q "^${path_to_check}$"; then
+    return 0 # Active
+  fi
+  return 1 # Not active
+}
+
+# _parse_size_to_dd_params validates the size string and determines dd parameters.
+# Arguments:
+#   $1: Size string (e.g., "2G", "512M").
+# Outputs (via echo, to be captured by command substitution):
+#   A string "<block_size> <count>" for dd, e.g., "1M 512".
+# Exits on invalid format.
+_parse_size_to_dd_params() {
+  local size_str="$1"
+  local num_part
+  local unit_part
+  local block_size
+  local count
+
+  if [[ ! "${size_str}" =~ ^([0-9]+)([MGK])$ ]]; then
+    err "Invalid size format: '${size_str}'. Expected <number><M|G|K> (e.g., 512M, 2G, 1024K)."
+    exit 1
+  fi
+
+  num_part="${BASH_REMATCH[1]}"
+  unit_part="${BASH_REMATCH[2]}"
+
+  case "${unit_part}" in
+    M) block_size="1M" ;;
+    G) block_size="1G" ;;
+    K) block_size="1K" ;;
+    *) # Should be caught by regex, but as a safeguard
+      err "Internal error: Unexpected unit part '${unit_part}'."
+      exit 1
+      ;;
+  esac
+  count="${num_part}"
+  echo "${block_size} ${count}"
+}
+
+# --- Core Logic Functions ---
+
+# _create_swap_action creates and activates the swap file.
+# Arguments:
+#   $1: Size string (e.g., "2G", "512M").
+# Globals:
+#   SWAP_FILE_PATH
+#   FSTAB_PATH
+_create_swap_action() {
+  _check_root
+  local size_str="$1"
+  local dd_params
+  local dd_bs
+  local dd_count
+
+  log "Starting 'create' operation for '${SWAP_FILE_PATH}' with size '${size_str}'."
+
+  if _is_swap_active "${SWAP_FILE_PATH}"; then
+    err "'${SWAP_FILE_PATH}' is already active as swap. Cannot create."
+    exit 1
+  fi
+
+  if [[ -e "${SWAP_FILE_PATH}" ]]; then
+    err "'${SWAP_FILE_PATH}' already exists. Please delete it first or use 'modify'."
+    exit 1
+  fi
+
+  dd_params=$(_parse_size_to_dd_params "${size_str}")
+  read -r dd_bs dd_count <<< "${dd_params}" # Split the output into two variables
+
+  log "Creating swap file with dd (bs=${dd_bs}, count=${dd_count})..."
+  if ! sudo dd if=/dev/zero of="${SWAP_FILE_PATH}" bs="${dd_bs}" count="${dd_count}" status=progress; then
+    err "Failed to create swap file with dd."
+    # Clean up potentially partially created file
+    sudo rm -f "${SWAP_FILE_PATH}"
+    exit 1
+  fi
+
+  log "Setting permissions (600) on '${SWAP_FILE_PATH}'..."
+  if ! sudo chmod 600 "${SWAP_FILE_PATH}"; then
+    err "Failed to set permissions on swap file."
+    sudo rm -f "${SWAP_FILE_PATH}" # Clean up
+    exit 1
+  fi
+
+  log "Formatting '${SWAP_FILE_PATH}' as swap..."
+  if ! sudo mkswap "${SWAP_FILE_PATH}"; then
+    err "Failed to format swap file with mkswap."
+    sudo rm -f "${SWAP_FILE_PATH}" # Clean up
+    exit 1
+  fi
+
+  log "Activating swap on '${SWAP_FILE_PATH}'..."
+  if ! sudo swapon "${SWAP_FILE_PATH}"; then
+    err "Failed to activate swap with swapon."
+    # Attempt to clean up mkswap changes, though the file exists
+    sudo rm -f "${SWAP_FILE_PATH}"
+    exit 1
+  fi
+
+  log "Updating '${FSTAB_PATH}'..."
+  # Escape SWAP_FILE_PATH for use in grep pattern
+  local fstab_entry_pattern
+  fstab_entry_pattern="^${SWAP_FILE_PATH//\//\\/}[[:space:]]" # Escapes / for grep
+
+  if grep -q "${fstab_entry_pattern}" "${FSTAB_PATH}"; then
+    log "'${SWAP_FILE_PATH}' already exists in '${FSTAB_PATH}'. No changes made to fstab."
+  else
+    log "Adding '${SWAP_FILE_PATH}' to '${FSTAB_PATH}'."
+    if ! echo "${SWAP_FILE_PATH} none swap sw 0 0" | sudo tee -a "${FSTAB_PATH}" > /dev/null; then
+      err "Failed to add swap entry to '${FSTAB_PATH}'. Manual addition might be required."
+      # Swap is active, but fstab update failed. This is not ideal.
+    fi
+  fi
+  log "'create' operation completed successfully."
+}
+
+# _delete_swap_action deactivates and deletes the swap file.
+# Globals:
+#   SWAP_FILE_PATH
+#   FSTAB_PATH
+_delete_swap_action() {
+  _check_root
+  log "Starting 'delete' operation for '${SWAP_FILE_PATH}'."
+
+  if _is_swap_active "${SWAP_FILE_PATH}"; then
+    log "Deactivating swap on '${SWAP_FILE_PATH}'..."
+    if ! sudo swapoff "${SWAP_FILE_PATH}"; then
+      err "Failed to deactivate swap on '${SWAP_FILE_PATH}'. Manual deactivation might be required."
+      # Proceeding with other steps might be problematic.
+    else
+      log "Swap deactivated."
+    fi
+  else
+    log "'${SWAP_FILE_PATH}' is not currently active as swap."
+  fi
+
+  log "Updating '${FSTAB_PATH}'..."
+  # Escape SWAP_FILE_PATH for use in sed pattern
+  local sed_pattern
+  # Path needs to be escaped for sed. / becomes \/.
+  # The [[:space:]] handles tabs or spaces after the path.
+  sed_pattern="\\#^${SWAP_FILE_PATH//\//\\/}[[:space:]]\\+none[[:space:]]\\+swap.*#d"
+
+  if grep -q "^${SWAP_FILE_PATH//\//\\/}[[:space:]]" "${FSTAB_PATH}"; then
+    log "Removing entry for '${SWAP_FILE_PATH}' from '${FSTAB_PATH}'."
+    if ! sudo sed -i "${sed_pattern}" "${FSTAB_PATH}"; then
+      err "Failed to remove swap entry from '${FSTAB_PATH}'. Manual removal might be required."
+    fi
+  else
+    log "No entry for '${SWAP_FILE_PATH}' found in '${FSTAB_PATH}'."
+  fi
+
+  if [[ -f "${SWAP_FILE_PATH}" ]]; then
+    log "Deleting file '${SWAP_FILE_PATH}'..."
+    if ! sudo rm -f "${SWAP_FILE_PATH}"; then
+      err "Failed to delete swap file '${SWAP_FILE_PATH}'."
+    fi
+  else
+    log "Swap file '${SWAP_FILE_PATH}' does not exist."
+  fi
+  log "'delete' operation completed."
+}
+
+# _modify_swap_action modifies the swap file by deleting and recreating it.
+# Arguments:
+#   $1: New size string (e.g., "2G", "512M").
+_modify_swap_action() {
+  _check_root
+  local new_size_str="$1"
+  log "Starting 'modify' operation for '${SWAP_FILE_PATH}' to new size '${new_size_str}'."
+  log "This involves deleting the existing swap file (if any) and creating a new one."
+
+  # Call delete logic (it's designed to be safe if swap doesn't exist)
+  _delete_swap_action
+
+  # Call create logic
+  _create_swap_action "${new_size_str}"
+
+  log "'modify' operation completed successfully."
+}
+
+# _status_swap_action shows the status of the swap file and system swap.
+# Globals:
+#   SWAP_FILE_PATH
+#   FSTAB_PATH
+_status_swap_action() {
+  log "Status for swap file: '${SWAP_FILE_PATH}'"
+  if [[ -f "${SWAP_FILE_PATH}" ]]; then
+    local file_size
+    file_size=$(sudo du -sh "${SWAP_FILE_PATH}" | awk '{print $1}')
+    log "  File exists: Yes (Size: ${file_size})"
+  else
+    log "  File exists: No"
+  fi
+
+  if _is_swap_active "${SWAP_FILE_PATH}"; then
+    log "  Active swap: Yes"
+  else
+    log "  Active swap: No"
+  fi
+  
+  local fstab_entry_pattern
+  fstab_entry_pattern="^${SWAP_FILE_PATH////\\/}[[:space:]]" # Escapes / for grep
+  if grep -q "${fstab_entry_pattern}" "${FSTAB_PATH}"; then
+    log "  Configured in '${FSTAB_PATH}': Yes"
+    log "    Entry: $(grep "${fstab_entry_pattern}" "${FSTAB_PATH}")"
+  else
+    log "  Configured in '${FSTAB_PATH}': No"
+  fi
+
+  log "\nOverall System Swap Status:"
+  if command -v swapon >/dev/null && swapon --show --noheadings | grep -q '.'; then
+    swapon --show
+  else
+    log "  No active swap devices/files found or 'swapon' tool output is empty."
+  fi
+}
+
+# --- Main Function ---
+main() {
+  if [[ $# -eq 0 ]]; then
+    usage
+    exit 0 # Per user request: no args shows help and exits cleanly
+  fi
+
+  local action="$1"
+  shift # Consume the action argument
+
+  case "${action}" in
+    create)
+      if [[ "$1" != "--size" ]] || [[ -z "${2:-}" ]]; then # Check if $2 is unset or empty
+        err "create: Missing or invalid --size parameter. Example: ${SCRIPT_NAME} create --size 2G"
+        usage
+        exit 1
+      fi
+      _create_swap_action "$2" # Pass only the size value
+      ;;
+    delete)
+      _delete_swap_action
+      ;;
+    modify)
+      if [[ "$1" != "--size" ]] || [[ -z "${2:-}" ]]; then
+        err "modify: Missing or invalid --size parameter. Example: ${SCRIPT_NAME} modify --size 4G"
+        usage
+        exit 1
+      fi
+      _modify_swap_action "$2" # Pass only the size value
+      ;;
+    status)
+      _status_swap_action
+      ;;
+    help|-h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      err "Unknown command '${action}'."
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+# Call main function with all script arguments
+# This ensures that 'main' is the entry point of the script.
+main "$@"
