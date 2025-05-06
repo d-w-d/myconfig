@@ -29,13 +29,20 @@ log() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] INFO: ${SCRIPT_NAME}: $*" >&1
 }
 
-# _check_root ensures the script is run with root privileges.
-# Exits if not root.
-_check_root() {
-  if [[ "$(id -u)" -ne 0 ]]; then
-    err "This operation requires root privileges. Please run with sudo."
+# _check_sudo_capability verifies that the user can use sudo.
+# Exits if sudo is unavailable or unusable by the current user.
+_check_sudo_capability() {
+  if ! command -v sudo >/dev/null; then
+    err "sudo command not found. This script requires sudo to perform privileged operations."
     exit 1
   fi
+  # Attempt to update user's cached credentials or prompt if necessary.
+  # If user is not in sudoers or sudo is misconfigured, this will fail.
+  if ! sudo -v; then
+    err "Sudo privilege check failed. Ensure you can run sudo commands (e.g., you are in the sudoers file)."
+    exit 1
+  fi
+  log "Sudo capability check passed. You may be prompted for your password for privileged operations."
 }
 
 # usage displays the help message for the script.
@@ -44,9 +51,10 @@ _check_root() {
 #   SWAP_FILE_PATH
 usage() {
   cat <<EOF
-Usage: sudo ${SCRIPT_NAME} <command> [options]
+Usage: ${SCRIPT_NAME} <command> [options]
 
 Manages the '${SWAP_FILE_PATH}' swap file on a Linux system.
+This script will use 'sudo' internally for privileged operations.
 
 Commands:
   create --size <SIZE>  Create and activate the swap file.
@@ -58,9 +66,9 @@ Commands:
   help                  Display this help message.
 
 Examples:
-  sudo ${SCRIPT_NAME} create --size 2G
-  sudo ${SCRIPT_NAME} status
-  sudo ${SCRIPT_NAME} delete
+  ${SCRIPT_NAME} create --size 2G
+  ${SCRIPT_NAME} status
+  ${SCRIPT_NAME} delete
 EOF
 }
 
@@ -73,7 +81,7 @@ _is_swap_active() {
   local path_to_check="$1"
   # swapon --show exits with 0 and prints output if there's any swap.
   # We need to check if our specific path is in the output.
-  if swapon --show=NAME --noheadings | grep -q "^${path_to_check}$"; then
+  if sudo swapon --show=NAME --noheadings | grep -q "^${path_to_check}$"; then
     return 0 # Active
   fi
   return 1 # Not active
@@ -122,7 +130,6 @@ _parse_size_to_dd_params() {
 #   SWAP_FILE_PATH
 #   FSTAB_PATH
 _create_swap_action() {
-  _check_root
   local size_str="$1"
   local dd_params
   local dd_bs
@@ -195,7 +202,6 @@ _create_swap_action() {
 #   SWAP_FILE_PATH
 #   FSTAB_PATH
 _delete_swap_action() {
-  _check_root
   log "Starting 'delete' operation for '${SWAP_FILE_PATH}'."
 
   if _is_swap_active "${SWAP_FILE_PATH}"; then
@@ -241,7 +247,6 @@ _delete_swap_action() {
 # Arguments:
 #   $1: New size string (e.g., "2G", "512M").
 _modify_swap_action() {
-  _check_root
   local new_size_str="$1"
   log "Starting 'modify' operation for '${SWAP_FILE_PATH}' to new size '${new_size_str}'."
   log "This involves deleting the existing swap file (if any) and creating a new one."
@@ -261,7 +266,7 @@ _modify_swap_action() {
 #   FSTAB_PATH
 _status_swap_action() {
   log "Status for swap file: '${SWAP_FILE_PATH}'"
-  if [[ -f "${SWAP_FILE_PATH}" ]]; then
+  if sudo test -f "${SWAP_FILE_PATH}"; then # Use sudo test for root-owned file
     local file_size
     file_size=$(sudo du -sh "${SWAP_FILE_PATH}" | awk '{print $1}')
     log "  File exists: Yes (Size: ${file_size})"
@@ -269,7 +274,8 @@ _status_swap_action() {
     log "  File exists: No"
   fi
 
-  if _is_swap_active "${SWAP_FILE_PATH}"; then
+  # Check if active using sudo
+  if sudo swapon --show=NAME --noheadings | grep -q "^${SWAP_FILE_PATH}$"; then
     log "  Active swap: Yes"
   else
     log "  Active swap: No"
@@ -285,8 +291,8 @@ _status_swap_action() {
   fi
 
   log "\nOverall System Swap Status:"
-  if command -v swapon >/dev/null && swapon --show --noheadings | grep -q '.'; then
-    swapon --show
+  if command -v swapon >/dev/null && sudo swapon --show --noheadings | grep -q '.'; then
+    sudo swapon --show
   else
     log "  No active swap devices/files found or 'swapon' tool output is empty."
   fi
@@ -294,6 +300,8 @@ _status_swap_action() {
 
 # --- Main Function ---
 main() {
+  _check_sudo_capability # Check for sudo access first
+
   if [[ $# -eq 0 ]]; then
     usage
     exit 0 # Per user request: no args shows help and exits cleanly
