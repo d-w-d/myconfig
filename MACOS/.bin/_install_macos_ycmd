@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# Completes installation of YouCompleteMe Vundle Plugin for macOS.
+# Assumes prerequisites like python3, cmake, and a C++ compiler are installed.
+
+# --- Sanity Checks ---
+
+# 1. Check for macOS
+if [[ "$(uname -s)" != "Darwin" ]]; then
+    echo "Error: This script is intended for macOS only. Exiting."
+    exit 1
+fi
+
+# 2. Check for python3
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "Error: python3 not found. Please install Python 3."
+    exit 1
+fi
+PYTHON_EXEC=$(which python3)
+
+# 3. Check for cmake
+if ! command -v cmake >/dev/null 2>&1; then
+    echo "Error: cmake not found. Please install cmake (e.g., 'brew install cmake')."
+    exit 1
+fi
+
+# 4. Check for C++ Compiler (clang++ preferred, then g++)
+CXX_COMPILER=""
+if command -v clang++ >/dev/null 2>&1; then
+    CXX_COMPILER=$(which clang++)
+elif command -v g++ >/dev/null 2>&1; then
+    CXX_COMPILER=$(which g++)
+else
+    echo "Error: No C++ compiler (clang++ or g++) found. Please install Xcode Command Line Tools or g++."
+    exit 1
+fi
+
+# 5. Check for YouCompleteMe directory
+YCM_DIR="$HOME/.vim/bundle/YouCompleteMe"
+if [[ ! -d "$YCM_DIR" ]]; then
+    echo "Error: YouCompleteMe directory not found at $YCM_DIR."
+    echo "Please ensure Vundle (or your plugin manager) has cloned YouCompleteMe."
+    exit 1
+fi
+
+# --- Installation ---
+
+echo "All prerequisites found. Proceeding with YouCompleteMe installation..."
+
+previous_dir=$PWD
+cd "$YCM_DIR" || { echo "Error: Failed to cd into $YCM_DIR"; exit 1; }
+
+echo "Updating YouCompleteMe repository (git pull)..."
+git pull origin master
+
+echo "Updating YouCompleteMe submodules (git submodule update)..."
+git submodule update --init --recursive
+
+echo "Running YouCompleteMe install script..."
+# Specify desired completers. Add more as needed.
+# e.g., --cs-completer --go-completer --rust-completer --java-completer
+COMPLETERS="--clang-completer --ts-completer"
+
+if CXX="$CXX_COMPILER" "$PYTHON_EXEC" install.py $COMPLETERS; then
+    echo "YouCompleteMe installation script completed successfully."
+else
+    echo "Error: YouCompleteMe installation script failed."
+    cd "$previous_dir"
+    exit 1
+fi
+
+cd "$previous_dir"
+
+echo -e "
+====================================
+  YouCompleteMe Installation Finalized
+====================================
+"
+echo "Script finished."

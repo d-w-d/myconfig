@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+#########################################
+### TMUX Requires libevent
+#########################################
+
+echo "Install via homebrew"
