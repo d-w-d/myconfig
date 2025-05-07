@@ -109,13 +109,13 @@ _parse_size_to_dd_params() {
   unit_part="${BASH_REMATCH[2]}"
 
   case "${unit_part}" in
-    M) block_size="1M" ;;
-    G) block_size="1G" ;;
-    K) block_size="1K" ;;
-    *) # Should be caught by regex, but as a safeguard
-      err "Internal error: Unexpected unit part '${unit_part}'."
-      exit 1
-      ;;
+  M) block_size="1M" ;;
+  G) block_size="1G" ;;
+  K) block_size="1K" ;;
+  *) # Should be caught by regex, but as a safeguard
+    err "Internal error: Unexpected unit part '${unit_part}'."
+    exit 1
+    ;;
   esac
   count="${num_part}"
   echo "${block_size} ${count}"
@@ -148,7 +148,7 @@ _create_swap_action() {
   fi
 
   dd_params=$(_parse_size_to_dd_params "${size_str}")
-  read -r dd_bs dd_count <<< "${dd_params}" # Split the output into two variables
+  read -r dd_bs dd_count <<<"${dd_params}" # Split the output into two variables
 
   log "Creating swap file with dd (bs=${dd_bs}, count=${dd_count})..."
   if ! sudo dd if=/dev/zero of="${SWAP_FILE_PATH}" bs="${dd_bs}" count="${dd_count}" status=progress; then
@@ -189,7 +189,7 @@ _create_swap_action() {
     log "'${SWAP_FILE_PATH}' already exists in '${FSTAB_PATH}'. No changes made to fstab."
   else
     log "Adding '${SWAP_FILE_PATH}' to '${FSTAB_PATH}'."
-    if ! echo "${SWAP_FILE_PATH} none swap sw 0 0" | sudo tee -a "${FSTAB_PATH}" > /dev/null; then
+    if ! echo "${SWAP_FILE_PATH} none swap sw 0 0" | sudo tee -a "${FSTAB_PATH}" >/dev/null; then
       err "Failed to add swap entry to '${FSTAB_PATH}'. Manual addition might be required."
       # Swap is active, but fstab update failed. This is not ideal.
     fi
@@ -280,7 +280,7 @@ _status_swap_action() {
   else
     log "  Active swap: No"
   fi
-  
+
   local fstab_entry_pattern
   fstab_entry_pattern="^${SWAP_FILE_PATH////\\/}[[:space:]]" # Escapes / for grep
   if grep -q "${fstab_entry_pattern}" "${FSTAB_PATH}"; then
@@ -290,7 +290,7 @@ _status_swap_action() {
     log "  Configured in '${FSTAB_PATH}': No"
   fi
 
-  echo # This will print a blank line
+  echo                              # This will print a blank line
   log "Overall System Swap Status:" # Log message without the \n
   if command -v swapon >/dev/null && sudo swapon --show --noheadings | grep -q '.'; then
     sudo swapon --show
@@ -312,37 +312,37 @@ main() {
   shift # Consume the action argument
 
   case "${action}" in
-    create)
-      if [[ "$1" != "--size" ]] || [[ -z "${2:-}" ]]; then # Check if $2 is unset or empty
-        err "create: Missing or invalid --size parameter. Example: ${SCRIPT_NAME} create --size 2G"
-        usage
-        exit 1
-      fi
-      _create_swap_action "$2" # Pass only the size value
-      ;;
-    delete)
-      _delete_swap_action
-      ;;
-    modify)
-      if [[ "$1" != "--size" ]] || [[ -z "${2:-}" ]]; then
-        err "modify: Missing or invalid --size parameter. Example: ${SCRIPT_NAME} modify --size 4G"
-        usage
-        exit 1
-      fi
-      _modify_swap_action "$2" # Pass only the size value
-      ;;
-    status)
-      _status_swap_action
-      ;;
-    help|-h|--help)
-      usage
-      exit 0
-      ;;
-    *)
-      err "Unknown command '${action}'."
+  create)
+    if [[ "$1" != "--size" ]] || [[ -z "${2:-}" ]]; then # Check if $2 is unset or empty
+      err "create: Missing or invalid --size parameter. Example: ${SCRIPT_NAME} create --size 2G"
       usage
       exit 1
-      ;;
+    fi
+    _create_swap_action "$2" # Pass only the size value
+    ;;
+  delete)
+    _delete_swap_action
+    ;;
+  modify)
+    if [[ "$1" != "--size" ]] || [[ -z "${2:-}" ]]; then
+      err "modify: Missing or invalid --size parameter. Example: ${SCRIPT_NAME} modify --size 4G"
+      usage
+      exit 1
+    fi
+    _modify_swap_action "$2" # Pass only the size value
+    ;;
+  status)
+    _status_swap_action
+    ;;
+  help | -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    err "Unknown command '${action}'."
+    usage
+    exit 1
+    ;;
   esac
 }
 
