@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#
+# This script toggles the ApplePressAndHoldEnabled setting.
+# Setting this to false allows you to hold down a key (like 'k') and have it repeat indefinitely.
+# Setting this to true shows the accent menu when holding down a key (for accented characters).
+
+# Get current value
+current_value=$(defaults read -g ApplePressAndHoldEnabled 2>/dev/null)
+
+if [[ "$current_value" == "1" ]]; then
+    # Currently enabled (true), so disable (set to false)
+    defaults write -g ApplePressAndHoldEnabled -bool false
+    echo "ApplePressAndHoldEnabled is now set to false. Key repeat is enabled."
+else
+    # Currently disabled (false) or unset, so enable (set to true)
+    defaults write -g ApplePressAndHoldEnabled -bool true
+    echo "ApplePressAndHoldEnabled is now set to true. Accent menu is enabled."
+fi
+
+echo "Note: You need to restart your Mac for this change to take effect."

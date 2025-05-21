@@ -179,3 +179,4 @@ bindkey "^[[1;5B" down-line-or-history  # [CTRL] + Cursor down
 
 # Added by Windsurf
 export PATH="/Users/dwd/.codeium/windsurf/bin:$PATH"
+
