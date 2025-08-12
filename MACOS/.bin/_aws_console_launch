@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+#
+# _aws_console_launch – Open an AWS Console session in Chrome with one command.
+#
+# Usage:
+#   _aws_console_launch [--profile PROFILE] [--duration SECONDS]
+#
+# Summary:
+#   1. Uses aws‑cli to call sts:GetSessionToken (Defaults: current profile, 12 h).
+#   2. Exchanges the temporary credentials for a SigninToken via the federation
+#      endpoint.  (Token is valid 15 min; console session lasts --duration secs.)
+#   3. Constructs the login URL and opens it in Google Chrome.
+#
+# Prerequisites:
+#   • aws-cli v2, curl, jq
+#   • A configured AWS profile that can call sts:GetSessionToken.
+#   • (Optional) If the profile has an MFA device, you’ll be prompted for the code.
+#
+# Security:
+#   The generated console URL grants console access for up to 12 h – keep it
+#   private and let the browser discard history if you wish.
+#
+# References:
+#   • sts:GetSessionToken supports up to 129 600 s (36 h) for IAM users – default
+#     43 200 s (12 h). :contentReference[oaicite:0]{index=0}
+#   • Steps to obtain a SigninToken and build a console URL. :contentReference[oaicite:1]{index=1}
+#
+set -euo pipefail
+
+readonly DEFAULT_DURATION=43200      # 12 h
+readonly FEDERATION_ENDPOINT="https://signin.aws.amazon.com/federation"
+readonly DESTINATION_URL="https://console.aws.amazon.com/"
+
+#
+# urlencode - URL‑encodes stdin using jq.
+#
+urlencode() {
+  jq -sRr @uri
+}
+
+#
+# open_in_chrome - Opens the supplied URL in Google Chrome (macOS or Linux).
+#
+open_in_chrome() {
+  local url="$1"
+  case "$(uname -s)" in
+    Darwin) open -a "Google Chrome" "$url" ;;
+    Linux)  (command -v google-chrome >/dev/null && google-chrome "$url") || xdg-open "$url" ;;
+    *)      echo "Unsupported OS. Manually open: $url" ;;
+  esac
+}
+
+#
+# build_console_url - Creates the final console login URL.
+#
+build_console_url() {
+  local signin_token="$1"
+  local destination_encoded
+  destination_encoded=$(printf '%s' "$DESTINATION_URL" | urlencode)
+  printf '%s?Action=login&Issuer=aws-cli&Destination=%s&SigninToken=%s' \
+    "$FEDERATION_ENDPOINT" "$destination_encoded" "$signin_token"
+}
+
+#
+# get_temp_creds - Calls sts:GetSessionToken (handles MFA if configured).
+#
+get_temp_creds() {
+  local profile="$1"
+  local duration="$2"
+
+  local mfa_serial
+  mfa_serial=$(aws configure get mfa_serial --profile "$profile" || true)
+
+  if [[ -n "$mfa_serial" ]]; then
+    read -rp "Enter MFA code for device $mfa_serial: " mfa_code
+    aws sts get-session-token \
+      --profile "$profile" \
+      --duration-seconds "$duration" \
+      --serial-number "$mfa_serial" \
+      --token-code "$mfa_code"
+  else
+    aws sts get-session-token \
+      --profile "$profile" \
+      --duration-seconds "$duration"
+  fi
+}
+
+#
+# get_signin_token - Exchanges temporary credentials for a SigninToken.
+#
+get_signin_token() {
+  local access_key="$1"
+  local secret_key="$2"
+  local session_token="$3"
+  local duration="$4"
+
+  local session_json
+  session_json=$(jq -n --arg id  "$access_key" \
+                       --arg key "$secret_key" \
+                       --arg tok "$session_token" \
+                       '{sessionId:$id,sessionKey:$key,sessionToken:$tok}')
+
+  local urlencoded_session
+  urlencoded_session=$(printf '%s' "$session_json" | urlencode)
+
+  local token_url="${FEDERATION_ENDPOINT}?Action=getSigninToken&SessionDuration=${duration}&Session=${urlencoded_session}"
+  curl -s "$token_url" | jq -r '.SigninToken'
+}
+
+#
+# main - Argument parsing and orchestration.
+#
+main() {
+  local profile=${AWS_PROFILE:-default}
+  local duration="$DEFAULT_DURATION"
+
+  # Simple flags parsing (two optional --profile / --duration longopts).
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --profile)   profile="$2"; shift 2 ;;
+      --duration)  duration="$2"; shift 2 ;;
+      -*)
+        echo "Unknown flag: $1" >&2; exit 1 ;;
+      *) break ;;
+    esac
+  done
+
+  echo "Using profile=$profile duration=${duration}s"
+
+  echo "Obtaining temporary credentials (sts:GetSessionToken)…"
+  local creds_json
+  creds_json=$(get_temp_creds "$profile" "$duration")
+
+  local access_key secret_key session_token
+  access_key=$(jq -r '.Credentials.AccessKeyId'     <<<"$creds_json")
+  secret_key=$(jq -r '.Credentials.SecretAccessKey' <<<"$creds_json")
+  session_token=$(jq -r '.Credentials.SessionToken' <<<"$creds_json")
+
+  echo "Exchanging credentials for SigninToken…"
+  local signin_token
+  signin_token=$(get_signin_token "$access_key" "$secret_key" "$session_token" "$duration")
+
+  echo "Building console URL…"
+  local console_url
+  console_url=$(build_console_url "$signin_token")
+
+  echo "Opening AWS Console in Chrome..."
+  open_in_chrome "$console_url"
+}
+
+main "$@"

@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+
+# Script to rename folders that are output from Photos App
+
+# Script to rename folders from "Location, Month Day, Year" or "Month Day, Year"
+# to "YYYY-MM-DD_Location" or "YYYY-MM-DD" respectively.
+# Operates on directories in the current working directory.
+# Includes a preliminary scan and confirmation step.
+
+# --- Configuration ---
+# Set DRY_RUN_CMD to "echo" to print commands instead of executing (dry run).
+# Set DRY_RUN_CMD to "" (empty string) to perform actual renaming.
+# DRY_RUN_CMD="echo" # Default to dry run, user can change this if they prefer
+DRY_RUN_CMD="" # Set to live mode as per previous state, user can change this
+
+# --- Script Logic ---
+echo "Starting directory renaming process..."
+echo "--------------------------------------------------"
+echo "Phase 1: Scanning for directories to rename..."
+
+potential_renames_arr=() # Array to store pairs of "original_name" "new_name"
+
+# Find directories in the current path (.), at max depth 1, that are directories (-type d),
+# and whose names contain at least one comma (-name '*,*').
+# Using -print0 and read -d $'\0' to handle names with spaces or special characters.
+while IFS= read -r -d $'\0' dir_path; do
+    original_dir_name=$(basename "$dir_path")
+
+    # Skip the current directory itself if it somehow matches
+    if [[ "$original_dir_name" == "." ]]; then
+        continue
+    fi
+
+    echo "Checking: '$original_dir_name'"
+    parsed_successfully=false
+    current_new_name=""
+
+    # Trim original_dir_name to avoid issues if it has leading/trailing spaces
+    trimmed_original_dir_name=$(echo "$original_dir_name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    # Count actual commas in the directory name to distinguish patterns
+    num_commas=$(echo "$trimmed_original_dir_name" | grep -o "," | wc -l)
+
+    # Attempt 1: Try parsing as "Location, Month Day, Year" (expects exactly 2 commas)
+    if [[ "$num_commas" -eq 2 ]]; then
+        IFS=',' read -r p1 p2 p3 <<< "$trimmed_original_dir_name"
+        location_part_scan=$(echo "$p1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        month_day_part_scan=$(echo "$p2" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        year_part_scan=$(echo "$p3" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+        if [[ -n "$location_part_scan" && -n "$month_day_part_scan" && -n "$year_part_scan" ]]; then
+            full_date_str_scan="$month_day_part_scan $year_part_scan"
+            # LC_TIME is crucial for month name parsing
+            formatted_date_scan=$(LC_TIME=en_US.UTF-8 date -j -f "%B %d %Y" "$full_date_str_scan" "+%Y-%m-%d" 2>/dev/null)
+
+            if [[ -n "$formatted_date_scan" ]]; then
+                current_new_name="${formatted_date_scan}_${location_part_scan}"
+                parsed_successfully=true
+                echo "  Pattern 1 (Loc, MD, Y): '$location_part_scan', '$month_day_part_scan', '$year_part_scan' -> $current_new_name"
+            fi
+        fi
+    fi
+
+    # Attempt 2: If not parsed as Type 1, try "Month Day, Year" (expects exactly 1 comma)
+    if ! $parsed_successfully && [[ "$num_commas" -eq 1 ]]; then
+        IFS=',' read -r p1 p2 <<< "$trimmed_original_dir_name"
+        month_day_part_scan=$(echo "$p1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        year_part_scan=$(echo "$p2" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+        if [[ -n "$month_day_part_scan" && -n "$year_part_scan" ]]; then
+            full_date_str_scan="$month_day_part_scan $year_part_scan"
+            formatted_date_scan=$(LC_TIME=en_US.UTF-8 date -j -f "%B %d %Y" "$full_date_str_scan" "+%Y-%m-%d" 2>/dev/null)
+            if [[ -n "$formatted_date_scan" ]]; then
+                current_new_name="${formatted_date_scan}"
+                parsed_successfully=true
+                echo "  Pattern 2 (MD, Y): '$month_day_part_scan', '$year_part_scan' -> $current_new_name"
+            fi
+        fi
+    fi
+
+    if $parsed_successfully; then
+        # Check if new name is actually different and doesn't cause collision
+        if [[ "$current_new_name" != "$original_dir_name" && ! -e "./$current_new_name" ]]; then
+            potential_renames_arr+=("$original_dir_name")
+            potential_renames_arr+=("$current_new_name")
+            echo "    Plan: Rename to '$current_new_name'"
+        elif [[ "$current_new_name" == "$original_dir_name" ]]; then
+            echo "    Skipping (no change): Name already '$current_new_name'"
+        elif [[ -e "./$current_new_name" ]]; then
+            echo "    Skipping (collision): Target './$current_new_name' for '$original_dir_name' already exists."
+        fi
+    else
+        echo "  Skipping (no parse): '$original_dir_name' did not match known patterns or date was invalid."
+    fi
+done < <(find . -maxdepth 1 -type d -name '*,*' -print0)
+
+actual_rename_count=$((${#potential_renames_arr[@]} / 2))
+echo "--------------------------------------------------"
+
+if [[ "$actual_rename_count" -eq 0 ]]; then
+    echo "Scan complete. No directories found that match the renaming criteria or require changes."
+    exit 0
+fi
+
+echo "Scan complete. Found $actual_rename_count director(y/ies) to be renamed:"
+for (( i=0; i<${#potential_renames_arr[@]}; i+=2 )); do
+    echo "  FROM: '${potential_renames_arr[i]}'"
+    echo "  TO:   '${potential_renames_arr[i+1]}'"
+done
+echo "--------------------------------------------------"
+
+# Confirmation prompt
+read -r -p "Proceed with renaming these $actual_rename_count directories? (yes/no): " confirmation
+if ! [[ "${confirmation,,}" == "yes" || "${confirmation,,}" == "y" ]]; then
+  echo "Aborted by user."
+  exit 0
+fi
+
+echo "--------------------------------------------------"
+echo "Phase 2: Performing Renames..."
+if [[ -n "$DRY_RUN_CMD" ]]; then
+    echo "DRY RUN MODE: Commands will be printed but not executed."
+    echo "To perform actual renaming, ensure DRY_RUN_CMD is empty in the script."
+else
+    echo "LIVE MODE: Performing actual renaming."
+fi
+echo "--------------------------------------------------"
+
+renamed_count=0
+failed_count=0
+for (( i=0; i<${#potential_renames_arr[@]}; i+=2 )); do
+    original_to_rename="${potential_renames_arr[i]}"
+    new_target_name="${potential_renames_arr[i+1]}"
+
+    echo "Processing: '$original_to_rename' -> '$new_target_name'"
+
+    if [[ -n "$DRY_RUN_CMD" ]]; then
+        # Dry run: print the command
+        echo "  $DRY_RUN_CMD mv \"$original_to_rename\" \"$new_target_name\""
+        renamed_count=$((renamed_count + 1)) # Count as if it succeeded for dry run summary
+    else
+        # Live run: execute the command
+        if mv "$original_to_rename" "$new_target_name"; then
+            echo "  Successfully renamed to '$new_target_name'"
+            renamed_count=$((renamed_count + 1))
+        else
+            echo "  Error: Failed to rename '$original_to_rename'. Check permissions or other issues."
+            failed_count=$((failed_count + 1))
+        fi
+    fi
+    echo "--------------------------------------------------"
+done
+
+echo "Renaming process finished."
+echo "Successfully renamed/simulated: $renamed_count director(y/ies)."
+if [[ "$failed_count" -gt 0 ]]; then
+    echo "Failed to rename: $failed_count director(y/ies)."
+fi
+

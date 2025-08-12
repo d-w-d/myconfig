@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+
+import os
+import shutil
+import subprocess
+
+# --- Configuration ---
+MAX_GROUP_SIZE_GB = 93
+# --- End Configuration ---
+
+MAX_GROUP_SIZE_BYTES = MAX_GROUP_SIZE_GB * 1024 * 1024 * 1024
+
+def get_dir_size_bytes(dir_path):
+    """Gets the total size of a directory in bytes using 'du -sk' (kilobytes) and converting."""
+    size_kb_str = "" # Initialize for use in exception message if parsing fails early
+    try:
+        # Using 'du -sk' which outputs size in kilobytes for better macOS compatibility.
+        result = subprocess.check_output(['du', '-sk', dir_path])
+        # Output is typically like "12345   ./directory", so split and take the first part.
+        size_kb_str = result.split()[0].decode('utf-8')
+        size_kb = int(size_kb_str)
+        return size_kb * 1024 # Convert kilobytes to bytes
+    except subprocess.CalledProcessError as e:
+        print(f"  Warning: 'du -sk {dir_path}' failed: {e}. Assuming size 0.")
+        return 0
+    except ValueError:
+        # It's good practice to show what couldn't be parsed.
+        print(f"  Warning: Could not parse size from 'du -sk {dir_path}' output ('{size_kb_str}'). Assuming size 0.")
+        return 0
+    except FileNotFoundError:
+        print(f"  Warning: 'du' command not found. Please ensure it's in your PATH. Assuming size 0 for {dir_path}")
+        return 0
+
+
+def format_bytes_to_gb(bytes_val):
+    """Converts bytes to a human-readable GB string."""
+    gb_val = bytes_val / (1024 * 1024 * 1024)
+    return f"{gb_val:.2f} GB"
+
+def main():
+    print("Starting directory grouping process (Python version)...")
+    print(f"Maximum group size set to: {MAX_GROUP_SIZE_GB} GB ({MAX_GROUP_SIZE_BYTES} bytes)")
+    print("--------------------------------------------------")
+    print("Phase 1: Planning Operations...")
+    print("Scanning directories and calculating plan...")
+
+    planned_groups = []
+    current_group_dirs_list = []
+    current_group_size_bytes = 0
+    current_group_item_count = 0
+    group_dir_counter = 1
+    
+    source_dirs_to_process = []
+    try:
+        for item in os.listdir("."):
+            item_path = os.path.join(".", item)
+            if os.path.isdir(item_path) and not item.startswith("_"):
+                source_dirs_to_process.append(item)
+        source_dirs_to_process.sort() # Ensure chronological processing
+    except OSError as e:
+        print(f"Error listing directories: {e}")
+        return
+
+    if not source_dirs_to_process:
+        print("No source directories found to process (directories not starting with '_').")
+        return
+
+    for source_dir_basename in source_dirs_to_process:
+        source_dir_path = os.path.join(".", source_dir_basename)
+        
+        source_dir_size_bytes = get_dir_size_bytes(source_dir_path)
+
+        if source_dir_size_bytes == 0:
+            print(f"  Skipping '{source_dir_basename}' as its size is 0 or could not be determined.")
+            continue
+
+        if not current_group_dirs_list or \
+           (current_group_size_bytes > 0 and 
+            current_group_size_bytes + source_dir_size_bytes > MAX_GROUP_SIZE_BYTES):
+            
+            if current_group_dirs_list: # Finalize the previous group
+                planned_groups.append({
+                    "name": f"_{group_dir_counter -1}",
+                    "dirs": list(current_group_dirs_list),
+                    "total_size": current_group_size_bytes,
+                    "item_count": current_group_item_count
+                })
+            
+            # Start new group
+            current_group_name = f"_{group_dir_counter}"
+            current_group_dirs_list = []
+            current_group_size_bytes = 0
+            current_group_item_count = 0
+            group_dir_counter += 1
+        
+        current_group_dirs_list.append(source_dir_basename)
+        current_group_size_bytes += source_dir_size_bytes
+        current_group_item_count += 1
+
+    # Add the last processed group
+    if current_group_dirs_list:
+        planned_groups.append({
+            "name": f"_{group_dir_counter - 1}", # Name was already set for this counter
+            "dirs": list(current_group_dirs_list),
+            "total_size": current_group_size_bytes,
+            "item_count": current_group_item_count
+        })
+
+    print("Planning scan complete.")
+    print("--------------------------------------------------")
+
+    if not planned_groups:
+        print("No operations planned. All processed directories might have been empty or caused issues.")
+        return
+
+    print("Proposed Grouping Plan:")
+    for group in planned_groups:
+        print(f"\nGroup Folder: {group['name']}")
+        print(f"  Total Items: {group['item_count']}")
+        print(f"  Estimated Total Size: {format_bytes_to_gb(group['total_size'])} ({group['total_size']} bytes)")
+        print(f"  Directories to be moved into '{group['name']}':")
+        for dir_name in group['dirs']:
+            print(f"    - {dir_name}")
+    print("--------------------------------------------------")
+
+    try:
+        confirmation = input("Proceed with these operations? (yes/no): ").strip().lower()
+    except EOFError: # Handle non-interactive environments
+        print("No input received. Aborting.")
+        confirmation = "no"
+
+
+    if confirmation in ["yes", "y"]:
+        print("--------------------------------------------------")
+        print("Phase 2: Executing Operations...")
+        for group in planned_groups:
+            group_name_exec = group['name']
+            print(f"\nProcessing Group: {group_name_exec}")
+            
+            target_group_path = os.path.join(".", group_name_exec)
+            if not os.path.exists(target_group_path):
+                print(f"  Creating group folder: '{group_name_exec}'")
+                try:
+                    os.makedirs(target_group_path)
+                except OSError as e:
+                    print(f"    Error: Failed to create directory '{group_name_exec}': {e}. Aborting further operations for this group.")
+                    continue
+            else:
+                print(f"  Group folder '{group_name_exec}' already exists. Adding items to it.")
+
+            print(f"  Moving directories into '{group_name_exec}':")
+            for dir_to_move_basename in group['dirs']:
+                source_path_for_mv = os.path.join(".", dir_to_move_basename)
+                dest_path_for_mv = os.path.join(target_group_path, dir_to_move_basename)
+                
+                if os.path.isdir(source_path_for_mv):
+                    print(f"    Moving '{source_path_for_mv}' -> '{dest_path_for_mv}'")
+                    try:
+                        shutil.move(source_path_for_mv, dest_path_for_mv)
+                    except Exception as e:
+                        print(f"      Error: Failed to move '{source_path_for_mv}': {e}")
+                else:
+                    print(f"    Warning: Source directory '{source_path_for_mv}' not found for moving (it may have been moved already or was a file). Skipping.")
+        print("--------------------------------------------------")
+        print("All operations complete.")
+    else:
+        print("Aborted by user. No changes were made.")
+
+if __name__ == "__main__":
+    main()
