@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat <<'INSTRUCTIONS'
+Ubuntu VM Setup Guide (Ubuntu 22.04/24.04 LTS)
+================================================
+
+0) Prerequisites
+----------------
+• You are logged in as the default cloud user (often `ubuntu`).
+• You have a working SSH key on your local machine (e.g., ~/.ssh/id_ed25519.pub).
+• Keep a second terminal ready to test login as the new user before disabling anything.
+
+1) Update the system and install essentials (fail2ban, apache, etc.)
+-------------------------------------------------------------------
+Run the following commands:
+
+  sudo apt update
+  sudo apt -y upgrade
+  sudo apt -y install \
+    build-essential curl wget git unzip htop ufw fail2ban apache2 \
+    unattended-upgrades apt-listchanges ca-certificates \
+    software-properties-common net-tools jq vim tmux rsync gnupg lsb-release
+
+Enable unattended security updates:
+
+  sudo dpkg-reconfigure -plow unattended-upgrades
+
+2) Create an admin user `joe` with sudo and common admin groups
+---------------------------------------------------------------
+Create the user and set an initial password (used for sudo and emergency access):
+
+  sudo adduser joe
+
+Add `joe` to useful admin groups:
+
+  sudo usermod -aG sudo,adm,systemd-journal,docker joe
+
+3) Configure SSH key-based login for `joe`
+-----------------------------------------
+
+ Copy the same SSH public key from the 'ubuntu' user:
+
+   # Create .ssh with correct permissions for joe
+   sudo install -d -m 700 -o joe -g joe /home/joe/.ssh
+   # Copy authorized_keys from ubuntu and set ownership/permissions
+   sudo rsync -a --chown=joe:joe /home/ubuntu/.ssh/authorized_keys /home/joe/.ssh/
+   sudo chmod 600 /home/joe/.ssh/authorized_keys
+
+ Test key-based login in a new terminal:
+
+   ssh joe@SERVER_IP
+
+4) Harden SSH: disable password logins (after key login works)
+--------------------------------------------------------------
+Ensure password authentication is disabled:
+
+  # Check the effective setting
+  sudo grep -E '^[#[:space:]]*PasswordAuthentication' /etc/ssh/sshd_config || true
+
+  # If it's not 'no', set it to no with this one-liner and reload ssh:
+  # sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+Reload SSH:
+
+  sudo systemctl reload ssh
+
+IMPORTANT: In a new terminal, test you can log in as `joe` using your SSH key:
+
+  ssh joe@SERVER_IP
+
+Only continue when the key-based login works.
+
+5) Configure UFW firewall
+-------------------------
+  sudo ufw default deny incoming
+  sudo ufw default allow outgoing
+  sudo ufw allow OpenSSH
+  sudo ufw allow 'Apache Full'    # if you installed Apache and will serve HTTP/HTTPS
+  sudo ufw enable
+  sudo ufw status verbose
+
+6) Install Docker and Docker Compose (v2)
+-----------------------------------------
+Install from Docker's official repository:
+
+  sudo apt-get update
+  sudo apt-get -y install ca-certificates curl gnupg
+  sudo install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  sudo chmod a+r /etc/apt/keyrings/docker.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update
+  sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+Enable and test Docker, and add 'joe' to the docker group:
+
+  sudo systemctl enable --now docker
+  docker --version
+  docker compose version
+  sudo usermod -aG docker joe
+  # Log out/in or run 'newgrp docker' for group changes to take effect
+
+7) Basic Apache setup (optional)
+--------------------------------
+Ensure Apache is running:
+
+  sudo systemctl enable --now apache2
+  systemctl status apache2 --no-pager
+  # Note: '--no-pager' prints full output directly instead of paging via 'less'.
+
+Open your server IP in a browser to see the Apache default page. For a simple vhost:
+
+  sudo a2enmod rewrite headers ssl macro proxy
+  # Create a site file in /etc/apache2/sites-available/your-site.conf, then:
+  # sudo a2ensite your-site
+  # sudo systemctl reload apache2
+
+For HTTPS with Let’s Encrypt (domain required, DNS pointing to server):
+
+  sudo certbot --apache -d yourdomain.com -d www.yourdomain.com
+
+8) Disable the default `ubuntu` user (only when safe)
+----------------------------------------------------
+Do this ONLY after confirming `joe` can log in with SSH keys and has sudo.
+
+  # Safer: lock and disable shell
+  sudo usermod -L ubuntu
+  sudo usermod -s /usr/sbin/nologin ubuntu
+
+  # Optional (more aggressive): remove the account after confirming nothing depends on it
+  # sudo deluser --remove-home ubuntu
+
+9) Other recommended hardening and hygiene
+-----------------------------------------
+• Timezone and NTP:
+    sudo timedatectl set-timezone <Your/Timezone>
+    timedatectl
+
+• Enable automatic reboots for kernel security updates (optional):
+    sudoedit /etc/apt/apt.conf.d/50unattended-upgrades
+    # Un-comment/adjust: Unattended-Upgrade::Automatic-Reboot "true";
+
+• Swap (if RAM is small):
+    sudo fallocate -l 2G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/60-swap.conf
+    sudo sysctl --system
+
+• Log review:
+    sudo apt -y install logwatch
+    sudo logwatch --output mail --mailto you@example.com --detail low
+
+• Backups and monitoring:
+    - Set up off-instance backups (e.g., restic/borg/rclone to object storage)
+    - Consider monitoring/alerts (e.g., Netdata, Prometheus node_exporter, UptimeRobot)
+
+• SSH quality of life:
+    - Use a key with a passphrase
+    - Consider changing the SSH port if desired (defense-in-depth)
+    - Limit auth attempts: in sshd_config, MaxAuthTries 3
+
+• Packages you might also want:
+    sudo apt -y install zip ripgrep fd-find tree ncdu dnsutils lsof
+
+
+All set! Save these instructions to your repo or notes for repeatable setups.
+INSTRUCTIONS

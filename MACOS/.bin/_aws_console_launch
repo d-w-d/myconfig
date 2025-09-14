@@ -4,147 +4,148 @@
 #
 # Usage:
 #   _aws_console_launch [--profile PROFILE] [--duration SECONDS]
+#                       [--mode get-federation-token|assume-role]
+#                       [--role-arn ARN] [--policy-arn ARN]...
 #
-# Summary:
-#   1. Uses aws‑cli to call sts:GetSessionToken (Defaults: current profile, 12 h).
-#   2. Exchanges the temporary credentials for a SigninToken via the federation
-#      endpoint.  (Token is valid 15 min; console session lasts --duration secs.)
-#   3. Constructs the login URL and opens it in Google Chrome.
+# Defaults:
+#   mode=get-federation-token, duration=43200 (12h), policy-arn=AdministratorAccess
 #
-# Prerequisites:
-#   • aws-cli v2, curl, jq
-#   • A configured AWS profile that can call sts:GetSessionToken.
-#   • (Optional) If the profile has an MFA device, you’ll be prompted for the code.
+# Reqs: aws-cli v2, jq, curl. Your IAM user must be allowed:
+#   - sts:GetFederationToken  (if --mode get-federation-token)
+#   - sts:AssumeRole          (if --mode assume-role, and a role trust for your user)
 #
-# Security:
-#   The generated console URL grants console access for up to 12 h – keep it
-#   private and let the browser discard history if you wish.
-#
-# References:
-#   • sts:GetSessionToken supports up to 129 600 s (36 h) for IAM users – default
-#     43 200 s (12 h). :contentReference[oaicite:0]{index=0}
-#   • Steps to obtain a SigninToken and build a console URL. :contentReference[oaicite:1]{index=1}
+# Notes:
+#   • Federation endpoint accepts only AssumeRole or GetFederationToken creds. :contentReference[oaicite:2]{index=2}
+#   • With AssumeRole, console param is SessionDuration (max 12h). :contentReference[oaicite:3]{index=3}
+#   • With GetFederationToken, console param is DurationSeconds (max 36h, default 12h). :contentReference[oaicite:4]{index=4}
+#   • If you omit a policy for GetFederationToken, the session has no permissions. :contentReference[oaicite:5]{index=5}
 #
 set -euo pipefail
 
-readonly DEFAULT_DURATION=43200      # 12 h
+readonly DEFAULT_DURATION=43200      # 12h
 readonly FEDERATION_ENDPOINT="https://signin.aws.amazon.com/federation"
 readonly DESTINATION_URL="https://console.aws.amazon.com/"
+readonly DEFAULT_MODE="get-federation-token"
 
-#
-# urlencode - URL‑encodes stdin using jq.
-#
-urlencode() {
-  jq -sRr @uri
-}
+# Reasonable default so the console session actually has permissions.
+readonly DEFAULT_POLICY_ARN="arn:aws:iam::aws:policy/AdministratorAccess"
 
-#
-# open_in_chrome - Opens the supplied URL in Google Chrome (macOS or Linux).
-#
+urlencode() { jq -sRr @uri; }
+
 open_in_chrome() {
   local url="$1"
   case "$(uname -s)" in
     Darwin) open -a "Google Chrome" "$url" ;;
-    Linux)  (command -v google-chrome >/dev/null && google-chrome "$url") || xdg-open "$url" ;;
-    *)      echo "Unsupported OS. Manually open: $url" ;;
+    Linux)
+      if command -v google-chrome >/dev/null; then google-chrome "$url"
+      elif command -v google-chrome-stable >/dev/null; then google-chrome-stable "$url"
+      else xdg-open "$url"; fi
+      ;;
+    *) echo "Unsupported OS. Open manually: $url" ;;
   esac
 }
 
-#
-# build_console_url - Creates the final console login URL.
-#
 build_console_url() {
-  local signin_token="$1"
+  local signin_token="$1" param_name="$2" duration="$3"
   local destination_encoded
   destination_encoded=$(printf '%s' "$DESTINATION_URL" | urlencode)
-  printf '%s?Action=login&Issuer=aws-cli&Destination=%s&SigninToken=%s' \
-    "$FEDERATION_ENDPOINT" "$destination_encoded" "$signin_token"
+  # param_name is SessionDuration (assume-role) or DurationSeconds (federation)
+  printf '%s?Action=login&Issuer=aws-cli&Destination=%s&%s=%s&SigninToken=%s' \
+    "$FEDERATION_ENDPOINT" "$destination_encoded" "$param_name" "$duration" "$signin_token"
 }
 
-#
-# get_temp_creds - Calls sts:GetSessionToken (handles MFA if configured).
-#
-get_temp_creds() {
-  local profile="$1"
-  local duration="$2"
-
-  local mfa_serial
-  mfa_serial=$(aws configure get mfa_serial --profile "$profile" || true)
-
-  if [[ -n "$mfa_serial" ]]; then
-    read -rp "Enter MFA code for device $mfa_serial: " mfa_code
-    aws sts get-session-token \
-      --profile "$profile" \
-      --duration-seconds "$duration" \
-      --serial-number "$mfa_serial" \
-      --token-code "$mfa_code"
-  else
-    aws sts get-session-token \
-      --profile "$profile" \
-      --duration-seconds "$duration"
-  fi
+get_temp_creds_via_assume_role() {
+  local profile="$1" role_arn="$2" duration="$3"
+  # Caller must use long-term creds (not already-temp) for the federation step to work. :contentReference[oaicite:6]{index=6}
+  aws sts assume-role \
+    --profile "$profile" \
+    --role-arn "$role_arn" \
+    --role-session-name "Console-$(whoami)-$(date +%s)" \
+    --duration-seconds "$duration"
 }
 
-#
-# get_signin_token - Exchanges temporary credentials for a SigninToken.
-#
+get_temp_creds_via_federation() {
+  local profile="$1" duration="$2"; shift 2
+  local name="Console-$(whoami)"
+  # Collect zero or more --policy-arn values (each must be passed as arn=...)
+  local policy_arns_cli=()
+  while [[ $# -gt 0 ]]; do
+    policy_arns_cli+=(--policy-arns "arn=$1")
+    shift
+  done
+  # You can also pass a single inline --policy via --policy file://policy.json if you prefer.
+  aws sts get-federation-token \
+    --profile "$profile" \
+    --name "$name" \
+    --duration-seconds "$duration" \
+    "${policy_arns_cli[@]}"
+}
+
 get_signin_token() {
-  local access_key="$1"
-  local secret_key="$2"
-  local session_token="$3"
-  local duration="$4"
+  local access_key="$1" secret_key="$2" session_token="$3" duration_param_name="$4" duration="$5"
 
-  local session_json
-  session_json=$(jq -n --arg id  "$access_key" \
-                       --arg key "$secret_key" \
-                       --arg tok "$session_token" \
+  local session_json urlencoded_session token_url
+  session_json=$(jq -n --arg id "$access_key" --arg key "$secret_key" --arg tok "$session_token" \
                        '{sessionId:$id,sessionKey:$key,sessionToken:$tok}')
-
-  local urlencoded_session
   urlencoded_session=$(printf '%s' "$session_json" | urlencode)
 
-  local token_url="${FEDERATION_ENDPOINT}?Action=getSigninToken&SessionDuration=${duration}&Session=${urlencoded_session}"
+  # Use the correct param name for the type of creds:
+  #   SessionDuration -> AssumeRole; DurationSeconds -> GetFederationToken. :contentReference[oaicite:7]{index=7}
+  token_url="${FEDERATION_ENDPOINT}?Action=getSigninToken&${duration_param_name}=${duration}&Session=${urlencoded_session}"
+
   curl -s "$token_url" | jq -r '.SigninToken'
 }
 
-#
-# main - Argument parsing and orchestration.
-#
 main() {
   local profile=${AWS_PROFILE:-default}
   local duration="$DEFAULT_DURATION"
+  local mode="$DEFAULT_MODE"
+  local role_arn=""
+  # allow multiple --policy-arn flags
+  local policy_arns=("$DEFAULT_POLICY_ARN")
 
-  # Simple flags parsing (two optional --profile / --duration longopts).
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --profile)   profile="$2"; shift 2 ;;
-      --duration)  duration="$2"; shift 2 ;;
-      -*)
-        echo "Unknown flag: $1" >&2; exit 1 ;;
-      *) break ;;
+      --profile)      profile="$2"; shift 2 ;;
+      --duration)     duration="$2"; shift 2 ;;
+      --mode)         mode="$2"; shift 2 ;;
+      --role-arn)     role_arn="$2"; shift 2 ;;
+      --policy-arn)   policy_arns+=("$2"); shift 2 ;;
+      --no-default-policy) policy_arns=(); shift 1 ;;
+      *) echo "Unknown arg: $1" >&2; exit 1 ;;
     esac
   done
 
-  echo "Using profile=$profile duration=${duration}s"
+  echo "Mode=$mode profile=$profile duration=${duration}s"
 
-  echo "Obtaining temporary credentials (sts:GetSessionToken)…"
-  local creds_json
-  creds_json=$(get_temp_creds "$profile" "$duration")
+  local creds_json duration_param_name
+  if [[ "$mode" == "assume-role" ]]; then
+    [[ -n "$role_arn" ]] || { echo "--role-arn is required with --mode assume-role" >&2; exit 1; }
+    echo "Obtaining temp creds via sts:AssumeRole…"
+    creds_json=$(get_temp_creds_via_assume_role "$profile" "$role_arn" "$duration")
+    duration_param_name="SessionDuration"   # for console URL
+  else
+    echo "Obtaining temp creds via sts:GetFederationToken…"
+    # Ensure we pass at least one policy so the session has permissions. :contentReference[oaicite:8]{index=8}
+    if [[ ${#policy_arns[@]} -eq 0 ]]; then
+      echo "Warning: no policy supplied; session will have no permissions." >&2
+    fi
+    creds_json=$(get_temp_creds_via_federation "$profile" "$duration" "${policy_arns[@]+"${policy_arns[@]}"}")
+    duration_param_name="DurationSeconds"   # for console URL
+  fi
 
   local access_key secret_key session_token
   access_key=$(jq -r '.Credentials.AccessKeyId'     <<<"$creds_json")
   secret_key=$(jq -r '.Credentials.SecretAccessKey' <<<"$creds_json")
   session_token=$(jq -r '.Credentials.SessionToken' <<<"$creds_json")
 
-  echo "Exchanging credentials for SigninToken…"
+  echo "Requesting SigninToken from federation endpoint…"
   local signin_token
-  signin_token=$(get_signin_token "$access_key" "$secret_key" "$session_token" "$duration")
+  signin_token=$(get_signin_token "$access_key" "$secret_key" "$session_token" "$duration_param_name" "$duration")
 
-  echo "Building console URL…"
+  echo "Opening AWS Console in Chrome…"
   local console_url
-  console_url=$(build_console_url "$signin_token")
-
-  echo "Opening AWS Console in Chrome..."
+  console_url=$(build_console_url "$signin_token" "$duration_param_name" "$duration")
   open_in_chrome "$console_url"
 }
 
