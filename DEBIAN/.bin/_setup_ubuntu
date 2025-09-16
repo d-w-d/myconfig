@@ -34,7 +34,7 @@ Create the user and set an initial password (used for sudo and emergency access)
 
 Add `joe` to useful admin groups:
 
-  sudo usermod -aG sudo,adm,systemd-journal,docker joe
+  sudo usermod -aG sudo,adm,systemd-journal joe
 
 3) Configure SSH key-based login for `joe`
 -----------------------------------------
@@ -82,25 +82,26 @@ Only continue when the key-based login works.
 
 6) Install Docker and Docker Compose (v2)
 -----------------------------------------
-Install from Docker's official repository:
+Docker’s installation steps change over time and are not reliably installed via a simple `sudo apt install docker`.
+For the most up-to-date instructions on Ubuntu, follow the official guide:
 
-  sudo apt-get update
-  sudo apt-get -y install ca-certificates curl gnupg
-  sudo install -m 0755 -d /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-  sudo chmod a+r /etc/apt/keyrings/docker.gpg
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | \
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  sudo apt-get update
-  sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  https://docs.docker.com/engine/install/ubuntu/
 
-Enable and test Docker, and add 'joe' to the docker group:
+Notes:
+  - Compose v2 is included with Docker Engine as the `docker compose` plugin (prefer `docker compose` over legacy `docker-compose`).
+  - For running Docker as a non-root user and other common post-install tasks, see:
 
-  sudo systemctl enable --now docker
+      https://docs.docker.com/engine/install/linux-postinstall/
+
+Verify after installation:
+
   docker --version
   docker compose version
-  sudo usermod -aG docker joe
-  # Log out/in or run 'newgrp docker' for group changes to take effect
+
+  Add `joe` to the docker group to use Docker without sudo:
+
+    sudo usermod -aG docker joe
+    # Log out/in or run 'newgrp docker' for group changes to take effect
 
 7) Basic Apache setup (optional)
 --------------------------------
