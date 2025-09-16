@@ -26,6 +26,33 @@ Enable unattended security updates:
 
   sudo dpkg-reconfigure -plow unattended-upgrades
 
+1.5) Set the server hostname (recommended early)
+ -----------------------------------------------
+ Set the hostname now so logs and prompts reflect the correct name.
+
+   # Set the system hostname (avoid spaces/special characters)
+   sudo hostnamectl set-hostname <your-hostname>
+
+   # Map your hostname in /etc/hosts for local name resolution
+   sudoedit /etc/hosts
+   # Add or adjust a line similar to:
+   # If you don't have a domain yet, use only the short hostname:
+   # 127.0.1.1   <your-hostname>
+   # If you have a domain configured, you may include the FQDN as an alias:
+   # 127.0.1.1   <your-hostname>   <your-hostname>.yourdomain.com
+   # Why 127.0.1.1?
+   # - Debian/Ubuntu convention: keep 127.0.0.1 reserved for 'localhost'.
+   # - 127.0.1.1 maps your machine's hostname on loopback so prompts/logs resolve even without DNS.
+   # - It's still loopback (not public). When you later have a stable IP + DNS, map the FQDN to that IP;
+   #   keeping the 127.0.1.1 hostname entry as a fallback is optional.
+
+   # If cloud-init manages hostnames, prevent overrides on reboot:
+   sudoedit /etc/cloud/cloud.cfg
+   # Set: preserve_hostname: true
+
+   # Verify
+   hostnamectl
+
 2) Create an admin user `joe` with sudo and common admin groups
 ---------------------------------------------------------------
 Create the user and set an initial password (used for sudo and emergency access):
@@ -135,13 +162,13 @@ Do this ONLY after confirming `joe` can log in with SSH keys and has sudo.
 
 9) Other recommended hardening and hygiene
 -----------------------------------------
-• Timezone and NTP:
-    sudo timedatectl set-timezone <Your/Timezone>
-    timedatectl
+ • Timezone and NTP:
+     sudo timedatectl set-timezone <Your/Timezone>
+     timedatectl
 
-• Enable automatic reboots for kernel security updates (optional):
-    sudoedit /etc/apt/apt.conf.d/50unattended-upgrades
-    # Un-comment/adjust: Unattended-Upgrade::Automatic-Reboot "true";
+ • Enable automatic reboots for kernel security updates (optional):
+     sudoedit /etc/apt/apt.conf.d/50unattended-upgrades
+     # Un-comment/adjust: Unattended-Upgrade::Automatic-Reboot "true";
 
 • Swap (if RAM is small):
     sudo fallocate -l 2G /swapfile
