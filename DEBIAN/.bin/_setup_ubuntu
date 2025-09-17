@@ -145,9 +145,15 @@ Open your server IP in a browser to see the Apache default page. For a simple vh
   # sudo a2ensite your-site
   # sudo systemctl reload apache2
 
-For HTTPS with Let’s Encrypt (domain required, DNS pointing to server):
+ Install Certbot (follow latest instructions):
 
-  sudo certbot --apache -d yourdomain.com -d www.yourdomain.com
+   https://certbot.eff.org/instructions
+
+ Choose: Software = Apache; System = Ubuntu (22.04 Jammy or 24.04 Noble), then follow the steps shown.
+
+  For HTTPS with Let’s Encrypt (domain required, DNS pointing to server):
+
+    sudo certbot --apache -d yourdomain.com -d www.yourdomain.com
 
 8) Disable the default `ubuntu` user (only when safe)
 ----------------------------------------------------
