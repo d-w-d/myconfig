@@ -20,7 +20,7 @@ Run the following commands:
   sudo apt -y install \
     build-essential curl wget git unzip htop ufw fail2ban apache2 \
     unattended-upgrades apt-listchanges ca-certificates \
-    software-properties-common net-tools jq vim tmux rsync gnupg lsb-release
+    software-properties-common net-tools jq vim tmux rsync gnupg lsb-release zsh
 
 Enable unattended security updates:
 
