@@ -140,7 +140,7 @@ Ensure Apache is running:
 
 Open your server IP in a browser to see the Apache default page. For a simple vhost:
 
-  sudo a2enmod rewrite headers ssl macro proxy
+  sudo a2enmod rewrite headers ssl macro proxy proxy_http
   # Create a site file in /etc/apache2/sites-available/your-site.conf, then:
   # sudo a2ensite your-site
   # sudo systemctl reload apache2
