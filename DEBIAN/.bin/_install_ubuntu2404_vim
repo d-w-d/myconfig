@@ -75,16 +75,28 @@ configure_vim() {
   # --enable-gui=auto: Automatically detect available GUI
   # --enable-python3interp=yes: Enable Python3 interpreter
   # --with-python3-config-dir: Set Python3 config directory
+  # --enable-pythoninterp=yes: Enable Python2 interpreter
+  # --with-python-command: Set Python2 binary
+  # --with-python-config-dir: Set Python2 config directory
+  # --enable-gtk2-check: Enable GTK2 clipboard support
+  # --enable-clipboard: Enable clipboard support
+  # --enable-xterm_clipboard: Enable xterm clipboard support
   # --enable-xim: Enable X Input Method
   # --enable-fontset: Enable fontset support
   # --enable-terminal: Enable terminal support
   # --enable-multibyte: Enable multibyte character support
   # --enable-cscope: Enable cscope interface
-  # --with-x: Enable X11 support (includes clipboard and xterm_clipboard)
+  # --with-x: Enable X11 support
   ./configure --with-features=huge \
     --enable-gui=auto \
     --enable-python3interp=yes \
     --with-python3-config-dir="${python3_config_dir}" \
+    --enable-pythoninterp=yes \
+    --with-python-command="$(which python2)" \
+    --with-python-config-dir="$(python2-config --configdir)" \
+    --enable-gtk2-check \
+    --enable-clipboard \
+    --enable-xterm_clipboard \
     --enable-xim \
     --enable-fontset \
     --enable-terminal \
@@ -133,7 +145,7 @@ main() {
   local build_dir="/tmp/vim_build"
   mkdir -p "$build_dir"
   cd "$build_dir" || exit 1
-  
+
   install_dependencies
   download_vim_source
   configure_vim
