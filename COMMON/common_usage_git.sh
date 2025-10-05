@@ -39,6 +39,9 @@ ${GOLD}git log --after=\"YYYY-MM-DD\"
 ${GOLD}git log --before=\"YYYY-MM-DD\"
 ${GOLD}git log --grep=\"keyword\"    ${RES}<-- Searches for commits with a message that matches the specified pattern
 
+${GOLD_BLUE}/* GIT REVERT */${WHITE_BLACK}
+${GOLD}git revert --no-commit C..HEAD ${RES}<-- Reverts the changes from the commit C to the current HEAD.
+${GOLD}git commit -m \"Revert to C\" ${RES}<-- Commits the revert.
 
 ${GOLD_BLUE}/* GIT REBASE */${WHITE_BLACK}
 ${GOLD}git rebase [base-branch]  ${RES}<-- Rebase the current branch onto base-branch. This moves all commits in the current branch to the tip of base-branch while remaining on the current branch.
